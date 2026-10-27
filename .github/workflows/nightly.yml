@@ -185,7 +185,7 @@ jobs:
           cat > "Release/${ASSET_NAME%.dmg}.html" <<HTML
           <h2>Nightly ${BRANCH_NAME}</h2>
           <p>Commit: <code>${SOURCE_SHA}</code></p>
-          <p>Source: <a href="https://github.com/TheBoredTeam/boring.notch/commit/${SOURCE_SHA}">View commit</a></p>
+          <p>Source: <a href="https://github.com/${{ github.repository }}/commit/${SOURCE_SHA}">View commit</a></p>
           HTML
 
       - name: Fetch Sparkle generate_appcast
@@ -220,8 +220,8 @@ jobs:
           rm -f "$APPCAST_OUTPUT"
           printf '%s' "$SPARKLE_PRIVATE_KEY" | "$RUNNER_TEMP/generate_appcast" \
             --ed-key-file - \
-            --link "https://github.com/TheBoredTeam/boring.notch/commits/${BRANCH_NAME}" \
-            --download-url-prefix "https://github.com/TheBoredTeam/boring.notch/releases/download/${TAG}/" \
+            --link "https://github.com/${{ github.repository }}/commits/${BRANCH_NAME}" \
+            --download-url-prefix "https://github.com/${{ github.repository }}/releases/download/${TAG}/" \
             --embed-release-notes \
             --channel "${BRANCH_NAME}" \
             -o "$APPCAST_OUTPUT" \

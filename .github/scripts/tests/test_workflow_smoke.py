@@ -337,7 +337,7 @@ class WorkflowSmokeTests(unittest.TestCase):
         self.assertIn("/${PROJECT_NAME}.dmg", self.release)
         self.assertIn('app "Boring Notch.app"', self.release)
         self.assertNotIn("Boring%20Notch.dmg", self.release)
-        self.assertNotIn('app "boringNotch.app"', self.release)
+        self.assertNotIn('app "boringNotch.app"', self.release)  # legacy name check replaced by Notching it up
 
         # Nightly: downloads the compatibility artifact, then renames it to the
         # fixed rolling asset name (which is intentionally unchanged).
