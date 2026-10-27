@@ -685,6 +685,16 @@ struct Media: View {
                         customBadge(text: "Beta")
                     }
                 }
+                if Defaults[.enableLyrics] {
+                    Defaults.Toggle(key: .lyricsBlurTransition) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Blur transition for lyric changes")
+                            Text("Use blur replace transition when lyrics change")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
             } header: {
                 Text("Media controls")
             }  footer: {

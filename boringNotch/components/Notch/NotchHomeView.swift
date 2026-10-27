@@ -173,17 +173,34 @@ struct MusicControlsView: View {
                         let v = scalar.value
                         return v >= 0x0600 && v <= 0x06FF
                     }
-                    MarqueeText(
-                        .constant(line),
-                        font: .subheadline,
-                        nsFont: .subheadline,
-                        textColor: musicManager.isFetchingLyrics ? .gray.opacity(0.7) : .gray,
-                        frameWidth: width
-                    )
-                    .font(isPersian ? .custom("Vazirmatn-Regular", size: NSFont.preferredFont(forTextStyle: .subheadline).pointSize) : .subheadline)
-                    .lineLimit(1)
-                    .opacity(musicManager.isPlaying ? 1 : 0)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                    let useBlur = Defaults[.lyricsBlurTransition]
+                    if useBlur {
+                        MarqueeText(
+                            .constant(line),
+                            font: .subheadline,
+                            nsFont: .subheadline,
+                            textColor: musicManager.isFetchingLyrics ? .gray.opacity(0.7) : .gray,
+                            frameWidth: width
+                        )
+                        .font(isPersian ? .custom("Vazirmatn-Regular", size: NSFont.preferredFont(forTextStyle: .subheadline).pointSize) : .subheadline)
+                        .lineLimit(1)
+                        .opacity(musicManager.isPlaying ? 1 : 0)
+                        .id(line)
+                        .transition(.blurReplace.animation(.spring(.bouncy(duration: 0.3))))
+                    } else {
+                        MarqueeText(
+                            .constant(line),
+                            font: .subheadline,
+                            nsFont: .subheadline,
+                            textColor: musicManager.isFetchingLyrics ? .gray.opacity(0.7) : .gray,
+                            frameWidth: width
+                        )
+                        .font(isPersian ? .custom("Vazirmatn-Regular", size: NSFont.preferredFont(forTextStyle: .subheadline).pointSize) : .subheadline)
+                        .lineLimit(1)
+                        .opacity(musicManager.isPlaying ? 1 : 0)
+                        .id(line)
+                        .transition(.opacity.combined(with: .move(edge: .top)))
+                    }
                 }
             }
         }
