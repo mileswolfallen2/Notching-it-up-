@@ -2,6 +2,15 @@
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
   <channel>
     <item>
+            <title>b0.2.3</title>
+            <pubDate>Wed, 28 Oct 2026 08:57:28 -0500</pubDate>
+            <link>https://github.com/mileswolfallen2/Notching-it-up-/releases</link>
+            <sparkle:version>274</sparkle:version>
+            <sparkle:shortVersionString>b0.2.3</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/mileswolfallen2/Notching-it-up-/releases/download/b0.2.3/boringNotch.dmg" length="9701963" type="application/octet-stream" sparkle:edSignature="6O4BvvfsHpypHc2K+Tn4pAC6lYDIvkjRLLVVgxlra5bzuQLHUuWkUDpDKN8D10KBqmLg0pIoytPaPbrEp7M+Dw==" />
+        </item>
+    <item>
             <title>b0.2.2</title>
             <pubDate>Tue, 27 Oct 2026 22:26:55 -0500</pubDate>
             <link>https://github.com/mileswolfallen2/Notching-it-up-/releases</link>
