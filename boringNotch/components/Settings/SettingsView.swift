@@ -17,6 +17,7 @@ import SwiftUIIntrospect
 struct SettingsView: View {
     @State private var selectedTab = "General"
     @State private var accentColorUpdateTrigger = UUID()
+    @Default(.showAdvancedSettings) var showAdvancedSettings
 
     let updaterController: SPUStandardUpdaterController?
 
@@ -42,23 +43,19 @@ struct SettingsView: View {
                 NavigationLink(value: "HUD") {
                     Label("HUDs", systemImage: "dial.medium.fill")
                 }
-                NavigationLink(value: "Battery") {
-                    Label("Battery", systemImage: "battery.100.bolt")
-                }
-//                NavigationLink(value: "Downloads") {
-//                    Label("Downloads", systemImage: "square.and.arrow.down")
-//                }
-                NavigationLink(value: "Shelf") {
-                    Label("Shelf", systemImage: "books.vertical")
-                }
-                NavigationLink(value: "Shortcuts") {
-                    Label("Shortcuts", systemImage: "keyboard")
-                }
-                // NavigationLink(value: "Extensions") {
-                //     Label("Extensions", systemImage: "puzzlepiece.extension")
-                // }
-                NavigationLink(value: "Advanced") {
-                    Label("Advanced", systemImage: "gearshape.2")
+                if showAdvancedSettings {
+                    NavigationLink(value: "Battery") {
+                        Label("Battery", systemImage: "battery.100.bolt")
+                    }
+                    NavigationLink(value: "Shelf") {
+                        Label("Shelf", systemImage: "books.vertical")
+                    }
+                    NavigationLink(value: "Shortcuts") {
+                        Label("Shortcuts", systemImage: "keyboard")
+                    }
+                    NavigationLink(value: "Advanced") {
+                        Label("Advanced", systemImage: "gearshape.2")
+                    }
                 }
                 NavigationLink(value: "About") {
                     Label("About", systemImage: "info.circle")
@@ -82,15 +79,15 @@ struct SettingsView: View {
                 case "HUD":
                     HUD()
                 case "Battery":
-                    Charge()
+                    showAdvancedSettings ? AnyView(Charge()) : AnyView(GeneralSettings())
                 case "Shelf":
-                    Shelf()
+                    showAdvancedSettings ? AnyView(Shelf()) : AnyView(GeneralSettings())
                 case "Shortcuts":
-                    Shortcuts()
+                    showAdvancedSettings ? AnyView(Shortcuts()) : AnyView(GeneralSettings())
                 case "Extensions":
                     GeneralSettings()
                 case "Advanced":
-                    Advanced()
+                    showAdvancedSettings ? AnyView(Advanced()) : AnyView(GeneralSettings())
                 case "About":
                     if let controller = updaterController {
                         About(updaterController: controller)
@@ -147,6 +144,7 @@ struct GeneralSettings: View {
     @Default(.automaticallySwitchDisplay) var automaticallySwitchDisplay
     @Default(.enableGestures) var enableGestures
     @Default(.openNotchOnHover) var openNotchOnHover
+    @Default(.showAdvancedSettings) var showAdvancedSettings
     
 
     var body: some View {
@@ -261,7 +259,11 @@ struct GeneralSettings: View {
 
             NotchBehaviour()
 
-            gestureControls()
+            if Defaults[.showAdvancedSettings] {
+                gestureControls()
+            }
+            
+            advancedToggleSection()
         }
         .toolbar {
             Button("Quit app") {
@@ -275,6 +277,22 @@ struct GeneralSettings: View {
             if !openNotchOnHover {
                 enableGestures = true
             }
+        }
+    }
+    
+    @ViewBuilder
+    func advancedToggleSection() -> some View {
+        Section {
+            Defaults.Toggle(key: .showAdvancedSettings) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Advanced options")
+                    Text("Show extra settings like Battery, Shelf, Shortcuts, and Advanced")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        } header: {
+            Text("Advanced")
         }
     }
 
@@ -476,9 +494,9 @@ struct HUD: View {
             Section {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Replace system HUD")
+                        Text("Use Notch for Volume & Brightness")
                             .font(.headline)
-                        Text("Replaces the standard macOS volume, display brightness, and keyboard brightness HUDs with a custom design.")
+                        Text("Show volume, brightness, and keyboard backlight in the notch instead of the default macOS HUD.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -493,7 +511,7 @@ struct HUD: View {
                 
                 if !accessibilityAuthorized {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Accessibility access is required to replace the system HUD.")
+                        Text("Accessibility access is required to show HUD controls in the notch.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
 
@@ -600,42 +618,47 @@ struct Media: View {
     @Default(.sneakPeekStyles) var sneakPeekStyles
 
     @Default(.enableLyrics) var enableLyrics
+    @Default(.lyricsBlurTransition) var lyricsBlurTransition
+    @Default(.lyricsBlurIntensity) var lyricsBlurIntensity
+    @Default(.lyricsBlurDuration) var lyricsBlurDuration
 
     var body: some View {
         Form {
-            Section {
-                Picker("Music Source", selection: $mediaController) {
-                    ForEach(availableMediaControllers) { controller in
-                        Text(controller.rawValue).tag(controller)
+            if Defaults[.showAdvancedSettings] {
+                Section {
+                    Picker("Music Source", selection: $mediaController) {
+                        ForEach(availableMediaControllers) { controller in
+                            Text(controller.rawValue).tag(controller)
+                        }
                     }
-                }
-                .onChange(of: mediaController) { _, _ in
-                    NotificationCenter.default.post(
-                        name: Notification.Name.mediaControllerChanged,
-                        object: nil
-                    )
-                }
-            } header: {
-                Text("Media Source")
-            } footer: {
-                if MusicManager.shared.isNowPlayingDeprecated {
-                    HStack {
-                        Text("YouTube Music requires this third-party app to be installed: ")
-                            .foregroundStyle(.secondary)
-                            .font(.caption)
-                        Link(
-                            "https://github.com/pear-devs/pear-desktop",
-                            destination: URL(string: "https://github.com/pear-devs/pear-desktop")!
+                    .onChange(of: mediaController) { _, _ in
+                        NotificationCenter.default.post(
+                            name: Notification.Name.mediaControllerChanged,
+                            object: nil
                         )
-                        .font(.caption)
-                        .foregroundColor(.blue)  // Ensures it's visibly a link
                     }
-                } else {
-                    Text(
-                        "'Now Playing' was the only option on previous versions and works with all media apps."
-                    )
-                    .foregroundStyle(.secondary)
-                    .font(.caption)
+                } header: {
+                    Text("Media Source")
+                } footer: {
+                    if MusicManager.shared.isNowPlayingDeprecated {
+                        HStack {
+                            Text("YouTube Music requires this third-party app to be installed: ")
+                                .foregroundStyle(.secondary)
+                                .font(.caption)
+                            Link(
+                                "https://github.com/pear-devs/pear-desktop",
+                                destination: URL(string: "https://github.com/pear-devs/pear-desktop")!
+                            )
+                            .font(.caption)
+                            .foregroundColor(.blue)
+                        }
+                    } else {
+                        Text(
+                            "'Now Playing' was the only option on previous versions and works with all media apps."
+                        )
+                        .foregroundStyle(.secondary)
+                        .font(.caption)
+                    }
                 }
             }
             
@@ -644,41 +667,45 @@ struct Media: View {
                     "Show music live activity",
                     isOn: $coordinator.musicLiveActivityEnabled.animation()
                 )
-                Toggle("Show sneak peek on playback changes", isOn: $enableSneakPeek)
-                Picker("Sneak Peek Style", selection: $sneakPeekStyles) {
-                    ForEach(SneakPeekStyle.allCases) { style in
-                        Text(style.rawValue).tag(style)
-                    }
-                }
-                HStack {
-                    Stepper(value: $waitInterval, in: 0...10, step: 1) {
-                        HStack {
-                            Text("Media inactivity timeout")
-                            Spacer()
-                            Text("\(Defaults[.waitInterval], specifier: "%.0f") seconds")
-                                .foregroundStyle(.secondary)
+                if Defaults[.showAdvancedSettings] {
+                    Toggle("Show sneak peek on playback changes", isOn: $enableSneakPeek)
+                    Picker("Sneak Peek Style", selection: $sneakPeekStyles) {
+                        ForEach(SneakPeekStyle.allCases) { style in
+                            Text(style.rawValue).tag(style)
                         }
                     }
-                }
-                Picker(
-                    selection: $hideNotchOption,
-                    label:
-                        HStack {
-                            Text("Full screen behavior")
-                            customBadge(text: "Beta")
+                    HStack {
+                        Stepper(value: $waitInterval, in: 0...10, step: 1) {
+                            HStack {
+                                Text("Media inactivity timeout")
+                                Spacer()
+                                Text("\(Defaults[.waitInterval], specifier: "%.0f") seconds")
+                                    .foregroundStyle(.secondary)
+                            }
                         }
-                ) {
-                    Text("Hide for all apps").tag(HideNotchOption.always)
-                    Text("Hide for media app only").tag(
-                        HideNotchOption.nowPlayingOnly)
-                    Text("Never hide").tag(HideNotchOption.never)
+                    }
+                    Picker(
+                        selection: $hideNotchOption,
+                        label:
+                            HStack {
+                                Text("Full screen behavior")
+                                customBadge(text: "Beta")
+                            }
+                    ) {
+                        Text("Hide for all apps").tag(HideNotchOption.always)
+                        Text("Hide for media app only").tag(
+                            HideNotchOption.nowPlayingOnly)
+                        Text("Never hide").tag(HideNotchOption.never)
+                    }
                 }
             } header: {
                 Text("Media playback live activity")
             }
             
             Section {
-                MusicSlotConfigurationView()
+                if Defaults[.showAdvancedSettings] {
+                    MusicSlotConfigurationView()
+                }
                 Defaults.Toggle(key: .enableLyrics) {
                     HStack {
                         Text("Show lyrics below artist name")
@@ -686,21 +713,47 @@ struct Media: View {
                     }
                 }
                 if Defaults[.enableLyrics] {
-                    Defaults.Toggle(key: .lyricsBlurTransition) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Blur transition for lyric changes")
-                            Text("Use blur replace transition when lyrics change")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                    if Defaults[.showAdvancedSettings] {
+                        Defaults.Toggle(key: .lyricsBlurTransition) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Blur transition for lyric changes")
+                                Text("Use blur replace transition when lyrics change")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        if Defaults[.lyricsBlurTransition] {
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack {
+                                    Text("Blur intensity")
+                                    Spacer()
+                                    Text("\(Int(Defaults[.lyricsBlurIntensity]))")
+                                        .foregroundStyle(.secondary)
+                                        .monospacedDigit()
+                                }
+                                Slider(value: $lyricsBlurIntensity, in: 0...20, step: 1)
+                                
+                                HStack {
+                                    Text("Transition speed")
+                                    Spacer()
+                                    Text(String(format: "%.2fs", Defaults[.lyricsBlurDuration]))
+                                        .foregroundStyle(.secondary)
+                                        .monospacedDigit()
+                                }
+                                Slider(value: $lyricsBlurDuration, in: 0.15...0.6, step: 0.01)
+                            }
+                            .padding(.top, 4)
                         }
                     }
                 }
             } header: {
-                Text("Media controls")
+                Text("Music Player")
             }  footer: {
-                Text("Customize which controls appear in the music player. Volume expands when active.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                if Defaults[.showAdvancedSettings] {
+                    Text("Customize which controls appear in the music player. Volume expands when active.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
         }
         .accentColor(.effectiveAccent)
@@ -880,7 +933,7 @@ struct About: View {
                 HStack(spacing: 30) {
                     Spacer(minLength: 0)
                     Button {
-                        if let url = URL(string: "https://github.com/TheBoredTeam/boring.notch") { // Original project - credits maintained as requested
+                        if let url = URL(string: "https://github.com/mileswolfallen2/Notching-it-up-") {
                             NSWorkspace.shared.open(url)
                         }
                     } label: {
@@ -1200,96 +1253,99 @@ struct Appearance: View {
                 }
                 Defaults
                     .Toggle("Player tinting", key: .playerColorTinting)
-                Defaults.Toggle(key: .lightingEffect) {
-                    Text("Enable blur effect behind album art")
-                }
-                Picker("Slider color", selection: $sliderColor) {
-                    ForEach(SliderColorEnum.allCases, id: \.self) { option in
-                        Text(option.rawValue)
+                if Defaults[.showAdvancedSettings] {
+                    Defaults.Toggle(key: .lightingEffect) {
+                        Text("Enable blur effect behind album art")
+                    }
+                    Picker("Slider color", selection: $sliderColor) {
+                        ForEach(SliderColorEnum.allCases, id: \.self) { option in
+                            Text(option.rawValue)
+                        }
                     }
                 }
             } header: {
                 Text("Media")
             }
 
-            Section {
-                Toggle(
-                    "Use music visualizer spectrogram",
-                    isOn: $useMusicVisualizer.animation()
-                )
-                .disabled(true)
-                if !useMusicVisualizer {
-                    if customVisualizers.count > 0 {
-                        Picker(
-                            "Selected animation",
-                            selection: $selectedVisualizer
-                        ) {
-                            ForEach(
-                                customVisualizers,
-                                id: \.self
-                            ) { visualizer in
-                                Text(visualizer.name)
-                                    .tag(visualizer)
+            if Defaults[.showAdvancedSettings] {
+                Section {
+                    Toggle(
+                        "Use music visualizer spectrogram",
+                        isOn: $useMusicVisualizer.animation()
+                    )
+                    .disabled(true)
+                    if !useMusicVisualizer {
+                        if customVisualizers.count > 0 {
+                            Picker(
+                                "Selected animation",
+                                selection: $selectedVisualizer
+                            ) {
+                                ForEach(
+                                    customVisualizers,
+                                    id: \.self
+                                ) { visualizer in
+                                    Text(visualizer.name)
+                                        .tag(visualizer)
+                                }
                             }
-                        }
-                    } else {
-                        HStack {
-                            Text("Selected animation")
-                            Spacer()
-                            Text("No custom animation available")
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                }
-            } header: {
-                HStack {
-                    Text("Custom music live activity animation")
-                    customBadge(text: "Coming soon")
-                }
-            }
-
-            Section {
-                List {
-                    ForEach(customVisualizers, id: \.self) { visualizer in
-                        HStack {
-                            LottieView(
-                                url: visualizer.url, speed: visualizer.speed,
-                                loopMode: .loop
-                            )
-                            .frame(width: 30, height: 30, alignment: .center)
-                            Text(visualizer.name)
-                            Spacer(minLength: 0)
-                            if selectedVisualizer == visualizer {
-                                Text("selected")
-                                    .font(.caption)
-                                    .fontWeight(.medium)
+                        } else {
+                            HStack {
+                                Text("Selected animation")
+                                Spacer()
+                                Text("No custom animation available")
                                     .foregroundStyle(.secondary)
-                                    .padding(.trailing, 8)
                             }
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .padding(.vertical, 2)
-                        .background(
-                            selectedListVisualizer != nil
-                                ? selectedListVisualizer == visualizer
-                                    ? Color.effectiveAccent : Color.clear : Color.clear,
-                            in: RoundedRectangle(cornerRadius: 5)
-                        )
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            if selectedListVisualizer == visualizer {
-                                selectedListVisualizer = nil
-                                return
-                            }
-                            selectedListVisualizer = visualizer
                         }
                     }
+                } header: {
+                    HStack {
+                        Text("Custom music live activity animation")
+                        customBadge(text: "Coming soon")
+                    }
                 }
-                .safeAreaPadding(
-                    EdgeInsets(top: 5, leading: 0, bottom: 5, trailing: 0)
-                )
-                .frame(minHeight: 120)
-                .actionBar {
+
+                Section {
+                    List {
+                        ForEach(customVisualizers, id: \.self) { visualizer in
+                            HStack {
+                                LottieView(
+                                    url: visualizer.url, speed: visualizer.speed,
+                                    loopMode: .loop
+                                )
+                                .frame(width: 30, height: 30, alignment: .center)
+                                Text(visualizer.name)
+                                Spacer(minLength: 0)
+                                if selectedVisualizer == visualizer {
+                                    Text("selected")
+                                        .font(.caption)
+                                        .fontWeight(.medium)
+                                        .foregroundStyle(.secondary)
+                                        .padding(.trailing, 8)
+                                }
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .padding(.vertical, 2)
+                            .background(
+                                selectedListVisualizer != nil
+                                    ? selectedListVisualizer == visualizer
+                                        ? Color.effectiveAccent : Color.clear : Color.clear,
+                                in: RoundedRectangle(cornerRadius: 5)
+                            )
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                if selectedListVisualizer == visualizer {
+                                    selectedListVisualizer = nil
+                                    return
+                                }
+                                selectedListVisualizer = visualizer
+                            }
+                        }
+                    }
+                    .safeAreaPadding(
+                        EdgeInsets(top: 5, leading: 0, bottom: 5, trailing: 0)
+                    )
+                    .frame(minHeight: 120)
+                    .actionBar {
                     HStack(spacing: 5) {
                         Button {
                             name = ""
@@ -1388,22 +1444,25 @@ struct Appearance: View {
 
             Section {
                 Defaults.Toggle(key: .showMirror) {
-                    Text("Enable boring mirror")
+                    Text("Enable mirror")
                 }
                     .disabled(!checkVideoInput())
-                Picker("Mirror shape", selection: $mirrorShape) {
-                    Text("Circle")
-                        .tag(MirrorShapeEnum.circle)
-                    Text("Square")
-                        .tag(MirrorShapeEnum.rectangle)
-                }
-                Defaults.Toggle(key: .showNotHumanFace) {
-                    Text("Show cool face animation while inactive")
+                if Defaults[.showAdvancedSettings] {
+                    Picker("Mirror shape", selection: $mirrorShape) {
+                        Text("Circle")
+                            .tag(MirrorShapeEnum.circle)
+                        Text("Square")
+                            .tag(MirrorShapeEnum.rectangle)
+                    }
+                    Defaults.Toggle(key: .showNotHumanFace) {
+                        Text("Show cool face animation while inactive")
+                    }
                 }
             } header: {
                 HStack {
                     Text("Additional features")
                 }
+            }
             }
         }
         .accentColor(.effectiveAccent)
@@ -1567,67 +1626,73 @@ struct Advanced: View {
                 initializeAccentColorState()
             }
             
-            Section {
-                Defaults.Toggle(key: .enableShadow) {
-                    Text("Enable window shadow")
+            if Defaults[.showAdvancedSettings] {
+                Section {
+                    Defaults.Toggle(key: .enableShadow) {
+                        Text("Enable window shadow")
+                    }
+                    Defaults.Toggle(key: .cornerRadiusScaling) {
+                        Text("Corner radius scaling")
+                    }
+                } header: {
+                    Text("Window Appearance")
                 }
-                Defaults.Toggle(key: .cornerRadiusScaling) {
-                    Text("Corner radius scaling")
-                }
-            } header: {
-                Text("Window Appearance")
             }
             
-            Section {
-                HStack {
-                    ForEach(icons, id: \.self) { icon in
-                        Spacer()
-                        VStack {
-                            Image(icon)
-                                .resizable()
-                                .frame(width: 80, height: 80)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 20, style: .circular)
-                                        .strokeBorder(
-                                            icon == selectedIcon ? Color.effectiveAccent : .clear,
-                                            lineWidth: 2.5
-                                        )
-                                )
+            if Defaults[.showAdvancedSettings] {
+                Section {
+                    HStack {
+                        ForEach(icons, id: \.self) { icon in
+                            Spacer()
+                            VStack {
+                                Image(icon)
+                                    .resizable()
+                                    .frame(width: 80, height: 80)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 20, style: .circular)
+                                            .strokeBorder(
+                                                icon == selectedIcon ? Color.effectiveAccent : .clear,
+                                                lineWidth: 2.5
+                                            )
+                                    )
 
-                            Text("Default")
-                                .fontWeight(.medium)
-                                .font(.caption)
-                                .foregroundStyle(icon == selectedIcon ? .white : .secondary)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 3)
-                                .background(
-                                    Capsule()
-                                        .fill(icon == selectedIcon ? Color.effectiveAccent : .clear)
-                                )
-                        }
-                        .onTapGesture {
-                            withAnimation {
-                                selectedIcon = icon
+                                Text("Default")
+                                    .fontWeight(.medium)
+                                    .font(.caption)
+                                    .foregroundStyle(icon == selectedIcon ? .white : .secondary)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 3)
+                                    .background(
+                                        Capsule()
+                                            .fill(icon == selectedIcon ? Color.effectiveAccent : .clear)
+                                    )
                             }
-                            NSApp.applicationIconImage = NSImage(named: icon)
+                            .onTapGesture {
+                                withAnimation {
+                                    selectedIcon = icon
+                                }
+                                NSApp.applicationIconImage = NSImage(named: icon)
+                            }
+                            Spacer()
                         }
-                        Spacer()
+                    }
+                    .disabled(true)
+                } header: {
+                    HStack {
+                        Text("App icon")
+                        customBadge(text: "Coming soon")
                     }
                 }
-                .disabled(true)
-            } header: {
-                HStack {
-                    Text("App icon")
-                    customBadge(text: "Coming soon")
-                }
             }
             
             Section {
-                Defaults.Toggle(key: .extendHoverArea) {
-                    Text("Extend hover area")
-                }
-                Defaults.Toggle(key: .hideTitleBar) {
-                    Text("Hide title bar")
+                if Defaults[.showAdvancedSettings] {
+                    Defaults.Toggle(key: .extendHoverArea) {
+                        Text("Extend hover area")
+                    }
+                    Defaults.Toggle(key: .hideTitleBar) {
+                        Text("Hide title bar")
+                    }
                 }
                 Defaults.Toggle(key: .showOnLockScreen) {
                     Text("Show notch on lock screen")

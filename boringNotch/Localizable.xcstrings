@@ -1601,18 +1601,18 @@
         }
       }
     },
-    "Accessibility access is required to replace the system HUD." : {
+    "Accessibility access is required to show HUD controls in the notch." : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Accessibility access is required to replace the system HUD."
+            "value" : "Accessibility access is required to show HUD controls in the notch."
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Accessibility access is required to replace the system HUD."
+            "value" : "Accessibility access is required to show HUD controls in the notch."
           }
         },
         "de" : {
@@ -1624,37 +1624,37 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Accessibility access is required to replace the system HUD."
+            "value" : "Accessibility access is required to show HUD controls in the notch."
           }
         },
         "en-GB" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Accessibility access is required to replace the system HUD."
+            "value" : "Accessibility access is required to show HUD controls in the notch."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Accessibility access is required to replace the system HUD."
+            "value" : "Accessibility access is required to show HUD controls in the notch."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Accessibility access is required to replace the system HUD."
+            "value" : "Accessibility access is required to show HUD controls in the notch."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Accessibility access is required to replace the system HUD."
+            "value" : "Accessibility access is required to show HUD controls in the notch."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Accessibility access is required to replace the system HUD."
+            "value" : "Accessibility access is required to show HUD controls in the notch."
           }
         },
         "ko" : {
@@ -1672,31 +1672,31 @@
         "pt-BR" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Accessibility access is required to replace the system HUD."
+            "value" : "Accessibility access is required to show HUD controls in the notch."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Accessibility access is required to replace the system HUD."
+            "value" : "Accessibility access is required to show HUD controls in the notch."
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Accessibility access is required to replace the system HUD."
+            "value" : "Accessibility access is required to show HUD controls in the notch."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Accessibility access is required to replace the system HUD."
+            "value" : "Accessibility access is required to show HUD controls in the notch."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "needs_review",
-            "value" : "Accessibility access is required to replace the system HUD."
+            "value" : "Accessibility access is required to show HUD controls in the notch."
           }
         }
       }
@@ -2201,6 +2201,9 @@
           }
         }
       }
+    },
+    "Advanced options" : {
+
     },
     "All-day" : {
       "localizations" : {
@@ -3601,6 +3604,9 @@
           }
         }
       }
+    },
+    "Blur intensity" : {
+
     },
     "Blur transition for lyric changes" : {
 
@@ -8110,6 +8116,7 @@
       }
     },
     "Enable boring mirror" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -8609,6 +8616,9 @@
           }
         }
       }
+    },
+    "Enable mirror" : {
+
     },
     "Enable shelf" : {
       "localizations" : {
@@ -13013,6 +13023,7 @@
       }
     },
     "Media controls" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -13911,6 +13922,9 @@
           }
         }
       }
+    },
+    "Music Player" : {
+
     },
     "Music Source" : {
       "localizations" : {
@@ -17413,107 +17427,8 @@
         }
       }
     },
-    "Replace system HUD" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Replace system HUD"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Replace system HUD"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "System HUD ersetzen"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Replace system HUD"
-          }
-        },
-        "en-GB" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Replace system HUD"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Replace system HUD"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Replace system HUD"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Replace system HUD"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Replace system HUD"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "시스템 HUD 교체"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Zastąp system HUD"
-          }
-        },
-        "pt-BR" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Replace system HUD"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Replace system HUD"
-          }
-        },
-        "tr" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Replace system HUD"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Replace system HUD"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Replace system HUD"
-          }
-        }
-      }
-    },
     "Replaces the standard macOS volume, display brightness, and keyboard brightness HUDs with a custom design." : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -19115,6 +19030,9 @@
         }
       }
     },
+    "Show extra settings like Battery, Shelf, Shortcuts, and Advanced" : {
+
+    },
     "Show HUD in open notch" : {
       "localizations" : {
         "ar" : {
@@ -20214,6 +20132,9 @@
           }
         }
       }
+    },
+    "Show volume, brightness, and keyboard backlight in the notch instead of the default macOS HUD." : {
+
     },
     "Slider color" : {
       "localizations" : {
@@ -21617,6 +21538,9 @@
         }
       }
     },
+    "Transition speed" : {
+
+    },
     "Two-finger swipe up on notch to close, two-finger swipe down on notch to open when **Open notch on hover** option is disabled" : {
       "localizations" : {
         "ar" : {
@@ -22317,6 +22241,106 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "使用音乐可视化器谱图"
+          }
+        }
+      }
+    },
+    "Use Notch for Volume & Brightness" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Use Notch for Volume & Brightness"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Use Notch for Volume & Brightness"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "System HUD ersetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Notch for Volume & Brightness"
+          }
+        },
+        "en-GB" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Use Notch for Volume & Brightness"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Use Notch for Volume & Brightness"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Use Notch for Volume & Brightness"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Use Notch for Volume & Brightness"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Use Notch for Volume & Brightness"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "시스템 HUD 교체"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Zastąp system HUD"
+          }
+        },
+        "pt-BR" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Use Notch for Volume & Brightness"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Use Notch for Volume & Brightness"
+          }
+        },
+        "tr" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Use Notch for Volume & Brightness"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Use Notch for Volume & Brightness"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Use Notch for Volume & Brightness"
           }
         }
       }

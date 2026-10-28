@@ -12,9 +12,9 @@
 	<key>SUEnableInstallerLauncherService</key>
 	<true/>
 	<key>SUFeedURL</key>
-	<string></string>
+	<string>https://raw.githubusercontent.com/mileswolfallen2/Notching-it-up-/main/updater/appcast.xml</string>
 	<key>SUPublicEDKey</key>
-	<string>B1Y47t8C/v8ImurYA+9arEsuCrpxwJSviekiflMElbI=</string>
+	<string>Rq1nTz25iKfrEE5AL8IPPUm9Azx+2kRPEZiz5D3JXC0=</string>
 	<key>UTImportedTypeDeclarations</key>
 	<array>
 		<dict/>

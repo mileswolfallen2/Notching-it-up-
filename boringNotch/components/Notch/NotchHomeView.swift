@@ -175,6 +175,7 @@ struct MusicControlsView: View {
                     }
                     let useBlur = Defaults[.lyricsBlurTransition]
                     if useBlur {
+                        let blurDur = Defaults[.lyricsBlurDuration]
                         MarqueeText(
                             .constant(line),
                             font: .subheadline,
@@ -185,8 +186,9 @@ struct MusicControlsView: View {
                         .font(isPersian ? .custom("Vazirmatn-Regular", size: NSFont.preferredFont(forTextStyle: .subheadline).pointSize) : .subheadline)
                         .lineLimit(1)
                         .opacity(musicManager.isPlaying ? 1 : 0)
+                        .scaleEffect(musicManager.isPlaying ? 1 : 0.98)
                         .id(line)
-                        .transition(.blurReplace.animation(.spring(.bouncy(duration: 0.3))))
+                        .transition(.blurReplace.animation(.spring(response: blurDur, dampingFraction: 0.8)))
                     } else {
                         MarqueeText(
                             .constant(line),
