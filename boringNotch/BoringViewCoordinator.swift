@@ -176,10 +176,14 @@ class BoringViewCoordinator: ObservableObject {
     }
     
     @objc func sneakPeekEvent(_ notification: Notification) {
+        guard let data = notification.userInfo?.values.compactMap({ $0 as? Data }).first else {
+            print("Failed to decode sneak peek notification: missing data payload")
+            return
+        }
+
         let decoder = JSONDecoder()
-        if let decodedData = try? decoder.decode(
-            SharedSneakPeek.self, from: notification.userInfo?.first?.value as! Data)
-        {
+        do {
+            let decodedData = try decoder.decode(SharedSneakPeek.self, from: data)
             let contentType =
                 decodedData.type == "brightness"
                 ? SneakContentType.brightness
@@ -197,11 +201,9 @@ class BoringViewCoordinator: ObservableObject {
             let icon = decodedData.icon
 
             print("Decoded: \(decodedData), Parsed value: \(value)")
-
             toggleSneakPeek(status: decodedData.show, type: contentType, value: value, icon: icon)
-
-        } else {
-            print("Failed to decode JSON data")
+        } catch {
+            print("Failed to decode sneak peek notification: \(error)")
         }
     }
 
