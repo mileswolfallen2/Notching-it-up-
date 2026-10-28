@@ -19,7 +19,7 @@ cd "$REPO_ROOT"
 APPCAST_PATH="updater/appcast.xml"
 FEED_URL="https://raw.githubusercontent.com/mileswolfallen2/Notching-it-up-/main/updater/appcast.xml"
 DOWNLOAD_BASE="https://github.com/mileswolfallen2/Notching-it-up-/releases/download"
-PROJECT_NAME="boringNotch"
+PROJECT_FILE="noching.xcodeproj"
 SCHEME="boringNotch"
 APP_NAME="Notching it up"
 
@@ -75,7 +75,7 @@ info "Archiving ${APP_NAME}…  (this takes a minute)"
 
 ARCHIVE_PATH="$TMPDIR/${PROJECT_NAME}.xcarchive"
 xcodebuild archive \
-    -project "${PROJECT_NAME}.xcodeproj" \
+    -project "${PROJECT_FILE}" \
     -scheme "$SCHEME" \
     -configuration Release \
     -archivePath "$ARCHIVE_PATH" \
