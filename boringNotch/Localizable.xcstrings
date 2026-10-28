@@ -501,6 +501,9 @@
         }
       }
     },
+    "%.1f pt" : {
+
+    },
     "%.1fs" : {
       "localizations" : {
         "ar" : {
@@ -16527,6 +16530,9 @@
         }
       }
     },
+    "Progress bar thickness" : {
+
+    },
     "Quick Share" : {
       "localizations" : {
         "ar" : {
@@ -20133,6 +20139,9 @@
         }
       }
     },
+    "Show track progress bar" : {
+
+    },
     "Show volume, brightness, and keyboard backlight in the notch instead of the default macOS HUD." : {
 
     },
@@ -22141,6 +22150,9 @@
           }
         }
       }
+    },
+    "Use better music sneak peek" : {
+
     },
     "Use blur replace transition when lyrics change" : {
 

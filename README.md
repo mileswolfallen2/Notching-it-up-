@@ -70,10 +70,48 @@ Then open the app normally.
 
 2. Open the project in Xcode:
    ```bash
-   open boringNotch.xcodeproj
+   open noching.xcodeproj
    ```
 
 3. Build and run with `Cmd + R`
+
+### Command-line build
+
+From the repository root, resolve Swift packages and build the release
+configuration with:
+
+```bash
+xcodebuild -resolvePackageDependencies -project noching.xcodeproj
+xcodebuild \
+  -project noching.xcodeproj \
+  -scheme boringNotch \
+  -configuration Release \
+  -destination 'generic/platform=macOS' \
+  build
+```
+
+The project file is named `noching.xcodeproj`; `boringNotch` is the app
+scheme and target.
+
+### Auto-updates
+
+The app uses Sparkle. It starts the updater at launch and the **Check for
+Updates…** menu item checks the feed at
+[`updater/appcast.xml`](updater/appcast.xml). Releases must be published
+through the **Deploy Notching it up** workflow so the final signed DMG,
+Sparkle EdDSA signature, embedded release notes, and appcast entry are
+generated together. Do not edit the signature or DMG URL by hand: the
+signature is specific to the final DMG.
+
+To publish a release:
+
+1. Merge the reviewed release changes into `main`.
+2. Run **Deploy Notching it up** with `0.2.2` (the workflow adds the `v`
+   tag), and provide the repository's Sparkle private-key secret.
+3. Confirm the draft release's DMG downloads and the generated appcast entry
+   points to that exact asset before publishing.
+4. Install the published DMG over an older version and choose **Check for
+   Updates…** to verify the update.
 
 ---
 
@@ -116,3 +154,46 @@ For a full list of licenses and attributions, see [Third-Party Licenses](./THIRD
 ---
 
 **Made with ❤️ as a fork of Boring Notch**
+
+## Version b0.2.2 release notes (draft)
+
+- Added the closed-notch music progress bar and improved music activity
+  presentation.
+- Added configurable lyrics blur transition intensity and speed controls.
+- Improved advanced-settings organization and the default HUD replacement
+  experience.
+- Added synced lyrics support through LRCLIB and a music-reactive spectrum
+  visualizer.
+- Updated the build metadata to marketing version `b0.2.2` and build `273`.
+
+
+## Roadmap
+
+### Low Effort (High Impact)
+- [x] **Progress bar in the closed notch** - Add a thin progress bar to the music live activity showing track progress
+- [ ] **Track change animations** - Crossfade album art and animate lyrics/text when switching tracks
+- [ ] **Better sneak peek** - Show album art, artist + title, and progress bar on track changes
+- [ ] **Per-app hiding** - UI to blacklist certain apps from opening the notch or showing live activity
+
+### Medium Effort (Really Useful)
+- [ ] **Clipboard history in the Shelf** - Store copied text/images and drag/paste from the shelf
+- [ ] **Quick toggles panel** - Control Center lite for WiFi, Bluetooth, Do Not Disturb, AirDrop, etc.
+- [ ] **Calendar glance** - Show next upcoming event with "Join" button for Zoom/Meet/Teams links
+- [ ] **Karaoke style lyrics** - Highlight individual words as they're sung (where timing data available)
+- [ ] **Timer/Pomodoro** - Compact timer that can live in the notch or open panel
+
+### High Effort (Ambitious, But Cool)
+- [ ] **True system audio reactive visualizer** - Tap system audio via CoreAudio/ScreenCaptureKit for real music visualization
+- [ ] **Widget system** - Extensible widgets for the open notch (weather, system stats, custom widgets)
+- [ ] **App Switcher** - Swipe gesture to bring up a compact app switcher in the notch
+- [ ] **Focus Mode integration** - Show and change Focus Mode from the notch/quick toggles
+
+### Completed
+- [x] Rebrand from Boring Notch to Notching it up with original credits preserved
+- [x] New auto-updater with fresh Sparkle keys
+- [x] Advanced options toggle for cleaner UI
+- [x] Customizable lyrics blur transition with intensity/speed controls
+- [x] HUD replacement enabled by default
+- [x] Synced lyrics (line-by-line) with LRCLIB integration
+- [x] Built-in music-reactive spectrum visualizer
+- [x] Lyrics display in closed notch live activity

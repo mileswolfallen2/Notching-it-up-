@@ -615,7 +615,9 @@ struct Media: View {
     @ObservedObject var coordinator = BoringViewCoordinator.shared
     @Default(.hideNotchOption) var hideNotchOption
     @Default(.enableSneakPeek) private var enableSneakPeek
+    @Default(.betterSneakPeek) private var betterSneakPeek
     @Default(.sneakPeekStyles) var sneakPeekStyles
+    @Default(.musicProgressBarThickness) var musicProgressBarThickness
 
     @Default(.enableLyrics) var enableLyrics
     @Default(.lyricsBlurTransition) var lyricsBlurTransition
@@ -667,8 +669,22 @@ struct Media: View {
                     "Show music live activity",
                     isOn: $coordinator.musicLiveActivityEnabled.animation()
                 )
+                Defaults.Toggle(key: .showMusicProgressBar) {
+                    Text("Show track progress bar")
+                }
                 if Defaults[.showAdvancedSettings] {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Progress bar thickness")
+                            Spacer()
+                            Text("\(musicProgressBarThickness, specifier: "%.1f") pt")
+                                .foregroundStyle(.secondary)
+                                .monospacedDigit()
+                        }
+                        Slider(value: $musicProgressBarThickness, in: 1...6, step: 0.5)
+                    }
                     Toggle("Show sneak peek on playback changes", isOn: $enableSneakPeek)
+                    Toggle("Use better music sneak peek", isOn: $betterSneakPeek)
                     Picker("Sneak Peek Style", selection: $sneakPeekStyles) {
                         ForEach(SneakPeekStyle.allCases) { style in
                             Text(style.rawValue).tag(style)

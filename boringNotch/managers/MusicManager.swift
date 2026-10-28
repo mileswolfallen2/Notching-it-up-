@@ -20,6 +20,7 @@ class MusicManager: ObservableObject {
     private var cancellables = Set<AnyCancellable>()
     private var controllerCancellables = Set<AnyCancellable>()
     private var debounceIdleTask: Task<Void, Never>?
+    private var pendingTrackSneakPeek = false
 
     // Helper to check if macOS has removed support for NowPlayingController
     public private(set) var isNowPlayingDeprecated: Bool = false
@@ -189,9 +190,6 @@ class MusicManager: ObservableObject {
                 self.updateIdleState(state: state.isPlaying)
             }
 
-            if state.isPlaying && !state.title.isEmpty && !state.artist.isEmpty {
-                self.updateSneakPeek()
-            }
         }
 
         // Check for changes in track metadata using last artwork change values
@@ -203,6 +201,10 @@ class MusicManager: ObservableObject {
         // Check for artwork changes
         let artworkChanged = state.artwork != nil && state.artwork != self.artworkData
         let hasContentChange = titleChanged || artistChanged || albumChanged || artworkChanged || bundleChanged
+
+        if hasContentChange {
+            pendingTrackSneakPeek = true
+        }
 
         // Handle artwork and visual transitions for changed content
         if hasContentChange {
@@ -227,11 +229,6 @@ class MusicManager: ObservableObject {
                 self.lastArtworkBundleIdentifier = state.bundleIdentifier
             }
 
-            // Only update sneak peek if there's actual content and something changed
-            if !state.title.isEmpty && !state.artist.isEmpty && state.isPlaying {
-                self.updateSneakPeek()
-            }
-
             // Fetch lyrics on content change
             self.fetchLyricsIfAvailable(bundleIdentifier: state.bundleIdentifier, title: state.title, artist: state.artist)
         }
@@ -249,6 +246,11 @@ class MusicManager: ObservableObject {
 
         if state.artist != self.artistName {
             self.artistName = state.artist
+        }
+
+        if pendingTrackSneakPeek && state.isPlaying && !state.title.isEmpty && !state.artist.isEmpty {
+            self.updateSneakPeek()
+            pendingTrackSneakPeek = false
         }
 
         if state.album != self.album {

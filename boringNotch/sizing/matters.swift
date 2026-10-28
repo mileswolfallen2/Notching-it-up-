@@ -65,6 +65,15 @@ enum MusicPlayerImageSizes {
             } else if Defaults[.notchHeightMode] == .matchMenuBar {
                 notchHeight = screen.frame.maxY - screen.visibleFrame.maxY
             }
+
+            // Extend height for the track progress bar only when not using a custom
+            // height — custom heights are explicitly chosen by the user so we leave
+            // them alone; auto-matched heights would clip the bar behind the physical
+            // notch otherwise.
+            if Defaults[.showMusicProgressBar] && Defaults[.notchHeightMode] != .custom {
+                // Bar thickness + 1 pt bottom padding + 1 pt breathing room
+                notchHeight += CGFloat(Defaults[.musicProgressBarThickness]) + 2
+            }
         } else {
             // This is a display WITHOUT a notch - use non-notch height settings
             notchHeight = Defaults[.nonNotchHeight]

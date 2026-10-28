@@ -38,6 +38,7 @@ jobs:
       contents: read
     env:
       PROJECT_NAME: boringNotch
+      PROJECT_FILE: noching.xcodeproj
       APP_NAME: Notching it up
       EXPORT_METHOD: development
       VERSION_INPUT: ${{ inputs.version }}
@@ -53,7 +54,7 @@ jobs:
           persist-credentials: false
 
       - name: Resolve Swift packages
-        run: xcodebuild -resolvePackageDependencies -project "$PROJECT_NAME.xcodeproj"
+        run: xcodebuild -resolvePackageDependencies -project "$PROJECT_FILE"
 
       - name: Install Apple certificate
         env:
@@ -85,7 +86,7 @@ jobs:
       - name: Set version and build number
         run: |
           set -euo pipefail
-          PBXPROJ="$PROJECT_NAME.xcodeproj/project.pbxproj"
+          PBXPROJ="$PROJECT_FILE/project.pbxproj"
           VERSION="$VERSION_INPUT"
           if [[ -z "$BUILD_NUMBER_INPUT" ]]; then
             echo "::error::A reserved build number must be provided by the caller"
@@ -102,7 +103,7 @@ jobs:
       - name: Build and archive
         run: |
           xcodebuild clean archive \
-            -project "$PROJECT_NAME.xcodeproj" \
+            -project "$PROJECT_FILE" \
             -scheme "$PROJECT_NAME" \
             -archivePath "$PROJECT_NAME" \
             -destination "generic/platform=macOS" \

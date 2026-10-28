@@ -312,7 +312,7 @@ class WorkflowSmokeTests(unittest.TestCase):
         # DMG keeps the legacy boringNotch.dmg name for download/appcast
         # compatibility. The project/target/scheme remain boringNotch.
         pbxproj = (
-            REPOSITORY_ROOT / "boringNotch.xcodeproj" / "project.pbxproj"
+            REPOSITORY_ROOT / "noching.xcodeproj" / "project.pbxproj"
         ).read_text(encoding="utf-8")
         self.assertEqual(pbxproj.count('PRODUCT_NAME = "Boring Notch";'), 2)
         self.assertEqual(pbxproj.count('INFOPLIST_KEY_CFBundleName = "Boring Notch";'), 2)
