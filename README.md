@@ -155,18 +155,6 @@ For a full list of licenses and attributions, see [Third-Party Licenses](./THIRD
 
 **Made with ❤️ as a fork of Boring Notch**
 
-## Version b0.2.2 release notes (draft)
-
-- Added the closed-notch music progress bar and improved music activity
-  presentation.
-- Added configurable lyrics blur transition intensity and speed controls.
-- Improved advanced-settings organization and the default HUD replacement
-  experience.
-- Added synced lyrics support through LRCLIB and a music-reactive spectrum
-  visualizer.
-- Updated the build metadata to marketing version `b0.2.2` and build `273`.
-
-
 ## Roadmap
 
 ### Low Effort (High Impact)
