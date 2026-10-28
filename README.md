@@ -160,7 +160,7 @@ For a full list of licenses and attributions, see [Third-Party Licenses](./THIRD
 ### Low Effort (High Impact)
 - [x] **Progress bar in the closed notch** - Add a thin progress bar to the music live activity showing track progress
 - [ ] **Track change animations** - Crossfade album art and animate lyrics/text when switching tracks
-- [ ] **Better sneak peek** - Show album art, artist + title, and progress bar on track changes
+- [x] **Better sneak peek** - Show album art, artist + title, and progress bar on track changes
 - [ ] **Per-app hiding** - UI to blacklist certain apps from opening the notch or showing live activity
 
 ### Medium Effort (Really Useful)
