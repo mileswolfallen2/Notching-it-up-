@@ -46,8 +46,8 @@ echo ""
 print -nP "%F{yellow}Enter the version number (e.g. b0.3.0 or 1.0.0): %f"
 read VERSION
 [[ -n "$VERSION" ]] || die "Version cannot be empty."
+# Strip leading v if the user typed it — we never use a v prefix
 VERSION="${VERSION#v}"
-TAG="v${VERSION}"
 
 # ── Ask for private key path ──────────────────────────────────────────────────
 DEFAULT_KEY_PATH="$HOME/Desktop/sparkle_private_key.txt"
@@ -169,22 +169,22 @@ if items:
 echo ""
 
 # ── Confirm before committing ─────────────────────────────────────────────────
-print -nP "%F{yellow}Commit appcast, tag ${TAG}, and push? (y/N): %f"
+print -nP "%F{yellow}Commit appcast, tag ${VERSION}, and push? (y/N): %f"
 read PUSH_CONFIRM
 [[ "${PUSH_CONFIRM:l}" == "y" ]] || { warn "Stopped before push. Appcast updated locally — review and push manually."; exit 0; }
 
 # ── Commit and tag ────────────────────────────────────────────────────────────
 git add "$APPCAST_PATH"
-git commit -m "Update appcast for ${TAG}"
-git tag "$TAG"
+git commit -m "Update appcast for ${VERSION}"
+git tag "$VERSION"
 git push origin main
-git push origin "$TAG"
+git push origin "$VERSION"
 
-success "Done! Tag ${TAG} pushed."
+success "Done! Tag ${VERSION} pushed."
 echo ""
 info "Next steps:"
 echo "  1. Go to https://github.com/mileswolfallen2/Notching-it-up-/releases"
-echo "  2. Create a release from tag ${TAG}"
+echo "  2. Create a release from tag ${VERSION}"
 echo "  3. Upload: ${DMG_PATH}"
 echo "  4. Once published, Sparkle will serve the update automatically."
 echo ""
