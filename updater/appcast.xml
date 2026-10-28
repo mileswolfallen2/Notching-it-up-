@@ -1,25 +1,29 @@
-<?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/">
+<?xml version='1.0' encoding='utf-8'?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
   <channel>
+    <item>
+            <title>b0.2.2</title>
+            <pubDate>Tue, 27 Oct 2026 22:26:55 -0500</pubDate>
+            <link>https://github.com/mileswolfallen2/Notching-it-up-/releases</link>
+            <sparkle:version>273</sparkle:version>
+            <sparkle:shortVersionString>b0.2.2</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/mileswolfallen2/Notching-it-up-/releases/download/vb0.2.2/boringNotch.dmg" length="9701485" type="application/octet-stream" sparkle:edSignature="d/oK+Aq19aQLlvdS/IwB7aimBjojRLFSk1xXdm/n68/SQOBvTxQXwcuvIlXf/FRc0/pJPBfxiN9cjcAiU8M5Cg==" />
+        </item>
     <title>Notching it up</title>
     <link>https://github.com/mileswolfallen2/Notching-it-up-</link>
     <description>Most recent changes with links to updates.</description>
     <language>en</language>
     <item>
       <title>Version b0.2.1</title>
-      <description><![CDATA[
-        <h2>Notching it up b0.2.1</h2>
-        <ul>
-          <li>Fork rebrand and updater reset</li>
-        </ul>
-      ]]></description>
+      <description>
+        &lt;h2&gt;Notching it up b0.2.1&lt;/h2&gt;
+        &lt;ul&gt;
+          &lt;li&gt;Fork rebrand and updater reset&lt;/li&gt;
+        &lt;/ul&gt;
+      </description>
       <pubDate>Mon, 27 Oct 2025 19:45:00 +0000</pubDate>
-      <enclosure url="https://github.com/mileswolfallen2/Notching-it-up-/releases/download/vb0.2.1/Notching-it-up-b0.2.1.dmg"
-                 sparkle:version="272"
-                 sparkle:shortVersionString="b0.2.1"
-                 length="8698151"
-                 type="application/octet-stream"
-                 sparkle:edSignature="P2KiZ7FTH7qg4Z8c5+aI1gR0xJ3Q0g3NIv/jFbShhlSl2iSxy+tstKYb7+CoC6qor7jFMywvlHDZQctjXAahBQ==" />
+      <enclosure url="https://github.com/mileswolfallen2/Notching-it-up-/releases/download/vb0.2.1/Notching-it-up-b0.2.1.dmg" sparkle:version="272" sparkle:shortVersionString="b0.2.1" length="8698151" type="application/octet-stream" sparkle:edSignature="P2KiZ7FTH7qg4Z8c5+aI1gR0xJ3Q0g3NIv/jFbShhlSl2iSxy+tstKYb7+CoC6qor7jFMywvlHDZQctjXAahBQ==" />
     </item>
   </channel>
 </rss>
