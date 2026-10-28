@@ -8,7 +8,7 @@
             <sparkle:version>273</sparkle:version>
             <sparkle:shortVersionString>b0.2.2</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/mileswolfallen2/Notching-it-up-/releases/download/vb0.2.2/boringNotch.dmg" length="9701485" type="application/octet-stream" sparkle:edSignature="d/oK+Aq19aQLlvdS/IwB7aimBjojRLFSk1xXdm/n68/SQOBvTxQXwcuvIlXf/FRc0/pJPBfxiN9cjcAiU8M5Cg==" />
+            <enclosure url="https://github.com/mileswolfallen2/Notching-it-up-/releases/download/b0.2.2/boringNotch.dmg" length="9701485" type="application/octet-stream" sparkle:edSignature="d/oK+Aq19aQLlvdS/IwB7aimBjojRLFSk1xXdm/n68/SQOBvTxQXwcuvIlXf/FRc0/pJPBfxiN9cjcAiU8M5Cg==" />
         </item>
     <title>Notching it up</title>
     <link>https://github.com/mileswolfallen2/Notching-it-up-</link>

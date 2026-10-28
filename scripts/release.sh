@@ -6,7 +6,6 @@
 set -euo pipefail
 
 # ── Colours ──────────────────────────────────────────────────────────────────
-RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[1;33m'; CYAN='\033[0;36m'; NC='\033[0m'
 info()    { print -P "%F{cyan}ℹ %f$*"; }
 success() { print -P "%F{green}✔ %f$*"; }
 warn()    { print -P "%F{yellow}⚠ %f$*"; }
@@ -17,18 +16,17 @@ REPO_ROOT="$(git -C "$(dirname "$0")" rev-parse --show-toplevel)"
 cd "$REPO_ROOT"
 
 APPCAST_PATH="updater/appcast.xml"
-FEED_URL="https://raw.githubusercontent.com/mileswolfallen2/Notching-it-up-/main/updater/appcast.xml"
 DOWNLOAD_BASE="https://github.com/mileswolfallen2/Notching-it-up-/releases/download"
 PROJECT_FILE="noching.xcodeproj"
 SCHEME="boringNotch"
 APP_NAME="Notching it up"
+DMG_NAME="boringNotch.dmg"
 
 # ── Find generate_appcast ─────────────────────────────────────────────────────
 GENERATE_APPCAST=""
 for candidate in \
-    "/Users/miles/Library/Developer/Xcode/DerivedData/boringNotch-drwtzmthavqbtvchsdxydlanefqe/SourcePackages/artifacts/sparkle/Sparkle/bin/generate_appcast" \
-    "/Users/miles/Library/Developer/Xcode/DerivedData/noching-faonocqigecsnadodxmfuwkyhrcl/SourcePackages/artifacts/sparkle/Sparkle/bin/generate_appcast" \
-    "$(find ~/Library/Developer/Xcode/DerivedData -name 'generate_appcast' -path '*/artifacts/sparkle/*' 2>/dev/null | head -1)"
+    "$(find ~/Library/Developer/Xcode/DerivedData -name 'generate_appcast' -path '*/artifacts/sparkle/*' 2>/dev/null | head -1)" \
+    "$(find ~/Library/Developer/Xcode/DerivedData -name 'generate_appcast' 2>/dev/null | head -1)"
 do
     if [[ -x "$candidate" ]]; then
         GENERATE_APPCAST="$candidate"
@@ -48,7 +46,6 @@ echo ""
 print -nP "%F{yellow}Enter the version number (e.g. b0.3.0 or 1.0.0): %f"
 read VERSION
 [[ -n "$VERSION" ]] || die "Version cannot be empty."
-# Strip leading v if provided
 VERSION="${VERSION#v}"
 TAG="v${VERSION}"
 
@@ -69,11 +66,11 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
     [[ "${CONFIRM:l}" == "y" ]] || die "Aborted. Commit your changes first."
 fi
 
-# ── Archive in Xcode ─────────────────────────────────────────────────────────
+# ── Archive in Xcode ──────────────────────────────────────────────────────────
 echo ""
 info "Archiving ${APP_NAME}…  (this takes a minute)"
 
-ARCHIVE_PATH="$TMPDIR/${PROJECT_NAME}.xcarchive"
+ARCHIVE_PATH="$TMPDIR/notching.xcarchive"
 xcodebuild archive \
     -project "${PROJECT_FILE}" \
     -scheme "$SCHEME" \
@@ -86,41 +83,23 @@ xcodebuild archive \
 [[ -d "$ARCHIVE_PATH" ]] || die "Archive failed — check Xcode build settings."
 success "Archive created."
 
-# ── Export .app ───────────────────────────────────────────────────────────────
-info "Exporting app…"
-EXPORT_DIR="$TMPDIR/${PROJECT_NAME}_export"
-rm -rf "$EXPORT_DIR"
+# ── Extract .app from archive ─────────────────────────────────────────────────
+info "Extracting app from archive…"
+APP_PATH=$(find "$ARCHIVE_PATH/Products" -name "*.app" -maxdepth 4 | head -1)
+[[ -n "$APP_PATH" ]] || die "Could not find .app inside archive at $ARCHIVE_PATH"
 
-# Write a minimal export options plist
-EXPORT_OPTIONS="$TMPDIR/ExportOptions.plist"
-cat > "$EXPORT_OPTIONS" <<PLIST
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>method</key>
-    <string>developer-id</string>
-    <key>signingStyle</key>
-    <string>automatic</string>
-</dict>
-</plist>
-PLIST
-
-xcodebuild -exportArchive \
-    -archivePath "$ARCHIVE_PATH" \
-    -exportPath "$EXPORT_DIR" \
-    -exportOptionsPlist "$EXPORT_OPTIONS" \
-    | xcpretty 2>/dev/null || true
-
-APP_PATH=$(find "$EXPORT_DIR" -name "*.app" -maxdepth 2 | head -1)
-[[ -n "$APP_PATH" ]] || die "Export failed — .app not found in $EXPORT_DIR"
-success "App exported: $(basename "$APP_PATH")"
+# Ad-hoc sign so the app runs on other Macs without a paid Developer ID cert.
+# Users may need to right-click → Open on first launch (standard for unsigned
+# open-source apps distributed outside the App Store).
+info "Ad-hoc signing app…"
+codesign --force --deep --sign - "$APP_PATH"
+success "App signed: $(basename "$APP_PATH")"
 
 # ── Create DMG ────────────────────────────────────────────────────────────────
 info "Creating DMG…"
 RELEASE_DIR="$REPO_ROOT/Release"
 mkdir -p "$RELEASE_DIR"
-DMG_PATH="${RELEASE_DIR}/${PROJECT_NAME}.dmg"
+DMG_PATH="${RELEASE_DIR}/${DMG_NAME}"
 rm -f "$DMG_PATH"
 
 hdiutil create \
@@ -140,7 +119,7 @@ NEW_APPCAST="$TMPDIR/new_appcast.xml"
 "$GENERATE_APPCAST" \
     --ed-key-file "$KEY_PATH" \
     --link "https://github.com/mileswolfallen2/Notching-it-up-/releases" \
-    --download-url-prefix "${DOWNLOAD_BASE}/${TAG}/" \
+    --download-url-prefix "${DOWNLOAD_BASE}/${VERSION}/" \
     -o "$NEW_APPCAST" \
     "$RELEASE_DIR/"
 
@@ -192,7 +171,7 @@ echo ""
 # ── Confirm before committing ─────────────────────────────────────────────────
 print -nP "%F{yellow}Commit appcast, tag ${TAG}, and push? (y/N): %f"
 read PUSH_CONFIRM
-[[ "${PUSH_CONFIRM:l}" == "y" ]] || { warn "Stopped before push. Appcast is updated locally — review it and push manually."; exit 0; }
+[[ "${PUSH_CONFIRM:l}" == "y" ]] || { warn "Stopped before push. Appcast updated locally — review and push manually."; exit 0; }
 
 # ── Commit and tag ────────────────────────────────────────────────────────────
 git add "$APPCAST_PATH"
