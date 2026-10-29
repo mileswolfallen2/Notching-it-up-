@@ -684,7 +684,7 @@ struct Media: View {
                         Slider(value: $musicProgressBarThickness, in: 1...6, step: 0.5)
                     }
                     Toggle("Show sneak peek on playback changes", isOn: $enableSneakPeek)
-                    Toggle("Use better music sneak peek", isOn: $betterSneakPeek)
+                    
                     Picker("Sneak Peek Style", selection: $sneakPeekStyles) {
                         ForEach(SneakPeekStyle.allCases) { style in
                             Text(style.rawValue).tag(style)
