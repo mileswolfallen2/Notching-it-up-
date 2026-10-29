@@ -8222,9 +8222,6 @@
         }
       }
     },
-    "Enable clipboard history" : {
-
-    },
     "Enable colored spectrograms" : {
       "extractionState" : "stale",
       "localizations" : {
