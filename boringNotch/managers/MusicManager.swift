@@ -248,9 +248,16 @@ class MusicManager: ObservableObject {
             self.artistName = state.artist
         }
 
-        if pendingTrackSneakPeek && state.isPlaying && !state.title.isEmpty && !state.artist.isEmpty {
+        if pendingTrackSneakPeek && state.isPlaying && !state.title.isEmpty {
             self.updateSneakPeek()
             pendingTrackSneakPeek = false
+        }
+        if state.isPlaying && state.title != self.songTitle && !state.title.isEmpty {
+            self.songTitle = state.title
+            self.artistName = state.artist
+            if Defaults[.betterSneakPeek] || Defaults[.enableSneakPeek] {
+                self.updateSneakPeek()
+            }
         }
 
         if state.album != self.album {

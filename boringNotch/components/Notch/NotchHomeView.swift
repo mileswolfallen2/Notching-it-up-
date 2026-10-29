@@ -226,6 +226,9 @@ struct MusicControlsView: View {
             }
             .padding(.top, 5)
             .frame(height: 36)
+            .id(musicManager.songTitle)
+            .transition(.opacity.combined(with: .scale(scale: 0.98)))
+            .animation(.spring(response: 0.35, dampingFraction: 0.8), value: musicManager.songTitle)
         }
     }
 

@@ -340,6 +340,9 @@ struct ContentView: View {
                               if betterSneakPeek {
                                   BetterMusicSneakPeek()
                                       .padding(.bottom, 6)
+                                      .onAppear {
+                                          coordinator.toggleSneakPeek(status: true, type: .music)
+                                      }
                               } else {
                                   HStack(alignment: .center) {
                                       Image(systemName: "music.note")
@@ -412,99 +415,57 @@ struct ContentView: View {
 
     @ViewBuilder
     func MusicLiveActivity() -> some View {
-        ZStack(alignment: .bottom) {
-            HStack {
-                Image(nsImage: musicManager.albumArt)
-                    .resizable()
-                    .clipped()
-                    .clipShape(
-                        RoundedRectangle(
-                            cornerRadius: MusicPlayerImageSizes.cornerRadiusInset.closed)
-                    )
-                    .matchedGeometryEffect(id: "albumArt", in: albumArtNamespace)
-                    .frame(
-                        width: max(0, vm.effectiveClosedNotchHeight - 12),
-                        height: max(0, vm.effectiveClosedNotchHeight - 12)
-                    )
-
-                Rectangle()
-                    .fill(.black)
-                    .overlay(
-                        HStack(alignment: .top) {
-                            if coordinator.expandingView.show
-                                && coordinator.expandingView.type == .music
-                            {
-                                MarqueeText(
-                                    .constant(musicManager.songTitle),
-                                    textColor: Defaults[.coloredSpectrogram]
-                                        ? Color(nsColor: musicManager.avgColor) : Color.gray,
-                                    minDuration: 0.4,
-                                    frameWidth: 100
-                                )
-                                .opacity(
-                                    (coordinator.expandingView.show
-                                        && Defaults[.sneakPeekStyles] == .inline)
-                                        ? 1 : 0
-                                )
-                                Spacer(minLength: vm.closedNotchSize.width)
-                                Text(musicManager.artistName)
-                                    .lineLimit(1)
-                                    .truncationMode(.tail)
-                                    .foregroundStyle(
-                                        Defaults[.coloredSpectrogram]
-                                            ? Color(nsColor: musicManager.avgColor)
-                                            : Color.gray
-                                    )
-                                    .opacity(
-                                        (coordinator.expandingView.show
-                                            && coordinator.expandingView.type == .music
-                                            && Defaults[.sneakPeekStyles] == .inline)
-                                            ? 1 : 0
-                                    )
-                            }
-                        }
-                    )
-                    .frame(
-                        width: (coordinator.expandingView.show
-                            && coordinator.expandingView.type == .music
-                            && Defaults[.sneakPeekStyles] == .inline)
-                            ? 380
-                            : vm.closedNotchSize.width
-                                + -cornerRadiusInsets.closed.top
-                    )
-
-                HStack {
-                    if useMusicVisualizer {
-                        Rectangle()
-                            .fill(
-                                Defaults[.coloredSpectrogram]
-                                    ? Color(nsColor: musicManager.avgColor).gradient
-                                    : Color.gray.gradient
-                            )
-                            .frame(width: 50, alignment: .center)
-                            .matchedGeometryEffect(id: "spectrum", in: albumArtNamespace)
-                            .mask {
-                                AudioSpectrumView(isPlaying: $musicManager.isPlaying)
-                                    .frame(width: 16, height: 12)
-                            }
-                    } else {
-                        LottieAnimationContainer()
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    }
-                }
-                .frame(
-                    width: max(
-                        0,
-                        vm.effectiveClosedNotchHeight - 12
-                            + gestureProgress / 2
-                    ),
-                    height: max(
-                        0,
-                        vm.effectiveClosedNotchHeight - 12
-                    ),
-                    alignment: .center
+        HStack(spacing: 0) {
+            Image(nsImage: musicManager.albumArt)
+                .resizable()
+                .clipped()
+                .clipShape(
+                    RoundedRectangle(
+                        cornerRadius: MusicPlayerImageSizes.cornerRadiusInset.closed)
                 )
+                .matchedGeometryEffect(id: "albumArt", in: albumArtNamespace)
+                .frame(
+                    width: max(0, vm.effectiveClosedNotchHeight - 12),
+                    height: max(0, vm.effectiveClosedNotchHeight - 12)
+                )
+
+            Rectangle()
+                .fill(.black)
+                .frame(width: vm.closedNotchSize.width)
+
+            HStack {
+                if useMusicVisualizer {
+                    Rectangle()
+                        .fill(
+                            Defaults[.coloredSpectrogram]
+                                ? Color(nsColor: musicManager.avgColor).gradient
+                                : Color.gray.gradient
+                        )
+                        .frame(width: 40, alignment: .center)
+                        .matchedGeometryEffect(id: "spectrum", in: albumArtNamespace)
+                        .mask {
+                            AudioSpectrumView(isPlaying: $musicManager.isPlaying)
+                                .frame(width: 16, height: 12)
+                        }
+                } else {
+                    LottieAnimationContainer()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
             }
+            .frame(
+                width: max(
+                    0,
+                    vm.effectiveClosedNotchHeight - 12
+                        + gestureProgress / 2
+                ),
+                height: max(
+                    0,
+                    vm.effectiveClosedNotchHeight - 12
+                ),
+                alignment: .center
+            )
+        }
+        .overlay(alignment: .bottom) {
             if showMusicProgressBar && musicManager.songDuration > 0 {
                 TimelineView(.periodic(from: .now, by: 0.25)) { context in
                     GeometryReader { geometry in
@@ -517,9 +478,9 @@ struct ContentView: View {
                             1
                         )
                         ZStack(alignment: .leading) {
-                            Capsule()
+                            Rectangle()
                                 .fill(.white.opacity(0.2))
-                            Capsule()
+                            Rectangle()
                                 .fill(
                                     Defaults[.coloredSpectrogram]
                                         ? Color(nsColor: musicManager.avgColor)
@@ -530,16 +491,14 @@ struct ContentView: View {
                     }
                     .frame(height: CGFloat(musicProgressBarThickness))
                 }
+                .frame(width: vm.closedNotchSize.width + (max(0, vm.effectiveClosedNotchHeight - 12) * 2) + 40)
                 .padding(.horizontal, 4)
-                .padding(.bottom, 1)
             }
         }
         .frame(
             height: vm.effectiveClosedNotchHeight,
             alignment: .center
         )
-        .frame(width: computedChinWidth, alignment: .center)
-        .clipped()
     }
 
     @ViewBuilder

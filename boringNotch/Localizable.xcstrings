@@ -5214,6 +5214,9 @@
         }
       }
     },
+    "Click to copy to clipboard" : {
+
+    },
     "Close" : {
       "localizations" : {
         "ar" : {
@@ -8218,6 +8221,9 @@
           }
         }
       }
+    },
+    "Enable clipboard history" : {
+
     },
     "Enable colored spectrograms" : {
       "extractionState" : "stale",
@@ -12225,7 +12231,11 @@
         }
       }
     },
+    "Made with ❤️ by miles allen" : {
+
+    },
     "Made with 🫶🏻 by not so boring not.people" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

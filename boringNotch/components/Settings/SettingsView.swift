@@ -968,7 +968,7 @@ struct About: View {
             }
             VStack(spacing: 0) {
                 Divider()
-                Text("Made with 🫶🏻 by not so boring not.people")
+                Text("Made with ❤️ by miles allen")
                     .foregroundStyle(.secondary)
                     .padding(.top, 5)
                     .padding(.bottom, 7)
@@ -1026,6 +1026,9 @@ struct Shelf: View {
                 }
                 Defaults.Toggle(key: .autoRemoveShelfItems) {
                     Text("Remove from shelf after dragging")
+                }
+                Defaults.Toggle(key: .enableClipboardHistory) {
+                    Text("Enable clipboard history")
                 }
 
             } header: {
