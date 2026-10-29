@@ -101,7 +101,9 @@ Updates…** menu item checks the feed at
 through the **Deploy Notching it up** workflow so the final signed DMG,
 Sparkle EdDSA signature, embedded release notes, and appcast entry are
 generated together. Do not edit the signature or DMG URL by hand: the
-signature is specific to the final DMG.
+signature is specific to the final DMG. Do not re-sign the archived app after
+Xcode signs it; changing its code-signing identity makes macOS privacy
+permissions appear to reset after an update.
 
 To publish a release:
 

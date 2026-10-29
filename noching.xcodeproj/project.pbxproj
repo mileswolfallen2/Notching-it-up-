@@ -1221,7 +1221,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 276;
+				CURRENT_PROJECT_VERSION = 277;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"boringNotch/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
@@ -1249,7 +1249,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.2.4.1;
+				MARKETING_VERSION = 0.2.4.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.notchingitup.notchingitup;
 				PRODUCT_NAME = "Notching it up";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1276,7 +1276,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 276;
+				CURRENT_PROJECT_VERSION = 277;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"boringNotch/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
@@ -1303,7 +1303,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.2.4.1;
+				MARKETING_VERSION = 0.2.4.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.notchingitup.notchingitup;
 				PRODUCT_NAME = "Notching it up";
 				PROVISIONING_PROFILE_SPECIFIER = "";
