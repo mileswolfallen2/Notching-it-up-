@@ -1,6 +1,5 @@
 import Foundation
 import Cocoa
-import ApplicationServices
 import AsyncXPCConnection
 
 final class XPCHelperClient: NSObject {
@@ -110,52 +109,15 @@ final class XPCHelperClient: NSObject {
     }
     
     nonisolated func isAccessibilityAuthorized() async -> Bool {
-        if AXIsProcessTrusted() {
-            await MainActor.run {
-                notifyAuthorizationChange(true)
-            }
-            return true
-        }
-
-        let result: Bool
         do {
             let service = await MainActor.run {
                 ensureRemoteService()
             }
-            let helperAuthorized = try await service.withContinuation { service, continuation in
+            let result: Bool = try await service.withContinuation { service, continuation in
                 service.isAccessibilityAuthorized { authorized in
                     continuation.resume(returning: authorized)
                 }
             }
-            result = helperAuthorized || AXIsProcessTrusted()
-        } catch {
-            return false
-        }
-
-        await MainActor.run {
-            notifyAuthorizationChange(result)
-        }
-        return result
-    }
-    
-    nonisolated func ensureAccessibilityAuthorization(promptIfNeeded: Bool) async -> Bool {
-        if AXIsProcessTrusted() {
-            await MainActor.run {
-                notifyAuthorizationChange(true)
-            }
-            return true
-        }
-
-        do {
-            let service = await MainActor.run {
-                ensureRemoteService()
-            }
-            let helperAuthorized: Bool = try await service.withContinuation { service, continuation in
-                service.ensureAccessibilityAuthorization(promptIfNeeded) { authorized in
-                    continuation.resume(returning: authorized)
-                }
-            }
-            let result = helperAuthorized || AXIsProcessTrusted()
             await MainActor.run {
                 notifyAuthorizationChange(result)
             }
@@ -164,7 +126,26 @@ final class XPCHelperClient: NSObject {
             return false
         }
     }
-
+    
+    nonisolated func ensureAccessibilityAuthorization(promptIfNeeded: Bool) async -> Bool {
+        do {
+            let service = await MainActor.run {
+                ensureRemoteService()
+            }
+            let result: Bool = try await service.withContinuation { service, continuation in
+                service.ensureAccessibilityAuthorization(promptIfNeeded) { authorized in
+                    continuation.resume(returning: authorized)
+                }
+            }
+            await MainActor.run {
+                notifyAuthorizationChange(result)
+            }
+            return result
+        } catch {
+            return false
+        }
+    }
+    
     // MARK: - Keyboard Brightness
     
     nonisolated func isKeyboardBrightnessAvailable() async -> Bool {
@@ -265,3 +246,5 @@ final class XPCHelperClient: NSObject {
 extension Notification.Name {
     static let accessibilityAuthorizationChanged = Notification.Name("accessibilityAuthorizationChanged")
 }
+
+

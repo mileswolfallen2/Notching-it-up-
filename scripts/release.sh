@@ -88,11 +88,12 @@ info "Extracting app from archive…"
 APP_PATH=$(find "$ARCHIVE_PATH/Products" -name "*.app" -maxdepth 4 | head -1)
 [[ -n "$APP_PATH" ]] || die "Could not find .app inside archive at $ARCHIVE_PATH"
 
-# Keep the archive's signature intact. Re-signing the app ad hoc here changes
-# its designated code requirement, which causes macOS privacy permissions to be
-# treated as belonging to a different app after an update.
-codesign --verify --deep --strict "$APP_PATH"
-success "App signature verified: $(basename "$APP_PATH")"
+# Ad-hoc sign so the app runs on other Macs without a paid Developer ID cert.
+# Users may need to right-click → Open on first launch (standard for unsigned
+# open-source apps distributed outside the App Store).
+info "Ad-hoc signing app…"
+codesign --force --deep --sign - "$APP_PATH"
+success "App signed: $(basename "$APP_PATH")"
 
 # ── Create DMG ────────────────────────────────────────────────────────────────
 info "Creating DMG…"

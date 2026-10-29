@@ -2,60 +2,6 @@
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
   <channel>
     <item>
-            <title>0.2.4.2</title>
-            <pubDate>Thu, 29 Oct 2026 10:09:02 -0500</pubDate>
-            <link>https://github.com/mileswolfallen2/Notching-it-up-/releases</link>
-            <sparkle:version>277</sparkle:version>
-            <sparkle:shortVersionString>0.2.4.2.1</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/mileswolfallen2/Notching-it-up-/releases/download/0.2.4.2.1/boringNotch.dmg" length="9737891" type="application/octet-stream" sparkle:edSignature="WyJQwRzZVft5Q43IVVjSDj5/VMo7HMCup6q/kLKFUbshH6/qaV+a03FJ8GP78k7GUlLWc9P4lTiFozQr9m46DQ==" />
-        </item>
-        <item>
-            <title>0.2.4.1</title>
-            <pubDate>Thu, 29 Oct 2026 09:59:30 -0500</pubDate>
-            <link>https://github.com/mileswolfallen2/Notching-it-up-/releases</link>
-            <sparkle:version>276</sparkle:version>
-            <sparkle:shortVersionString>0.2.4.1</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/mileswolfallen2/Notching-it-up-/releases/download/0.2.4.1/boringNotch.dmg" length="9722405" type="application/octet-stream" sparkle:edSignature="Plx32vNPxGAtVpOPCEGeefzXDCRrLUI13QopBLTzW5SmkftFPlQrqVtLC5GIv3KCwWqxbCh5Ndxn9lQPAU5jDQ==" />
-        </item>
-        <item>
-            <title>0.2.4</title>
-            <pubDate>Wed, 28 Oct 2026 20:14:38 -0500</pubDate>
-            <link>https://github.com/mileswolfallen2/Notching-it-up-/releases</link>
-            <sparkle:version>275</sparkle:version>
-            <sparkle:shortVersionString>0.2.4</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/mileswolfallen2/Notching-it-up-/releases/download/0.2.4/boringNotch.dmg" length="9723128" type="application/octet-stream" sparkle:edSignature="Wlu1i/eQ4OB66ieuAIbkQqhfud9e27mGTVR2UZ+OI0YHJe/vkhxHC8jTsvkHtAwvlsrB633U8HwCDp81n1uUCw==" />
-        </item>
-    <item>
-            <title>0.2.4.2</title>
-            <pubDate>Thu, 29 Oct 2026 10:09:02 -0500</pubDate>
-            <link>https://github.com/mileswolfallen2/Notching-it-up-/releases</link>
-            <sparkle:version>277</sparkle:version>
-            <sparkle:shortVersionString>0.2.4.2</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/mileswolfallen2/Notching-it-up-/releases/download/0.2.4.2/boringNotch.dmg" length="9730835" type="application/octet-stream" sparkle:edSignature="GyqqVihGCzAcf1H9TazJEzg3VU04dlED5fdwfxoMn48N3kAvL7OH5RAd+9yHriYa4MHJn/SVMvyjDpubGnT6AA==" />
-        </item>
-        <item>
-            <title>0.2.4.1</title>
-            <pubDate>Thu, 29 Oct 2026 09:59:30 -0500</pubDate>
-            <link>https://github.com/mileswolfallen2/Notching-it-up-/releases</link>
-            <sparkle:version>276</sparkle:version>
-            <sparkle:shortVersionString>0.2.4.1</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/mileswolfallen2/Notching-it-up-/releases/download/0.2.4.1/boringNotch.dmg" length="9722405" type="application/octet-stream" sparkle:edSignature="Plx32vNPxGAtVpOPCEGeefzXDCRrLUI13QopBLTzW5SmkftFPlQrqVtLC5GIv3KCwWqxbCh5Ndxn9lQPAU5jDQ==" />
-        </item>
-        <item>
-            <title>0.2.4</title>
-            <pubDate>Wed, 28 Oct 2026 20:14:38 -0500</pubDate>
-            <link>https://github.com/mileswolfallen2/Notching-it-up-/releases</link>
-            <sparkle:version>275</sparkle:version>
-            <sparkle:shortVersionString>0.2.4</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/mileswolfallen2/Notching-it-up-/releases/download/0.2.4/boringNotch.dmg" length="9723128" type="application/octet-stream" sparkle:edSignature="Wlu1i/eQ4OB66ieuAIbkQqhfud9e27mGTVR2UZ+OI0YHJe/vkhxHC8jTsvkHtAwvlsrB633U8HwCDp81n1uUCw==" />
-        </item>
-    <item>
             <title>0.2.4.1</title>
             <pubDate>Thu, 29 Oct 2026 09:59:30 -0500</pubDate>
             <link>https://github.com/mileswolfallen2/Notching-it-up-/releases</link>
