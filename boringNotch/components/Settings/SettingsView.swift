@@ -43,12 +43,15 @@ struct SettingsView: View {
                 NavigationLink(value: "HUD") {
                     Label("HUDs", systemImage: "dial.medium.fill")
                 }
+                NavigationLink(value: "Timer") {
+                    Label("Timer", systemImage: "timer")
+                }
+                NavigationLink(value: "Shelf") {
+                    Label("Shelf", systemImage: "books.vertical")
+                }
                 if showAdvancedSettings {
                     NavigationLink(value: "Battery") {
                         Label("Battery", systemImage: "battery.100.bolt")
-                    }
-                    NavigationLink(value: "Shelf") {
-                        Label("Shelf", systemImage: "books.vertical")
                     }
                     NavigationLink(value: "Shortcuts") {
                         Label("Shortcuts", systemImage: "keyboard")
@@ -78,10 +81,12 @@ struct SettingsView: View {
                     CalendarSettings()
                 case "HUD":
                     HUD()
+                case "Timer":
+                    TimerSettings()
                 case "Battery":
                     showAdvancedSettings ? AnyView(Charge()) : AnyView(GeneralSettings())
                 case "Shelf":
-                    showAdvancedSettings ? AnyView(Shelf()) : AnyView(GeneralSettings())
+                    AnyView(Shelf())
                 case "Shortcuts":
                     showAdvancedSettings ? AnyView(Shortcuts()) : AnyView(GeneralSettings())
                 case "Extensions":
@@ -1005,6 +1010,18 @@ struct Shelf: View {
     
     var body: some View {
         Form {
+            // MARK: Top bar tab layout
+            Section {
+                TopBarSlotConfigurationView()
+            } header: {
+                Text("Top Bar Layout")
+            } footer: {
+                Text("Drag tabs to reorder them in the top bar. Toggle each tab to show or hide it.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            // MARK: Shelf general
             Section {
                 Defaults.Toggle(key: .boringShelf) {
                     Text("Enable shelf")
@@ -1027,7 +1044,6 @@ struct Shelf: View {
                 Defaults.Toggle(key: .autoRemoveShelfItems) {
                     Text("Remove from shelf after dragging")
                 }
-                
 
             } header: {
                 HStack {
@@ -1888,4 +1904,40 @@ func warningBadge(_ text: String, _ description: String) -> some View {
 
 #Preview {
     HUD()
+}
+
+
+struct TimerSettings: View {
+    @Default(.timerWorkDuration) private var workDuration
+    @Default(.timerShortBreakDuration) private var shortBreakDuration
+    @Default(.timerLongBreakDuration) private var longBreakDuration
+    @Default(.timerSessionsBeforeLongBreak) private var sessionsBeforeLongBreak
+    @Default(.timerAutoStartBreaks) private var autoStartBreaks
+    @Default(.timerAutoStartWork) private var autoStartWork
+    @Default(.timerShowInClosedNotch) private var showInClosedNotch
+
+    var body: some View {
+        Form {
+            Section("Pomodoro durations") {
+                durationPicker("Work", value: $workDuration, range: 1...120)
+                durationPicker("Short break", value: $shortBreakDuration, range: 1...60)
+                durationPicker("Long break", value: $longBreakDuration, range: 1...120)
+                Stepper("Sessions before long break: \(sessionsBeforeLongBreak)", value: $sessionsBeforeLongBreak, in: 1...12)
+            }
+
+            Section("Automation") {
+                Toggle("Automatically start breaks", isOn: $autoStartBreaks)
+                Toggle("Automatically start work sessions", isOn: $autoStartWork)
+                Toggle("Show timer in the closed notch", isOn: $showInClosedNotch)
+            }
+        }
+        .onChange(of: workDuration) { PomodoroTimer.shared.applySettings() }
+        .onChange(of: shortBreakDuration) { PomodoroTimer.shared.applySettings() }
+        .onChange(of: longBreakDuration) { PomodoroTimer.shared.applySettings() }
+        .navigationTitle("Timer")
+    }
+
+    private func durationPicker(_ title: String, value: Binding<Int>, range: ClosedRange<Int>) -> some View {
+        Stepper("\(title): \(value.wrappedValue) minutes", value: value, in: range)
+    }
 }

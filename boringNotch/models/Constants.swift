@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Defaults
+import Foundation
 
 private let availableDirectories = FileManager
     .default
@@ -68,6 +69,34 @@ enum OptionKeyAction: String, CaseIterable, Identifiable, Defaults.Serializable 
     var id: String { self.rawValue }
 }
 
+/// Represents a configurable item in the top bar (header tab strip).
+enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializable {
+    case home  = "home"
+    case shelf = "shelf"
+    case timer = "timer"
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .home:  return "Home"
+        case .shelf: return "Shelf"
+        case .timer: return "Timer"
+        }
+    }
+
+    var iconName: String {
+        switch self {
+        case .home:  return "house.fill"
+        case .shelf: return "tray.fill"
+        case .timer: return "timer"
+        }
+    }
+
+    /// Default ordered layout shown in the top bar.
+    static let defaultLayout: [TopBarTab] = [.home, .shelf, .timer]
+}
+
 extension Defaults.Keys {
     // MARK: General
     static let menubarIcon = Key<Bool>("menubarIcon", default: true)
@@ -96,6 +125,20 @@ extension Defaults.Keys {
     static let hideFromScreenRecording = Key<Bool>("hideFromScreenRecording", default: false)
     static let enableClipboardHistory = Key<Bool>("enableClipboardHistory", default: false)
     
+    // MARK: Top bar tab layout
+    static let topBarSlots = Key<[TopBarTab]>("topBarSlots", default: TopBarTab.defaultLayout)
+
+    // MARK: Timer
+    static let timerWorkDuration = Key<Int>("timerWorkDuration", default: 25)
+    static let timerShortBreakDuration = Key<Int>("timerShortBreakDuration", default: 5)
+    static let timerLongBreakDuration = Key<Int>("timerLongBreakDuration", default: 15)
+    static let timerSessionsBeforeLongBreak = Key<Int>("timerSessionsBeforeLongBreak", default: 4)
+    static let timerAutoStartBreaks = Key<Bool>("timerAutoStartBreaks", default: false)
+    static let timerAutoStartWork = Key<Bool>("timerAutoStartWork", default: false)
+    static let timerShowInClosedNotch = Key<Bool>("timerShowInClosedNotch", default: true)
+    static let showHomeTab = Key<Bool>("showHomeTab", default: true)
+    static let showShelfTab = Key<Bool>("showShelfTab", default: true)
+    static let showTimerTab = Key<Bool>("showTimerTab", default: true)
     // MARK: Appearance
     static let showEmojis = Key<Bool>("showEmojis", default: false)
     //static let alwaysShowTabs = Key<Bool>("alwaysShowTabs", default: true)

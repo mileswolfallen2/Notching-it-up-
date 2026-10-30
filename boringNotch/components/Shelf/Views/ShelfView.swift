@@ -14,10 +14,32 @@ struct ShelfView: View {
     @StateObject var tvm = ShelfStateViewModel.shared
     @StateObject var selection = ShelfSelectionModel.shared
     @StateObject private var quickLookService = QuickLookService()
+    @ObservedObject var coordinator = BoringViewCoordinator.shared
     @Default(.enableClipboardHistory) var enableClipboardHistory
+    @Default(.showHomeTab) private var showHomeTab
+    @Default(.showShelfTab) private var showShelfTab
+    @Default(.showTimerTab) private var showTimerTab
     private let spacing: CGFloat = 8
     @State private var clipboardItems: [ClipboardItem] = []
     @State private var clipboardTimer: Timer?
+    
+    private var visibleTabs: [NotchViews] {
+        var tabs: [NotchViews] = []
+        if showHomeTab { tabs.append(.home) }
+        if showShelfTab && Defaults[.boringShelf] { tabs.append(.shelf) }
+        if showTimerTab { tabs.append(.timer) }
+        return tabs
+    }
+    
+    func switchTab(by offset: Int) {
+        guard let currentIndex = visibleTabs.firstIndex(of: coordinator.currentView) else { return }
+        let newIndex = currentIndex + offset
+        if newIndex >= 0 && newIndex < visibleTabs.count {
+            withAnimation(.smooth) {
+                coordinator.currentView = visibleTabs[newIndex]
+            }
+        }
+    }
 
     var body: some View {
         HStack(spacing: 12) {
@@ -52,6 +74,16 @@ struct ShelfView: View {
                 clipboardItems = []
             }
         }
+        .gesture(
+            DragGesture()
+                .onEnded { value in
+                    if value.translation.width < -50 {
+                        switchTab(by: 1)
+                    } else if value.translation.width > 50 {
+                        switchTab(by: -1)
+                    }
+                }
+        )
     }
     
     private func startClipboardMonitoring() {

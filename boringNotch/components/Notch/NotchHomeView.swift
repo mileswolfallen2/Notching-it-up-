@@ -598,3 +598,65 @@ struct CustomSlider: View {
         }
     }
 }
+
+
+struct PomodoroTimerView: View {
+    @ObservedObject private var timer = PomodoroTimer.shared
+
+    var body: some View {
+        VStack(spacing: 4) {
+            VStack(spacing: 0) {
+                Text(timer.phase.rawValue)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.secondary)
+                Text(timer.formattedRemaining)
+                    .font(.system(size: 30, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
+            }
+
+            ProgressView(value: timer.progress)
+                .tint(.effectiveAccent)
+                .clipShape(RoundedRectangle(cornerRadius: 3))
+                .frame(maxWidth: 200)
+
+            HStack(spacing: 4) {
+                Button(timer.isRunning ? "Pause" : "Start") {
+                    timer.toggle()
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.mini)
+
+                Button("Reset") {
+                    timer.reset()
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.mini)
+
+                Button {
+                    timer.skipPhase()
+                } label: {
+                    Image(systemName: "forward.end.fill")
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.mini)
+                .help("Skip phase")
+            }
+
+            Text("Sessions: \(timer.completedWorkSessions)")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.horizontal, 18)
+        .padding(.vertical, 6)
+        .frame(maxWidth: 240)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(.black)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .strokeBorder(Color.white.opacity(0.1), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
+}

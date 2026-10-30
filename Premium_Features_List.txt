@@ -1,0 +1,17 @@
+Premium Features in Notching it up (Current Codebase)
+======================================================
+
+Generated: Fri Oct 30 2026
+
+UI/Badges & Premium Markers
+----------------------------
+- SettingsView.swift:1918 - proFeatureBadge() function displaying "Upgrade to Pro" (purple badge)
+- SettingsView.swift:1930 - comingSoonTag() function for features marked "Coming soon"
+- SettingsView.swift:1940 - customBadge(text:) helper function
+- Localizable.xcstrings:22134+ - "Upgrade to Pro" strings in multiple languages
+
+Notes
+-----
+The "Upgrade to Pro" badge is defined in the codebase but not actively applied to specific features in the current UI. This appears to be a leftover/placeholder from the original Boring Notch Pro version that was forked. There are no actual licensing checks, subscription validation, or feature gating logic found in the current codebase.
+
+All features appear to be unlocked by default in this fork.

@@ -704,6 +704,16 @@
         }
       }
     },
+    "%@: %lld minutes" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$lld minutes"
+          }
+        }
+      }
+    },
     "%d%%" : {
       "localizations" : {
         "ar" : {
@@ -3108,6 +3118,12 @@
         }
       }
     },
+    "Automatically start breaks" : {
+
+    },
+    "Automatically start work sessions" : {
+
+    },
     "Automatically switch displays" : {
       "localizations" : {
         "ar" : {
@@ -3207,6 +3223,9 @@
           }
         }
       }
+    },
+    "Automation" : {
+
     },
     "Battery" : {
       "localizations" : {
@@ -7721,6 +7740,12 @@
         }
       }
     },
+    "Drag tabs to reorder them in the top bar. Toggle each tab to show or hide it." : {
+
+    },
+    "Drag to reorder" : {
+
+    },
     "Drop files here" : {
       "localizations" : {
         "ar" : {
@@ -11126,6 +11151,9 @@
           }
         }
       }
+    },
+    "Home" : {
+
     },
     "Hover delay" : {
       "localizations" : {
@@ -16137,6 +16165,9 @@
         }
       }
     },
+    "Pause" : {
+
+    },
     "Pick a Color" : {
       "localizations" : {
         "ar" : {
@@ -16336,6 +16367,9 @@
           }
         }
       }
+    },
+    "Pomodoro durations" : {
+
     },
     "Preferred display" : {
       "localizations" : {
@@ -17641,6 +17675,9 @@
         }
       }
     },
+    "Reset" : {
+
+    },
     "Reset to Defaults" : {
       "localizations" : {
         "ar" : {
@@ -18342,6 +18379,12 @@
           }
         }
       }
+    },
+    "Sessions before long break: %lld" : {
+
+    },
+    "Sessions: %lld" : {
+
     },
     "Settings" : {
       "localizations" : {
@@ -20146,10 +20189,16 @@
         }
       }
     },
+    "Show timer in the closed notch" : {
+
+    },
     "Show track progress bar" : {
 
     },
     "Show volume, brightness, and keyboard backlight in the notch instead of the default macOS HUD." : {
+
+    },
+    "Skip phase" : {
 
     },
     "Slider color" : {
@@ -20752,6 +20801,9 @@
         }
       }
     },
+    "Start" : {
+
+    },
     "Stopped" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -21154,6 +21206,12 @@
         }
       }
     },
+    "Tab Order" : {
+
+    },
+    "Tab Visibility" : {
+
+    },
     "Time to Full Charge: %lld min" : {
       "localizations" : {
         "ar" : {
@@ -21253,6 +21311,9 @@
           }
         }
       }
+    },
+    "Timer" : {
+
     },
     "Tint progress bar with accent color" : {
       "localizations" : {
@@ -21553,6 +21614,9 @@
           }
         }
       }
+    },
+    "Top Bar Layout" : {
+
     },
     "Transition speed" : {
 

@@ -47,6 +47,113 @@ struct ExpandedItem {
 }
 
 @MainActor
+final class PomodoroTimer: ObservableObject {
+    enum Phase: String {
+        case work = "Work"
+        case shortBreak = "Short Break"
+        case longBreak = "Long Break"
+    }
+
+    static let shared = PomodoroTimer()
+
+    @Published private(set) var phase: Phase = .work
+    @Published private(set) var remainingSeconds: Int
+    @Published private(set) var isRunning = false
+    @Published private(set) var completedWorkSessions = 0
+
+    private var timer: Timer?
+
+    private init() {
+        remainingSeconds = Defaults[.timerWorkDuration] * 60
+    }
+
+    var totalSeconds: Int {
+        switch phase {
+        case .work: return Defaults[.timerWorkDuration] * 60
+        case .shortBreak: return Defaults[.timerShortBreakDuration] * 60
+        case .longBreak: return Defaults[.timerLongBreakDuration] * 60
+        }
+    }
+
+    var progress: Double {
+        guard totalSeconds > 0 else { return 0 }
+        return Double(totalSeconds - remainingSeconds) / Double(totalSeconds)
+    }
+
+    var formattedRemaining: String {
+        String(format: "%02d:%02d", remainingSeconds / 60, remainingSeconds % 60)
+    }
+
+    func toggle() {
+        isRunning ? pause() : start()
+    }
+
+    func start() {
+        guard !isRunning else { return }
+        isRunning = true
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.tick()
+            }
+        }
+        if let timer { RunLoop.current.add(timer, forMode: .common) }
+    }
+
+    func pause() {
+        timer?.invalidate()
+        timer = nil
+        isRunning = false
+    }
+
+    func reset() {
+        pause()
+        remainingSeconds = totalSeconds
+    }
+
+    func skipPhase() {
+        advancePhase()
+    }
+
+    func applySettings() {
+        if !isRunning {
+            remainingSeconds = min(remainingSeconds, totalSeconds)
+            if remainingSeconds <= 0 {
+                remainingSeconds = totalSeconds
+            }
+        }
+    }
+
+    private func tick() {
+        guard remainingSeconds > 0 else {
+            advancePhase()
+            return
+        }
+        remainingSeconds -= 1
+    }
+
+    private func advancePhase() {
+        pause()
+        if phase == .work {
+            completedWorkSessions += 1
+            if completedWorkSessions % Defaults[.timerSessionsBeforeLongBreak] == 0 {
+                phase = .longBreak
+            } else {
+                phase = .shortBreak
+            }
+            remainingSeconds = totalSeconds
+            if Defaults[.timerAutoStartBreaks] {
+                start()
+            }
+        } else {
+            phase = .work
+            remainingSeconds = totalSeconds
+            if Defaults[.timerAutoStartWork] {
+                start()
+            }
+        }
+    }
+}
+
 class BoringViewCoordinator: ObservableObject {
     static let shared = BoringViewCoordinator()
 

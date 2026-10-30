@@ -100,6 +100,8 @@ struct BoringHeader: View {
         }
         .foregroundColor(.gray)
         .environmentObject(vm)
+        .frame(height: 32)
+        .fixedSize(horizontal: false, vertical: true)
     }
 
     func isHUDType(_ type: SneakContentType) -> Bool {

@@ -23,6 +23,7 @@ struct ContentView: View {
     @ObservedObject var batteryModel = BatteryStatusViewModel.shared
     @ObservedObject var brightnessManager = BrightnessManager.shared
     @ObservedObject var volumeManager = VolumeManager.shared
+    @ObservedObject var pomodoroTimer = PomodoroTimer.shared
     @State private var hoverTask: Task<Void, Never>?
     @State private var isHovering: Bool = false
     @State private var anyDropDebounceTask: Task<Void, Never>?
@@ -331,6 +332,15 @@ struct ContentView: View {
                               .padding(.bottom, 10)
                               .padding(.leading, 4)
                               .padding(.trailing, 8)
+                          } else if pomodoroTimer.isRunning && Defaults[.timerShowInClosedNotch] && vm.notchState == .closed && !vm.hideOnClosed && !musicManager.isPlaying && musicManager.isPlayerIdle {
+                              HStack(spacing: 4) {
+                                  Image(systemName: "timer")
+                                  Text(pomodoroTimer.formattedRemaining)
+                                      .monospacedDigit()
+                              }
+                              .font(.caption.weight(.medium))
+                              .foregroundStyle(.white)
+                              .padding(.bottom, 8)
                           }
                           else if coordinator.sneakPeek.type == .music
                               && vm.notchState == .closed
@@ -377,8 +387,12 @@ struct ContentView: View {
                         NotchHomeView(albumArtNamespace: albumArtNamespace)
                     case .shelf:
                         ShelfView()
+                    case .timer:
+                        PomodoroTimerView()
                     }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                .padding(.top, 0)
                 .transition(
                     .scale(scale: 0.8, anchor: .top)
                     .combined(with: .opacity)
