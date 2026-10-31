@@ -15,6 +15,8 @@
 <p align="center">
   <img src="https://github.com/user-attachments/assets/2d5f69c1-6e7b-4bc2-a6f1-bb9e27cf88a8" alt="Demo GIF" />
 </p>
+<h1>why </h1>
+<p>I've become increasingly unhappy with the direction Boring Notch is heading. It feels like the focus is shifting away from improving the actual application and delivering the features and polish that made it worth using in the first place, and more toward building an extension/plugin ecosystem and introducing paid features. I believe the core app should come first. It should be fast, polished, useful, customizable, and feel like a natural part of macOS without having to rely on a bunch of add-ons to make it great. That's exactly why I decided to start **Notching It Up**. I want to take what makes Boring Notch great, build on it, and focus on making the actual notch experience better rather than losing sight of what the application is supposed to be.</p>
 
 ---
 
