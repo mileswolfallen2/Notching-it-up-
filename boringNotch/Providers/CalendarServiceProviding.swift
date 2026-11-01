@@ -94,7 +94,7 @@ class CalendarService: CalendarServiceProviding {
                         return false
                     }
                     
-                    return dueDate >= start && dueDate <= end
+                    return dueDate >= start && dueDate < end
                 }
                 
                 // Convert to EventModel
