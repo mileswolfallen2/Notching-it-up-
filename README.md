@@ -120,7 +120,7 @@ To publish a release:
 
 1. Merge the reviewed release changes into `main`.
 2. Run **Deploy Notching it up** with `0.2.2` (the workflow adds the `v`
-   tag), and provide the repository's Sparkle private-key secret.
+   tag), and provide the repository's Sparkle private-key secret.(If you don't have this, you shouldn't be trying to push an update. Please contact mileswolfallen2 to push an update to all client apps)
 3. Confirm the draft release's DMG downloads and the generated appcast entry
    points to that exact asset before publishing.
 4. Install the published DMG over an older version and choose **Check for
