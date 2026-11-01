@@ -74,6 +74,7 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
     case home  = "home"
     case shelf = "shelf"
     case timer = "timer"
+    case ai    = "ai"
 
     var id: String { rawValue }
 
@@ -82,6 +83,7 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
         case .home:  return "Home"
         case .shelf: return "Shelf"
         case .timer: return "Timer"
+        case .ai:    return "AI"
         }
     }
 
@@ -90,11 +92,240 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
         case .home:  return "house.fill"
         case .shelf: return "tray.fill"
         case .timer: return "timer"
+        case .ai:    return "sparkles"
+        }
+    }
+
+    var notchView: NotchViews {
+        switch self {
+        case .home:  return .home
+        case .shelf: return .shelf
+        case .timer: return .timer
+        case .ai:    return .ai
         }
     }
 
     /// Default ordered layout shown in the top bar.
-    static let defaultLayout: [TopBarTab] = [.home, .shelf, .timer]
+    static let defaultLayout: [TopBarTab] = [.home, .shelf, .timer, .ai]
+
+    /// Returns the stored order with any missing tabs appended, then filters out
+    /// tabs the user has hidden. This keeps existing installations working when
+    /// new tabs are introduced.
+    static func orderedVisibleTabs(
+        slots: [TopBarTab],
+        showHome: Bool,
+        showShelf: Bool,
+        showTimer: Bool,
+        showAI: Bool,
+        shelfEnabled: Bool
+    ) -> [TopBarTab] {
+        var ordered = slots
+        for tab in allCases where !ordered.contains(tab) {
+            ordered.append(tab)
+        }
+        return ordered.filter { tab in
+            switch tab {
+            case .home:  return showHome
+            case .shelf: return showShelf && shelfEnabled
+            case .timer: return showTimer
+            case .ai:    return showAI
+            }
+        }
+    }
+}
+
+// MARK: - AI usage tracking
+
+/// Providers whose plan usage can be surfaced in the AI tab.
+enum AIProvider: String, CaseIterable, Codable, Identifiable, Defaults.Serializable, Hashable, Sendable {
+    case claude
+    case codex
+    case cursor
+    case antigravity
+    case copilot
+    case gemini
+    case opencode
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .claude:      return "Claude"
+        case .codex:       return "Codex"
+        case .cursor:      return "Cursor"
+        case .antigravity: return "Antigravity"
+        case .copilot:     return "Copilot"
+        case .gemini:      return "Gemini"
+        case .opencode:    return "OpenCode"
+        }
+    }
+
+    var iconName: String {
+        switch self {
+        case .claude:      return "sparkles"
+        case .codex:       return "terminal"
+        case .cursor:      return "cursorarrow.rays"
+        case .antigravity: return "atom"
+        case .copilot:     return "chevron.left.forwardslash.chevron.right"
+        case .gemini:      return "diamond.fill"
+        case .opencode:    return "brain.head.profile"
+        }
+    }
+
+    var tint: Color {
+        switch self {
+        case .claude:      return Color(red: 0.85, green: 0.47, blue: 0.34)
+        case .codex:       return Color(red: 0.10, green: 0.72, blue: 0.55)
+        case .cursor:      return Color(red: 0.24, green: 0.52, blue: 1.00)
+        case .antigravity: return Color(red: 0.62, green: 0.42, blue: 1.00)
+        case .copilot:     return Color(red: 0.45, green: 0.55, blue: 0.95)
+        case .gemini:      return Color(red: 0.35, green: 0.62, blue: 0.98)
+        case .opencode:    return Color(red: 0.20, green: 0.75, blue: 0.78)
+        }
+    }
+
+    var defaultPlanName: String {
+        switch self {
+        case .claude:      return "Claude Pro"
+        case .codex:       return "ChatGPT Plus"
+        case .cursor:      return "Cursor Pro"
+        case .antigravity: return "Antigravity"
+        case .copilot:     return "GitHub Copilot"
+        case .gemini:      return "Google AI Pro"
+        case .opencode:    return "OpenCode"
+        }
+    }
+
+    /// Typical length of a usage window before the plan limits reset.
+    var resetInterval: TimeInterval {
+        switch self {
+        case .claude, .codex, .antigravity, .opencode:
+            return 5 * 60 * 60
+        case .gemini:
+            return 24 * 60 * 60
+        case .cursor, .copilot:
+            return 30 * 24 * 60 * 60
+        }
+    }
+
+    var resetIntervalLabel: String {
+        switch self {
+        case .claude, .codex, .antigravity, .opencode:
+            return "5 hours"
+        case .gemini:
+            return "24 hours"
+        case .cursor, .copilot:
+            return "30 days"
+        }
+    }
+
+    /// Providers that expose a personal usage endpoint we can read after signing in.
+    var supportsLiveUsage: Bool {
+        switch self {
+        case .claude, .codex, .antigravity, .copilot:
+            return true
+        case .cursor, .gemini, .opencode:
+            return false
+        }
+    }
+
+    static var liveProviders: [AIProvider] {
+        allCases.filter(\.supportsLiveUsage)
+    }
+
+    var signInHint: String {
+        switch self {
+        case .claude:      return "Sign in with your Claude account"
+        case .codex:       return "Sign in with your ChatGPT account"
+        case .antigravity: return "Sign in with your Google account"
+        case .copilot:     return "Connect with a GitHub device code"
+        case .cursor:      return "Cursor is tracked manually"
+        case .gemini:      return "Gemini is tracked manually"
+        case .opencode:    return "OpenCode is tracked manually"
+        }
+    }
+}
+
+/// A single tracked AI plan. Usage is kept locally so no credentials or
+/// network requests are required.
+struct AIUsageEntry: Codable, Hashable, Identifiable, Defaults.Serializable {
+    var id: UUID = UUID()
+    var provider: AIProvider
+    var planName: String = ""
+    var percentRemaining: Double = 100
+    var resetDate: Date? = nil
+    var enabled: Bool = true
+    /// When the last low-usage alert was posted for the current window.
+    /// Optional so existing stored entries keep decoding.
+    var lastAlertDate: Date? = nil
+    /// Signed-in account this entry last synced with, when live usage is enabled.
+    var accountLabel: String? = nil
+    /// Last successful live sync.
+    var lastSyncDate: Date? = nil
+    /// Last live sync failure, kept so the settings pane can explain stale data.
+    var syncError: String? = nil
+
+    var isLiveSynced: Bool { lastSyncDate != nil }
+
+    var displayPlanName: String {
+        planName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? provider.defaultPlanName
+            : planName
+    }
+
+    var clampedPercent: Double {
+        min(max(percentRemaining, 0), 100)
+    }
+
+    var statusColor: Color {
+        if clampedPercent <= 15 { return .red }
+        if clampedPercent <= 35 { return .orange }
+        return provider.tint
+    }
+
+    func isLow(threshold: Double) -> Bool {
+        clampedPercent <= threshold
+    }
+
+    /// The next reset time after `now`, keeping the original anchor while
+    /// advancing by whole windows.
+    static func nextReset(after now: Date, from anchor: Date, interval: TimeInterval) -> Date {
+        guard interval > 60 else { return now.addingTimeInterval(interval) }
+        var next = anchor
+        // Guard against absurd loops from corrupt data.
+        var safety = 0
+        while next <= now && safety < 10_000 {
+            next = next.addingTimeInterval(interval)
+            safety += 1
+        }
+        return next
+    }
+
+    var defaultResetDate: Date {
+        Date().addingTimeInterval(provider.resetInterval)
+    }
+
+    var resetText: String {
+        guard let resetDate else { return "No reset time" }
+        let interval = resetDate.timeIntervalSinceNow
+        if interval <= 0 { return "Reset ready" }
+        if interval < 60 * 60 {
+            return "Resets in \(max(1, Int(interval / 60)))m"
+        }
+        if interval < 24 * 60 * 60 {
+            let hours = Int(interval / 3600)
+            let minutes = Int(interval.truncatingRemainder(dividingBy: 3600) / 60)
+            return minutes == 0 ? "Resets in \(hours)h" : "Resets in \(hours)h \(minutes)m"
+        }
+        return "Resets \(resetDate.formatted(.dateTime.weekday(.abbreviated).hour().minute()))"
+    }
+
+    static let defaultEntries: [AIUsageEntry] = [
+        AIUsageEntry(provider: .claude, planName: "Claude Pro", resetDate: Date().addingTimeInterval(AIProvider.claude.resetInterval)),
+        AIUsageEntry(provider: .codex, planName: "ChatGPT Plus", resetDate: Date().addingTimeInterval(AIProvider.codex.resetInterval)),
+        AIUsageEntry(provider: .cursor, planName: "Cursor Pro", resetDate: Date().addingTimeInterval(AIProvider.cursor.resetInterval)),
+        AIUsageEntry(provider: .antigravity, planName: "Antigravity", resetDate: Date().addingTimeInterval(AIProvider.antigravity.resetInterval))
+    ]
 }
 
 extension Defaults.Keys {
@@ -127,6 +358,18 @@ extension Defaults.Keys {
     
     // MARK: Top bar tab layout
     static let topBarSlots = Key<[TopBarTab]>("topBarSlots", default: TopBarTab.defaultLayout)
+
+    // MARK: AI usage
+    static let aiUsageEntries = Key<[AIUsageEntry]>("aiUsageEntries", default: AIUsageEntry.defaultEntries)
+    static let showAITab = Key<Bool>("showAITab", default: true)
+    static let aiSortByLowest = Key<Bool>("aiSortByLowest", default: false)
+    static let aiShowPlanName = Key<Bool>("aiShowPlanName", default: true)
+    static let aiShowResetTime = Key<Bool>("aiShowResetTime", default: true)
+    static let aiCompactCards = Key<Bool>("aiCompactCards", default: false)
+    static let aiAutoReset = Key<Bool>("aiAutoReset", default: true)
+    static let aiLiveSync = Key<Bool>("aiLiveSync", default: true)
+    static let aiLowUsageAlerts = Key<Bool>("aiLowUsageAlerts", default: true)
+    static let aiLowUsageThreshold = Key<Double>("aiLowUsageThreshold", default: 20)
 
     // MARK: Timer
     static let timerWorkDuration = Key<Int>("timerWorkDuration", default: 25)

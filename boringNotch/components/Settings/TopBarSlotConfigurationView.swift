@@ -2,8 +2,6 @@
 //  TopBarSlotConfigurationView.swift
 //  boringNotch
 //
-//  Created by miles allen on 2025-10-30.
-//
 //  Drag-and-drop layout editor for the top bar tab strip.
 //  Mirrors the pattern used in MusicSlotConfigurationView.
 //
@@ -17,71 +15,226 @@ struct TopBarSlotConfigurationView: View {
     @Default(.showHomeTab) private var showHomeTab
     @Default(.showShelfTab) private var showShelfTab
     @Default(.showTimerTab) private var showTimerTab
+    @Default(.showAITab) private var showAITab
+    @Default(.boringShelf) private var shelfEnabled
+
+    @State private var draggedTab: TopBarTab?
+
+    /// Stored order with any newly introduced tabs appended.
+    private var orderedTabs: [TopBarTab] {
+        var ordered = topBarSlots
+        for tab in TopBarTab.allCases where !ordered.contains(tab) {
+            ordered.append(tab)
+        }
+        return ordered
+    }
+
+    private var visibleTabs: [TopBarTab] {
+        TopBarTab.orderedVisibleTabs(
+            slots: topBarSlots,
+            showHome: showHomeTab,
+            showShelf: showShelfTab,
+            showTimer: showTimerTab,
+            showAI: showAITab,
+            shelfEnabled: shelfEnabled
+        )
+    }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-
-            // ── Order section ───────────────────────────────────────────
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text("Tab Order")
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                    Text("Drag to reorder")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-
-                // Live preview row – one chip per tab in stored order
-                HStack(spacing: 8) {
-                    ForEach(Array(topBarSlots.enumerated()), id: \.element) { idx, tab in
-                        tabChip(for: tab)
-                            .onDrag {
-                                NSItemProvider(object: NSString(string: "slot:\(idx)"))
-                            }
-                            .onDrop(of: [UTType.plainText.identifier], isTargeted: nil) { providers in
-                                handleDrop(providers, toIndex: idx)
-                            }
-                    }
-                }
-                .padding(12)
-                .background(Color(NSColor.controlBackgroundColor))
-                .cornerRadius(8)
-            }
-
+        VStack(alignment: .leading, spacing: 14) {
+            previewSection
             Divider()
+            visibilitySection
 
-            // ── Visibility section ──────────────────────────────────────
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Tab Visibility")
-                    .font(.headline)
-                    .foregroundStyle(.secondary)
-
-                Toggle(isOn: $showHomeTab) {
-                    Label("Home", systemImage: "house.fill")
-                }
-                .tint(.effectiveAccent)
-
-                Toggle(isOn: $showShelfTab) {
-                    Label("Shelf", systemImage: "tray.fill")
-                }
-                .tint(.effectiveAccent)
-
-                Toggle(isOn: $showTimerTab) {
-                    Label("Timer", systemImage: "timer")
-                }
-                .tint(.effectiveAccent)
-            }
-
-            // ── Reset ───────────────────────────────────────────────────
             HStack {
+                if !shelfEnabled {
+                    Label("The shelf is disabled, so its tab stays hidden.", systemImage: "info.circle")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
                 Spacer()
+
                 Button("Reset to Defaults") {
-                    withAnimation { topBarSlots = TopBarTab.defaultLayout }
+                    withAnimation(.snappy) {
+                        topBarSlots = TopBarTab.defaultLayout
+                        showHomeTab = true
+                        showShelfTab = true
+                        showTimerTab = true
+                        showAITab = true
+                    }
                 }
                 .buttonStyle(.borderless)
             }
+        }
+        .onAppear(perform: normalizeSlots)
+    }
+
+    // MARK: - Preview
+
+    private var previewSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Top Bar Preview")
+                    .font(.headline)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text("Drag chips to reorder")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            Group {
+                if visibleTabs.isEmpty {
+                    HStack(spacing: 8) {
+                        Image(systemName: "eye.slash")
+                            .foregroundStyle(.secondary)
+                        Text("All tabs are hidden. Turn one on below to show it in the notch.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(12)
+                } else {
+                    HStack(spacing: 8) {
+                        ForEach(visibleTabs, id: \.self) { tab in
+                            tabChip(for: tab)
+                                .opacity(draggedTab == tab ? 0.4 : 1)
+                                .onDrag {
+                                    DispatchQueue.main.async { draggedTab = tab }
+                                    return NSItemProvider(object: NSString(string: "tab:\(tab.rawValue)"))
+                                }
+                                .onDrop(of: [UTType.plainText.identifier], isTargeted: nil) { providers in
+                                    let handled = handleDrop(providers, onto: tab)
+                                    DispatchQueue.main.async { draggedTab = nil }
+                                    return handled
+                                }
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    .padding(12)
+                }
+            }
+            .background(Color(NSColor.controlBackgroundColor))
+            .cornerRadius(8)
+        }
+    }
+
+    // MARK: - Visibility & order
+
+    private var visibilitySection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Tabs")
+                    .font(.headline)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text("Drag to reorder")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            ForEach(orderedTabs, id: \.self) { tab in
+                tabRow(for: tab)
+            }
+        }
+    }
+
+    private func tabRow(for tab: TopBarTab) -> some View {
+        let visible = isVisible(tab)
+        let shelfBlocked = tab == .shelf && !shelfEnabled
+
+        return HStack(spacing: 10) {
+            Image(systemName: "line.3.horizontal")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.tertiary)
+
+            ZStack {
+                RoundedRectangle(cornerRadius: 7)
+                    .fill(Color(NSColor.controlBackgroundColor))
+                Image(systemName: tab.iconName)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(.primary)
+            }
+            .frame(width: 30, height: 30)
+
+            VStack(alignment: .leading, spacing: 1) {
+                HStack(spacing: 6) {
+                    Text(tab.label)
+                        .fontWeight(.medium)
+
+                    if !visible {
+                        Text(shelfBlocked ? "Shelf off" : "Hidden")
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Capsule().fill(Color.secondary.opacity(0.14)))
+                    }
+                }
+
+                Text(subtitle(for: tab))
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+
+            Spacer(minLength: 8)
+
+            Toggle("", isOn: visibilityBinding(for: tab))
+                .labelsHidden()
+                .toggleStyle(.switch)
+                .disabled(shelfBlocked)
+                .accessibilityLabel("Show \(tab.label) tab")
+                .help(shelfBlocked ? "Enable the shelf to show this tab" : "")
+        }
+        .padding(.vertical, 6)
+        .padding(.horizontal, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 7)
+                .fill(Color(NSColor.controlBackgroundColor).opacity(visible ? 0.55 : 0.25))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 7)
+                .strokeBorder(Color.primary.opacity(0.05), lineWidth: 1)
+        )
+        .contentShape(RoundedRectangle(cornerRadius: 7))
+        .opacity(visible ? 1 : 0.6)
+        .onDrag {
+            DispatchQueue.main.async { draggedTab = tab }
+            return NSItemProvider(object: NSString(string: "tab:\(tab.rawValue)"))
+        }
+        .onDrop(of: [UTType.plainText.identifier], isTargeted: nil) { providers in
+            let handled = handleDrop(providers, onto: tab)
+            DispatchQueue.main.async { draggedTab = nil }
+            return handled
+        }
+    }
+
+    private func subtitle(for tab: TopBarTab) -> String {
+        switch tab {
+        case .home:  return "Music, calendar and live activity"
+        case .shelf: return "Files and clipboard items"
+        case .timer: return "Pomodoro sessions"
+        case .ai:    return "Plan limits across your AI tools"
+        }
+    }
+
+    private func isVisible(_ tab: TopBarTab) -> Bool {
+        switch tab {
+        case .home:  return showHomeTab
+        case .shelf: return showShelfTab && shelfEnabled
+        case .timer: return showTimerTab
+        case .ai:    return showAITab
+        }
+    }
+
+    private func visibilityBinding(for tab: TopBarTab) -> Binding<Bool> {
+        switch tab {
+        case .home:  return $showHomeTab
+        case .shelf: return $showShelfTab
+        case .timer: return $showTimerTab
+        case .ai:    return $showAITab
         }
     }
 
@@ -93,10 +246,10 @@ struct TopBarSlotConfigurationView: View {
             ZStack {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(Color(NSColor.controlBackgroundColor))
-                    .frame(width: 48, height: 48)
+                    .frame(width: 44, height: 44)
                     .shadow(color: .black.opacity(0.08), radius: 2, y: 1)
                 Image(systemName: tab.iconName)
-                    .font(.system(size: 18, weight: .medium))
+                    .font(.system(size: 16, weight: .medium))
                     .foregroundStyle(Color.primary)
             }
             .cornerRadius(8)
@@ -108,9 +261,15 @@ struct TopBarSlotConfigurationView: View {
         }
     }
 
-    // MARK: - Drop handling
+    // MARK: - Helpers
 
-    private func handleDrop(_ providers: [NSItemProvider], toIndex: Int) -> Bool {
+    private func normalizeSlots() {
+        let normalized = orderedTabs
+        guard normalized != topBarSlots else { return }
+        topBarSlots = normalized
+    }
+
+    private func handleDrop(_ providers: [NSItemProvider], onto target: TopBarTab) -> Bool {
         for provider in providers where provider.canLoadObject(ofClass: NSString.self) {
             provider.loadObject(ofClass: NSString.self) { item, _ in
                 let raw: String
@@ -118,19 +277,21 @@ struct TopBarSlotConfigurationView: View {
                 else if let s = item as? String { raw = s }
                 else { return }
 
-                guard raw.hasPrefix("slot:"),
-                      let from = Int(raw.replacingOccurrences(of: "slot:", with: "")),
-                      from != toIndex,
-                      from >= 0 && from < self.topBarSlots.count,
-                      toIndex >= 0 && toIndex < self.topBarSlots.count
+                guard raw.hasPrefix("tab:"),
+                      let dragged = TopBarTab(rawValue: raw.replacingOccurrences(of: "tab:", with: "")),
+                      dragged != target
                 else { return }
 
                 DispatchQueue.main.async {
-                    var slots = self.topBarSlots
-                    let moved = slots.remove(at: from)
-                    let dest  = toIndex > from ? toIndex - 1 : toIndex
-                    slots.insert(moved, at: dest)
-                    self.topBarSlots = slots
+                    var slots = self.orderedTabs
+                    guard let from = slots.firstIndex(of: dragged),
+                          let to = slots.firstIndex(of: target)
+                    else { return }
+
+                    withAnimation(.snappy) {
+                        slots.swapAt(from, to)
+                        self.topBarSlots = slots
+                    }
                 }
             }
             return true

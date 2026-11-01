@@ -15,8 +15,11 @@
 <p align="center">
   <img src="https://github.com/user-attachments/assets/2d5f69c1-6e7b-4bc2-a6f1-bb9e27cf88a8" alt="Demo GIF" />
 </p>
-<h1>why </h1>
-<p>I've become increasingly unhappy with the direction Boring Notch is heading. It feels like the focus is shifting away from improving the actual application and delivering the features and polish that made it worth using in the first place, and more toward building an extension/plugin ecosystem and introducing paid features. I believe the core app should come first. It should be fast, polished, useful, customizable, and feel like a natural part of macOS without having to rely on a bunch of add-ons to make it great. That's exactly why I decided to start **Notching It Up**. I want to take what makes Boring Notch great, build on it, and focus on making the actual notch experience better rather than losing sight of what the application is supposed to be.</p>
+## Why this fork
+
+I've become increasingly unhappy with the direction Boring Notch is heading. It feels like the focus is shifting away from improving the actual application and delivering the features and polish that made it worth using in the first place, and more toward building an extension/plugin ecosystem and introducing paid features.
+
+I believe the core app should come first. It should be fast, polished, useful, customizable, and feel like a natural part of macOS without requiring add-ons to make it great. That's exactly why I decided to start **Notching it up**: to take what makes Boring Notch great, build on it, and focus on making the actual notch experience better.
 
 ---
 
@@ -27,8 +30,16 @@
 - **File Shelf** - Drag and drop files for quick AirDrop or temporary storage
 - **HUD Replacement** - Replace macOS volume, brightness, and keyboard backlight HUDs with sleek notch overlays (enabled by default)
 - **Camera Mirror** - Quick mirror view right from the notch
+- **Pomodoro Timer** - Run focused work and break sessions without leaving the notch
+- **AI Usage Dashboard** - Track supported AI subscriptions and their usage windows in one place
 - **Customizable** - Tweak the notch to fit your needs with gestures, sizing, and more
-- **Advanced Options** - Simplified UI for casual users, with advanced settings hidden behind an "Advanced options" toggle
+- **Configurable layout** - Choose which tabs appear in the open notch and arrange them to fit your workflow
+- **Keyboard shortcuts** - Open the notch, trigger sneak peek, and access supported panels without reaching for the mouse
+- **Advanced Options** - Keep the default settings simple, with advanced controls available when you need them
+
+## Project status
+
+Notching it up is an actively developed fork. The core notch, media controls, shelf, calendar, HUD replacement, lyrics, timer, and customization features are usable today. Some integrations and advanced ideas below are still exploratory, so the roadmap is directional rather than a promise of release dates.
 
 ---
 
@@ -159,24 +170,45 @@ For a full list of licenses and attributions, see [Third-Party Licenses](./THIRD
 
 ## Roadmap
 
-### Low Effort (High Impact)
+### Near term: polish and reliability
+- [ ] **First-run permissions guide** - Explain calendar, media, accessibility, and notification permissions when each feature is enabled
+- [ ] **Improved empty states** - Add clear setup guidance when no media, events, files, or AI accounts are available
+- [ ] **Remember user context** - Restore the last selected tab and panel state after relaunch
+- [ ] **Reduced motion and accessibility options** - Respect macOS motion preferences and improve VoiceOver labels and keyboard navigation
+- [ ] **Performance pass** - Reduce unnecessary updates while the notch is closed and improve energy usage over long sessions
+- [ ] **Error and diagnostics view** - Make integration failures actionable without requiring users to inspect logs
+- [ ] **Release quality checklist** - Add regression coverage for updater, permissions, media controls, and shelf workflows
+
+### Low effort, high impact
 - [x] **Progress bar in the closed notch** - Add a thin progress bar to the music live activity showing track progress
 - [ ] **Track change animations** - Crossfade album art and animate lyrics/text when switching tracks
 - [x] **Better sneak peek** - Show album art, artist + title, and progress bar on track changes
 - [ ] **Per-app hiding** - UI to blacklist certain apps from opening the notch or showing live activity
+- [ ] **More sneak-peek sources** - Add compact previews for downloads, timers, calendar events, and file transfers
+- [ ] **Customizable gestures** - Let users choose actions for hover, click, swipe, and keyboard shortcuts
+- [ ] **Theme presets** - Offer curated visual styles alongside the existing sizing and blur controls
 
-### Medium Effort (Really Useful)
+### Medium effort: daily workflows
 - [ ] **Clipboard history in the Shelf** - Store copied text/images and drag/paste from the shelf
 - [ ] **Quick toggles panel** - Control Center lite for WiFi, Bluetooth, Do Not Disturb, AirDrop, etc.
 - [ ] **Calendar glance** - Show next upcoming event with "Join" button for Zoom/Meet/Teams links
 - [ ] **Karaoke style lyrics** - Highlight individual words as they're sung (where timing data available)
 - [ ] **Timer/Pomodoro** - Compact timer that can live in the notch or open panel
+- [ ] **Shelf collections** - Pin, label, reorder, and expire shelf items without losing useful files
+- [ ] **Notification summaries** - Show a compact, user-controlled summary of recent notifications
+- [ ] **More media integrations** - Improve parity across Apple Music, Spotify, YouTube Music, and browser playback
+- [ ] **Shortcuts integration** - Expose notch actions to macOS Shortcuts and support automation triggers
+- [ ] **AI provider expansion** - Add more providers and clearer account-health and reset-time details to the usage dashboard
 
-### High Effort (Ambitious, But Cool)
+### High effort: ambitious, but cool
 - [ ] **True system audio reactive visualizer** - Tap system audio via CoreAudio/ScreenCaptureKit for real music visualization
 - [ ] **Widget system** - Extensible widgets for the open notch (weather, system stats, custom widgets)
 - [ ] **App Switcher** - Swipe gesture to bring up a compact app switcher in the notch
 - [ ] **Focus Mode integration** - Show and change Focus Mode from the notch/quick toggles
+- [ ] **Multi-display improvements** - Make notch placement and behavior predictable when displays are connected or disconnected
+- [ ] **Window and stage controls** - Provide optional, privacy-conscious controls for common window-management tasks
+- [ ] **Plugin-free extension points** - Support safe, local customization without requiring a paid extension ecosystem
+- [ ] **Signed and notarized distribution** - Simplify installation by reducing Gatekeeper friction for stable releases
 
 ### Completed
 - [x] Rebrand from Boring Notch to Notching it up with original credits preserved
@@ -187,3 +219,6 @@ For a full list of licenses and attributions, see [Third-Party Licenses](./THIRD
 - [x] Synced lyrics (line-by-line) with LRCLIB integration
 - [x] Built-in music-reactive spectrum visualizer
 - [x] Lyrics display in closed notch live activity
+- [x] **Configurable top-bar tabs** - Choose and reorder the panels shown in the open notch
+- [x] **Pomodoro timer foundation** - Configure work, short-break, and long-break durations
+- [x] **AI usage dashboard foundation** - Track usage windows for supported providers with optional low-usage alerts

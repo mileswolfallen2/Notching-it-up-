@@ -46,6 +46,9 @@ struct SettingsView: View {
                 NavigationLink(value: "Timer") {
                     Label("Timer", systemImage: "timer")
                 }
+                NavigationLink(value: "AI Usage") {
+                    Label("AI Usage", systemImage: "sparkles")
+                }
                 NavigationLink(value: "Shelf") {
                     Label("Shelf", systemImage: "books.vertical")
                 }
@@ -83,6 +86,8 @@ struct SettingsView: View {
                     HUD()
                 case "Timer":
                     TimerSettings()
+                case "AI Usage":
+                    AIUsageSettings()
                 case "Battery":
                     showAdvancedSettings ? AnyView(Charge()) : AnyView(GeneralSettings())
                 case "Shelf":
@@ -125,6 +130,9 @@ struct SettingsView: View {
         .id(accentColorUpdateTrigger)
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("AccentColorChanged"))) { _ in
             accentColorUpdateTrigger = UUID()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .openAISettings)) { _ in
+            selectedTab = "AI Usage"
         }
     }
 }
@@ -998,6 +1006,7 @@ struct Shelf: View {
     @Default(.shelfTapToOpen) var shelfTapToOpen: Bool
     @Default(.quickShareProvider) var quickShareProvider
     @Default(.expandedDragDetection) var expandedDragDetection: Bool
+    @Default(.boringShelf) var shelfEnabled: Bool
     @StateObject private var quickShareService = QuickShareService.shared
 
     private var selectedProvider: QuickShareProvider? {
@@ -1014,9 +1023,12 @@ struct Shelf: View {
             Section {
                 TopBarSlotConfigurationView()
             } header: {
-                Text("Top Bar Layout")
+                HStack {
+                    Text("Top Bar Layout")
+                    customBadge(text: "New")
+                }
             } footer: {
-                Text("Drag tabs to reorder them in the top bar. Toggle each tab to show or hide it.")
+                Text("Choose which tabs appear in the notch and drag them into the order you want. Disabled tabs are hidden without leaving gaps.")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }
@@ -1026,24 +1038,35 @@ struct Shelf: View {
                 Defaults.Toggle(key: .boringShelf) {
                     Text("Enable shelf")
                 }
-                Defaults.Toggle(key: .openShelfByDefault) {
-                    Text("Open shelf by default if items are present")
+
+                if !shelfEnabled {
+                    Label("Shelf options are hidden while the shelf is turned off.", systemImage: "info.circle")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
-                Defaults.Toggle(key: .expandedDragDetection) {
-                    Text("Expanded drag detection area")
+
+                Group {
+                    Defaults.Toggle(key: .openShelfByDefault) {
+                        Text("Open shelf by default if items are present")
+                    }
+                    Defaults.Toggle(key: .expandedDragDetection) {
+                        Text("Expanded drag detection area")
+                    }
+                    .onChange(of: expandedDragDetection) {
+                        NotificationCenter.default.post(
+                            name: Notification.Name.expandedDragDetectionChanged,
+                            object: nil
+                        )
+                    }
+                    Defaults.Toggle(key: .copyOnDrag) {
+                        Text("Copy items on drag")
+                    }
+                    Defaults.Toggle(key: .autoRemoveShelfItems) {
+                        Text("Remove from shelf after dragging")
+                    }
                 }
-                .onChange(of: expandedDragDetection) {
-                    NotificationCenter.default.post(
-                        name: Notification.Name.expandedDragDetectionChanged,
-                        object: nil
-                    )
-                }
-                Defaults.Toggle(key: .copyOnDrag) {
-                    Text("Copy items on drag")
-                }
-                Defaults.Toggle(key: .autoRemoveShelfItems) {
-                    Text("Remove from shelf after dragging")
-                }
+                .disabled(!shelfEnabled)
+                .opacity(shelfEnabled ? 1 : 0.55)
 
             } header: {
                 HStack {
@@ -1052,11 +1075,32 @@ struct Shelf: View {
             }
             
             Section {
-                Picker("Quick Share Service", selection: $quickShareProvider) {
-                    ForEach(quickShareService.availableProviders, id: \.id) { provider in
+                Group {
+                    Picker("Quick Share Service", selection: $quickShareProvider) {
+                        ForEach(quickShareService.availableProviders, id: \.id) { provider in
+                            HStack {
+                                Group {
+                                    if let imgData = provider.imageData, let nsImg = NSImage(data: imgData) {
+                                        Image(nsImage: nsImg)
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fit)
+                                    } else {
+                                        Image(systemName: "square.and.arrow.up")
+                                    }
+                                }
+                                .frame(width: 16, height: 16)
+                                .foregroundColor(.accentColor)
+                                Text(provider.id)
+                            }
+                            .tag(provider.id)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    
+                    if let selectedProvider = selectedProvider {
                         HStack {
                             Group {
-                                if let imgData = provider.imageData, let nsImg = NSImage(data: imgData) {
+                                if let imgData = selectedProvider.imageData, let nsImg = NSImage(data: imgData) {
                                     Image(nsImage: nsImg)
                                         .resizable()
                                         .aspectRatio(contentMode: .fit)
@@ -1066,37 +1110,20 @@ struct Shelf: View {
                             }
                             .frame(width: 16, height: 16)
                             .foregroundColor(.accentColor)
-                            Text(provider.id)
-                        }
-                        .tag(provider.id)
-                    }
-                }
-                .pickerStyle(.menu)
-                
-                if let selectedProvider = selectedProvider {
-                    HStack {
-                        Group {
-                            if let imgData = selectedProvider.imageData, let nsImg = NSImage(data: imgData) {
-                                Image(nsImage: nsImg)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                            } else {
-                                Image(systemName: "square.and.arrow.up")
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Currently selected: \(selectedProvider.id)")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                Text("Files dropped on the shelf will be shared via this service")
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
                             }
                         }
-                        .frame(width: 16, height: 16)
-                        .foregroundColor(.accentColor)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Currently selected: \(selectedProvider.id)")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            Text("Files dropped on the shelf will be shared via this service")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                        }
+                        .padding(.vertical, 4)
                     }
-                    .padding(.vertical, 4)
                 }
+                .disabled(!shelfEnabled)
+                .opacity(shelfEnabled ? 1 : 0.55)
                 // Providers are always enabled; user can pick default service above.
                 
             } header: {
@@ -1104,13 +1131,20 @@ struct Shelf: View {
                     Text("Quick Share")
                 }
             } footer: {
-                Text("Choose which service to use when sharing files from the shelf. Click the shelf button to select files, or drag files onto it to share immediately.")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                if shelfEnabled {
+                    Text("Choose which service to use when sharing files from the shelf. Click the shelf button to select files, or drag files onto it to share immediately.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                } else {
+                    Text("Enable the shelf to configure quick sharing.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
         }
         .accentColor(.effectiveAccent)
         .navigationTitle("Shelf")
+        .animation(.easeInOut(duration: 0.18), value: shelfEnabled)
     }
 }
 

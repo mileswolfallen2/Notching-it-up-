@@ -19,16 +19,23 @@ struct ShelfView: View {
     @Default(.showHomeTab) private var showHomeTab
     @Default(.showShelfTab) private var showShelfTab
     @Default(.showTimerTab) private var showTimerTab
+    @Default(.showAITab) private var showAITab
+    @Default(.boringShelf) private var shelfEnabled
+    @Default(.topBarSlots) private var topBarSlots
     private let spacing: CGFloat = 8
     @State private var clipboardItems: [ClipboardItem] = []
     @State private var clipboardTimer: Timer?
     
     private var visibleTabs: [NotchViews] {
-        var tabs: [NotchViews] = []
-        if showHomeTab { tabs.append(.home) }
-        if showShelfTab && Defaults[.boringShelf] { tabs.append(.shelf) }
-        if showTimerTab { tabs.append(.timer) }
-        return tabs
+        TopBarTab.orderedVisibleTabs(
+            slots: topBarSlots,
+            showHome: showHomeTab,
+            showShelf: showShelfTab,
+            showTimer: showTimerTab,
+            showAI: showAITab,
+            shelfEnabled: shelfEnabled
+        )
+        .map(\.notchView)
     }
     
     func switchTab(by offset: Int) {

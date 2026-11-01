@@ -75,6 +75,10 @@
 		11F748822ECB07A400F841DB /* MusicControlButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F748812ECB07A400F841DB /* MusicControlButton.swift */; };
 		11F748842ECB27DC00F841DB /* MusicSlotConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F748832ECB27DC00F841DB /* MusicSlotConfigurationView.swift */; };
 		11F748852ECB27DC00F841DB /* TopBarSlotConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F748862ECB27DC00F841DB /* TopBarSlotConfigurationView.swift */; };
+		11F748892ECB300000F841DB /* AIUsageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F748882ECB300000F841DB /* AIUsageView.swift */; };
+		11F7488B2ECB400000F841DB /* AIUsageStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F7488A2ECB400000F841DB /* AIUsageStore.swift */; };
+		11F748912ECB600000F841DB /* AIAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F748902ECB600000F841DB /* AIAuth.swift */; };
+		11F748932ECB600000F841DB /* AIUsageAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F748922ECB600000F841DB /* AIUsageAPI.swift */; };
 		14288DDC2C6E015000B9F80C /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14288DD62C6E015000B9F80C /* AudioPlayer.swift */; };
 		14288DE82C6E01C800B9F80C /* ProgressIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14288DE72C6E01C800B9F80C /* ProgressIndicator.swift */; };
 		14288E0C2C6F8EC000B9F80C /* AppIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14288E0B2C6F8EC000B9F80C /* AppIcons.swift */; };
@@ -243,6 +247,10 @@
 		11F748812ECB07A400F841DB /* MusicControlButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicControlButton.swift; sourceTree = "<group>"; };
 		11F748832ECB27DC00F841DB /* MusicSlotConfigurationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MusicSlotConfigurationView.swift; sourceTree = "<group>"; };
 		11F748862ECB27DC00F841DB /* TopBarSlotConfigurationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopBarSlotConfigurationView.swift; sourceTree = "<group>"; };
+		11F748882ECB300000F841DB /* AIUsageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIUsageView.swift; sourceTree = "<group>"; };
+		11F7488A2ECB400000F841DB /* AIUsageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIUsageStore.swift; sourceTree = "<group>"; };
+		11F748902ECB600000F841DB /* AIAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIAuth.swift; sourceTree = "<group>"; };
+		11F748922ECB600000F841DB /* AIUsageAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIUsageAPI.swift; sourceTree = "<group>"; };
 		14288DD62C6E015000B9F80C /* AudioPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioPlayer.swift; sourceTree = "<group>"; };
 		14288DE72C6E01C800B9F80C /* ProgressIndicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressIndicator.swift; sourceTree = "<group>"; };
 		14288E0B2C6F8EC000B9F80C /* AppIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIcons.swift; sourceTree = "<group>"; };
@@ -454,6 +462,17 @@
 			path = XPCHelperClient;
 			sourceTree = "<group>";
 		};
+		11F748872ECB300000F841DB /* AI */ = {
+			isa = PBXGroup;
+			children = (
+				11F748882ECB300000F841DB /* AIUsageView.swift */,
+				11F7488A2ECB400000F841DB /* AIUsageStore.swift */,
+				11F748902ECB600000F841DB /* AIAuth.swift */,
+				11F748922ECB600000F841DB /* AIUsageAPI.swift */,
+			);
+			path = AI;
+			sourceTree = "<group>";
+		};
 		14288DD92C6E015000B9F80C /* helpers */ = {
 			isa = PBXGroup;
 			children = (
@@ -488,6 +507,7 @@
 		1471639B2C5D362F0068B555 /* components */ = {
 			isa = PBXGroup;
 			children = (
+				11F748872ECB300000F841DB /* AI */,
 				B141C23B2CA5F50900AC8CC8 /* Onboarding */,
 				B1C448992C97375A001F0858 /* Tips */,
 				14C08BB72C8DE49E000F8AA0 /* Calendar */,
@@ -1008,6 +1028,10 @@
 				B1FEB4992C7686630066EBBC /* PanGesture.swift in Sources */,
 				11F748842ECB27DC00F841DB /* MusicSlotConfigurationView.swift in Sources */,
 				11F748852ECB27DC00F841DB /* TopBarSlotConfigurationView.swift in Sources */,
+				11F748892ECB300000F841DB /* AIUsageView.swift in Sources */,
+				11F7488B2ECB400000F841DB /* AIUsageStore.swift in Sources */,
+				11F748912ECB600000F841DB /* AIAuth.swift in Sources */,
+				11F748932ECB600000F841DB /* AIUsageAPI.swift in Sources */,
 				9A0887352C7AFF8E00C160EA /* TabSelectionView.swift in Sources */,
 				112FB7352CCF16F70015238C /* NotchSpaceManager.swift in Sources */,
 				14FC6E502C7DED5600C7BEA5 /* DataTypes+Extensions.swift in Sources */,
@@ -1225,7 +1249,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 277;
+				CURRENT_PROJECT_VERSION = 278;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"boringNotch/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
@@ -1253,7 +1277,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.2.5;
+				MARKETING_VERSION = 0.2.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.notchingitup.notchingitup;
 				PRODUCT_NAME = "Notching it up";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1280,7 +1304,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 277;
+				CURRENT_PROJECT_VERSION = 278;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"boringNotch/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
@@ -1307,7 +1331,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.2.5;
+				MARKETING_VERSION = 0.2.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.notchingitup.notchingitup;
 				PRODUCT_NAME = "Notching it up";
 				PROVISIONING_PROFILE_SPECIFIER = "";

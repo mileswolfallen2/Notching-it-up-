@@ -201,6 +201,12 @@
         }
       }
     },
+    "·" : {
+
+    },
+    "· %@" : {
+
+    },
     "'Now Playing' was the only option on previous versions and works with all media apps." : {
       "localizations" : {
         "ar" : {
@@ -704,6 +710,36 @@
         }
       }
     },
+    "%@ — %@ left. %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ — %2$@ left. %3$@."
+          }
+        }
+      }
+    },
+    "%@ — %lld%% left. %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ — %2$lld%% left. %3$@."
+          }
+        }
+      }
+    },
+    "%@, %@ remaining, %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$@ remaining, %3$@"
+          }
+        }
+      }
+    },
     "%@: %lld minutes" : {
       "localizations" : {
         "en" : {
@@ -913,6 +949,9 @@
           }
         }
       }
+    },
+    "%lld low" : {
+
     },
     "%lld%%" : {
       "localizations" : {
@@ -1714,6 +1753,12 @@
         }
       }
     },
+    "Account" : {
+
+    },
+    "Accounts" : {
+
+    },
     "Add" : {
       "localizations" : {
         "ar" : {
@@ -1813,6 +1858,9 @@
           }
         }
       }
+    },
+    "Add AI provider" : {
+
     },
     "Add manually" : {
       "extractionState" : "stale",
@@ -2216,6 +2264,15 @@
       }
     },
     "Advanced options" : {
+
+    },
+    "AI Usage" : {
+
+    },
+    "Alert at" : {
+
+    },
+    "All tabs are hidden. Turn one on below to show it in the notch." : {
 
     },
     "All-day" : {
@@ -5033,6 +5090,9 @@
         }
       }
     },
+    "Choose which tabs appear in the notch and drag them into the order you want. Disabled tabs are hidden without leaving gaps." : {
+
+    },
     "Circle" : {
       "localizations" : {
         "ar" : {
@@ -5133,6 +5193,9 @@
         }
       }
     },
+    "Clear" : {
+
+    },
     "Clear slot" : {
       "localizations" : {
         "ar" : {
@@ -5232,6 +5295,9 @@
           }
         }
       }
+    },
+    "Click a provider to edit its plan name, usage, and reset time." : {
+
     },
     "Click to copy to clipboard" : {
 
@@ -5835,6 +5901,12 @@
           }
         }
       }
+    },
+    "Compact cards" : {
+
+    },
+    "Configure AI usage" : {
+
     },
     "Continue" : {
       "localizations" : {
@@ -7339,6 +7411,9 @@
         }
       }
     },
+    "Display" : {
+
+    },
     "Download" : {
       "localizations" : {
         "ar" : {
@@ -7640,6 +7715,9 @@
         }
       }
     },
+    "Drag chips to reorder" : {
+
+    },
     "Drag items in the preview to reorder or drop from the palette" : {
       "localizations" : {
         "ar" : {
@@ -7739,9 +7817,6 @@
           }
         }
       }
-    },
-    "Drag tabs to reorder them in the top bar. Toggle each tab to show or hide it." : {
-
     },
     "Drag to reorder" : {
 
@@ -8751,6 +8826,12 @@
         }
       }
     },
+    "Enable the shelf to configure quick sharing." : {
+
+    },
+    "Enable the shelf to show this tab" : {
+
+    },
     "Enable window shadow" : {
       "localizations" : {
         "ar" : {
@@ -9050,6 +9131,9 @@
           }
         }
       }
+    },
+    "Enter this code on the provider’s site:" : {
+
     },
     "Expanded drag detection area" : {
       "localizations" : {
@@ -10352,6 +10436,9 @@
         }
       }
     },
+    "Hidden" : {
+
+    },
     "Hide all-day events" : {
       "localizations" : {
         "ar" : {
@@ -10852,6 +10939,9 @@
         }
       }
     },
+    "Hide from the notch" : {
+
+    },
     "Hide title bar" : {
       "localizations" : {
         "ar" : {
@@ -11151,9 +11241,6 @@
           }
         }
       }
-    },
-    "Home" : {
-
     },
     "Hover delay" : {
       "localizations" : {
@@ -11555,6 +11642,9 @@
         }
       }
     },
+    "In %@" : {
+
+    },
     "In progress" : {
       "localizations" : {
         "ar" : {
@@ -11856,6 +11946,9 @@
         }
       }
     },
+    "Last synced %@" : {
+
+    },
     "Layout Preview" : {
       "localizations" : {
         "ar" : {
@@ -11955,6 +12048,12 @@
           }
         }
       }
+    },
+    "Live" : {
+
+    },
+    "Live from your account" : {
+
     },
     "Lottie JSON URL" : {
       "localizations" : {
@@ -12360,6 +12459,12 @@
         }
       }
     },
+    "Maintenance" : {
+
+    },
+    "Mark all plans as full" : {
+
+    },
     "Mark as complete" : {
       "localizations" : {
         "ar" : {
@@ -12459,6 +12564,9 @@
           }
         }
       }
+    },
+    "Mark as full" : {
+
     },
     "Mark as incomplete" : {
       "localizations" : {
@@ -14464,6 +14572,9 @@
         }
       }
     },
+    "No AI providers added yet" : {
+
+    },
     "No custom animation available" : {
       "localizations" : {
         "ar" : {
@@ -14965,6 +15076,9 @@
         }
       }
     },
+    "No plans visible" : {
+
+    },
     "Not Now" : {
       "localizations" : {
         "ar" : {
@@ -15365,6 +15479,9 @@
         }
       }
     },
+    "Notch preview" : {
+
+    },
     "Notch sizing" : {
       "localizations" : {
         "ar" : {
@@ -15564,6 +15681,15 @@
           }
         }
       }
+    },
+    "Notify when a plan runs low" : {
+
+    },
+    "Open AI settings" : {
+
+    },
+    "Open Browser Again" : {
+
     },
     "Open Calendar Settings" : {
       "localizations" : {
@@ -16267,6 +16393,12 @@
           }
         }
       }
+    },
+    "Plan" : {
+
+    },
+    "Plan name" : {
+
     },
     "Plugged In" : {
       "localizations" : {
@@ -16974,6 +17106,18 @@
         }
       }
     },
+    "Refresh" : {
+
+    },
+    "Refresh now" : {
+
+    },
+    "Refresh usage" : {
+
+    },
+    "Refreshing…" : {
+
+    },
     "Release name" : {
       "localizations" : {
         "ar" : {
@@ -17073,6 +17217,9 @@
           }
         }
       }
+    },
+    "Remaining" : {
+
     },
     "Remember last tab" : {
       "localizations" : {
@@ -17373,6 +17520,9 @@
           }
         }
       }
+    },
+    "Remove" : {
+
     },
     "Remove from shelf after dragging" : {
       "localizations" : {
@@ -17678,6 +17828,15 @@
     "Reset" : {
 
     },
+    "Reset in 5 hours" : {
+
+    },
+    "Reset plans automatically" : {
+
+    },
+    "Reset time" : {
+
+    },
     "Reset to Defaults" : {
       "localizations" : {
         "ar" : {
@@ -17777,6 +17936,9 @@
           }
         }
       }
+    },
+    "Resets" : {
+
     },
     "Restart" : {
       "extractionState" : "stale",
@@ -17879,6 +18041,9 @@
         }
       }
     },
+    "Restart all countdowns" : {
+
+    },
     "Restart Notching it up" : {
       "localizations" : {
         "ar" : {
@@ -17978,6 +18143,12 @@
           }
         }
       }
+    },
+    "Restore default providers" : {
+
+    },
+    "Rings show how much is left and when each plan refreshes. Signed-in providers update automatically; manual plans follow their own countdown." : {
+
     },
     "Running" : {
       "extractionState" : "stale",
@@ -18380,6 +18551,9 @@
         }
       }
     },
+    "Send test notification" : {
+
+    },
     "Sessions before long break: %lld" : {
 
     },
@@ -18586,6 +18760,12 @@
         }
       }
     },
+    "Shelf off" : {
+
+    },
+    "Shelf options are hidden while the shelf is turned off." : {
+
+    },
     "Shortcuts" : {
       "localizations" : {
         "ar" : {
@@ -18685,6 +18865,12 @@
           }
         }
       }
+    },
+    "Show %@ tab" : {
+
+    },
+    "Show AI Usage tab in the notch" : {
+
     },
     "Show battery indicator" : {
       "localizations" : {
@@ -19188,6 +19374,9 @@
           }
         }
       }
+    },
+    "Show in the notch" : {
+
     },
     "Show lyrics below artist name" : {
       "localizations" : {
@@ -19789,6 +19978,9 @@
         }
       }
     },
+    "Show plan names" : {
+
+    },
     "Show power status icons" : {
       "localizations" : {
         "ar" : {
@@ -19988,6 +20180,9 @@
           }
         }
       }
+    },
+    "Show reset times" : {
+
     },
     "Show settings icon in notch" : {
       "localizations" : {
@@ -20196,6 +20391,24 @@
 
     },
     "Show volume, brightness, and keyboard backlight in the notch instead of the default macOS HUD." : {
+
+    },
+    "Sign in" : {
+
+    },
+    "Sign in from Accounts above to keep this plan in sync automatically." : {
+
+    },
+    "Sign in once and Notching it up reads the same usage numbers your provider shows. Tokens are kept in your Mac’s Keychain and never leave this device. Cursor, Gemini and OpenCode are tracked manually." : {
+
+    },
+    "Sign in to Claude, ChatGPT, Copilot or Antigravity, or add any plan manually." : {
+
+    },
+    "Sign out" : {
+
+    },
+    "Signed in as %@" : {
 
     },
     "Skip phase" : {
@@ -20600,6 +20813,12 @@
           }
         }
       }
+    },
+    "Sort by lowest remaining" : {
+
+    },
+    "Sorting and card style apply to both the notch panel and the preview above." : {
+
     },
     "Speed" : {
       "localizations" : {
@@ -21006,6 +21225,12 @@
         }
       }
     },
+    "Sync usage from signed-in accounts" : {
+
+    },
+    "Synced automatically" : {
+
+    },
     "System" : {
       "localizations" : {
         "ar" : {
@@ -21206,10 +21431,10 @@
         }
       }
     },
-    "Tab Order" : {
+    "Tabs" : {
 
     },
-    "Tab Visibility" : {
+    "The shelf is disabled, so its tab stays hidden." : {
 
     },
     "Time to Full Charge: %lld min" : {
@@ -21616,6 +21841,15 @@
       }
     },
     "Top Bar Layout" : {
+
+    },
+    "Top Bar Preview" : {
+
+    },
+    "Track your AI limits" : {
+
+    },
+    "Tracked AIs" : {
 
     },
     "Transition speed" : {
@@ -22525,6 +22759,12 @@
         }
       }
     },
+    "Used 5%" : {
+
+    },
+    "Used 10%" : {
+
+    },
     "Using System Accent" : {
       "localizations" : {
         "ar" : {
@@ -22925,6 +23165,12 @@
         }
       }
     },
+    "Waiting for approval…" : {
+
+    },
+    "Waiting for the first sync" : {
+
+    },
     "Welcome" : {
       "localizations" : {
         "ar" : {
@@ -23124,6 +23370,9 @@
           }
         }
       }
+    },
+    "When a window ends, the plan returns to 100% and its countdown advances automatically. Low-usage alerts are sent once per window." : {
+
     },
     "Window Appearance" : {
       "localizations" : {
@@ -23325,6 +23574,9 @@
         }
       }
     },
+    "Window: %@" : {
+
+    },
     "You can now enjoy the app. If you want to tweak things further, you can always visit the settings." : {
       "localizations" : {
         "ar" : {
@@ -23524,6 +23776,9 @@
           }
         }
       }
+    },
+    "Your browser should have opened automatically. If it didn’t, use the button below." : {
+
     },
     "Your macOS system accent color" : {
       "localizations" : {

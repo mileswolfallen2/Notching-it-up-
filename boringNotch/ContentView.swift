@@ -389,6 +389,8 @@ struct ContentView: View {
                         ShelfView()
                     case .timer:
                         PomodoroTimerView()
+                    case .ai:
+                        AIUsageView()
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
