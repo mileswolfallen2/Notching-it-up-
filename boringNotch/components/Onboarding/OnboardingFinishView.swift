@@ -11,6 +11,7 @@ import SwiftUI
 struct OnboardingFinishView: View {
     let onFinish: () -> Void
     let onOpenSettings: () -> Void
+    let settingsButtonTitle: String
 
     var body: some View {
         VStack(spacing: 20) {
@@ -36,7 +37,7 @@ struct OnboardingFinishView: View {
 
             VStack(spacing: 12) {
                 Button(action: onOpenSettings) {
-                    Label("Customize in Settings", systemImage: "gear")
+                    Label(settingsButtonTitle, systemImage: "gear")
                         .controlSize(.large)
                 }
                 .controlSize(.large)
@@ -57,5 +58,9 @@ struct OnboardingFinishView: View {
 }
 
 #Preview {
-    OnboardingFinishView(onFinish: { }, onOpenSettings: { })
+    OnboardingFinishView(
+        onFinish: { },
+        onOpenSettings: { },
+        settingsButtonTitle: "Customize in Settings"
+    )
 }

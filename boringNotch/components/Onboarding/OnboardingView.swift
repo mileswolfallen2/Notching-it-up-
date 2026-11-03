@@ -7,9 +7,11 @@
 
 import SwiftUI
 import AVFoundation
+import Defaults
 
 enum OnboardingStep {
     case welcome
+    case featureSelection
     case permissionsGuide
     case cameraPermission
     case calendarPermission
@@ -25,12 +27,23 @@ struct OnboardingView: View {
     @State var step: OnboardingStep = .welcome
     let onFinish: () -> Void
     let onOpenSettings: () -> Void
+    let onOpenAISettings: () -> Void
+    @State private var shouldOpenAISettings = false
 
     var body: some View {
         ZStack {
             switch step {
             case .welcome:
                 WelcomeView {
+                    withAnimation(.easeInOut(duration: 0.6)) {
+                        step = .featureSelection
+                    }
+                }
+                .transition(.opacity)
+
+            case .featureSelection:
+                FeatureSelectionView { openAISettings in
+                    shouldOpenAISettings = openAISettings
                     withAnimation(.easeInOut(duration: 0.6)) {
                         step = .permissionsGuide
                     }
@@ -145,8 +158,13 @@ struct OnboardingView: View {
                 .transition(.opacity)
 
             case .finished:
-                OnboardingFinishView(onFinish: onFinish, onOpenSettings: onOpenSettings)
+                OnboardingFinishView(
+                    onFinish: onFinish,
+                    onOpenSettings: shouldOpenAISettings ? onOpenAISettings : onOpenSettings,
+                    settingsButtonTitle: shouldOpenAISettings ? "Set Up AI" : "Customize in Settings"
+                )
             }
+
         }
         .frame(width: 400, height: 600)
     }
@@ -167,5 +185,72 @@ struct OnboardingView: View {
     
     func requestAccessibilityPermission() async {
         await XPCHelperClient.shared.ensureAccessibilityAuthorization(promptIfNeeded: true)
+    }
+}
+
+private struct FeatureSelectionView: View {
+    let onContinue: (_ shouldOpenAISettings: Bool) -> Void
+
+    @State private var showHomeTab = Defaults[.showHomeTab]
+    @State private var showShelfTab = Defaults[.showShelfTab]
+    @State private var showTimerTab = Defaults[.showTimerTab]
+    @State private var showNotesTab = Defaults[.showNotesTab]
+    @State private var showAITab = Defaults[.showAITab]
+
+    private var hasSelection: Bool {
+        showHomeTab || showShelfTab || showTimerTab || showNotesTab || showAITab
+    }
+
+    var body: some View {
+        VStack(spacing: 18) {
+            Text("Choose what to use")
+                .font(.title)
+                .fontWeight(.bold)
+                .padding(.top, 24)
+
+            Text("Choose the tabs you want to see in the notch. You can change this later in Settings.")
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal)
+
+            ScrollView {
+                VStack(spacing: 10) {
+                    featureToggle("Home", icon: "house.fill", isOn: $showHomeTab)
+                    featureToggle("Files", icon: "tray.fill", isOn: $showShelfTab)
+                    featureToggle("Timer", icon: "timer", isOn: $showTimerTab)
+                    featureToggle("Notes", icon: "note.text", isOn: $showNotesTab)
+                    featureToggle("AI", icon: "sparkles", isOn: $showAITab)
+                }
+                .padding()
+            }
+
+            Button("Continue") {
+                Defaults[.showHomeTab] = showHomeTab
+                Defaults[.showShelfTab] = showShelfTab
+                Defaults[.showTimerTab] = showTimerTab
+                Defaults[.showNotesTab] = showNotesTab
+                Defaults[.showAITab] = showAITab
+                onContinue(showAITab)
+            }
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .disabled(!hasSelection)
+            .padding(.bottom, 24)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(
+            VisualEffectView(material: .underWindowBackground, blendingMode: .behindWindow)
+                .ignoresSafeArea()
+        )
+    }
+
+    private func featureToggle(_ title: String, icon: String, isOn: Binding<Bool>) -> some View {
+        Toggle(isOn: isOn) {
+            Label(title, systemImage: icon)
+                .font(.headline)
+        }
+        .toggleStyle(.switch)
+        .padding()
+        .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
     }
 }

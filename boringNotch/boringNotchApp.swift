@@ -582,6 +582,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                     onOpenSettings: {
                         window.close()
                         SettingsWindowController.shared.showWindow()
+                    },
+                    onOpenAISettings: {
+                        window.close()
+                        SettingsWindowController.shared.showWindow()
+                        DispatchQueue.main.async {
+                            NotificationCenter.default.post(name: .openAISettings, object: nil)
+                        }
                     }
                 ))
             window.isRestorable = false

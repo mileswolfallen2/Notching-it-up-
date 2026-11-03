@@ -4973,6 +4973,12 @@
         }
       }
     },
+    "Choose the tabs you want to see in the notch. You can change this later in Settings." : {
+
+    },
+    "Choose what to use" : {
+
+    },
     "Choose which service to use when sharing files from the shelf. Click the shelf button to select files, or drag files onto it to share immediately." : {
       "localizations" : {
         "ar" : {
@@ -6796,6 +6802,7 @@
       }
     },
     "Customize in Settings" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {

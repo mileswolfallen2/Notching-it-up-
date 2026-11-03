@@ -402,7 +402,7 @@ extension Defaults.Keys {
 
     // MARK: AI usage
     static let aiUsageEntries = Key<[AIUsageEntry]>("aiUsageEntries", default: AIUsageEntry.defaultEntries)
-    static let showAITab = Key<Bool>("showAITab", default: true)
+    static let showAITab = Key<Bool>("showAITab", default: false)
     static let aiSortByLowest = Key<Bool>("aiSortByLowest", default: false)
     static let aiCompactCards = Key<Bool>("aiCompactCards", default: false)
     static let aiColorStyle = Key<AIUsageColorStyle>("aiColorStyle", default: .monochrome)
@@ -422,8 +422,8 @@ extension Defaults.Keys {
     static let timerShowInClosedNotch = Key<Bool>("timerShowInClosedNotch", default: true)
     static let showHomeTab = Key<Bool>("showHomeTab", default: true)
     static let showShelfTab = Key<Bool>("showShelfTab", default: true)
-    static let showTimerTab = Key<Bool>("showTimerTab", default: true)
-    static let showNotesTab = Key<Bool>("showNotesTab", default: true)
+    static let showTimerTab = Key<Bool>("showTimerTab", default: false)
+    static let showNotesTab = Key<Bool>("showNotesTab", default: false)
     static let notesText = Key<String>("notesText", default: "")
     // MARK: Appearance
     static let showEmojis = Key<Bool>("showEmojis", default: false)
@@ -501,7 +501,7 @@ extension Defaults.Keys {
     
     // MARK: Shelf
     static let boringShelf = Key<Bool>("boringShelf", default: true)
-    static let openShelfByDefault = Key<Bool>("openShelfByDefault", default: true)
+    static let openShelfByDefault = Key<Bool>("openShelfByDefault", default: false)
     static let shelfTapToOpen = Key<Bool>("shelfTapToOpen", default: true)
     static let quickShareProvider = Key<String>("quickShareProvider", default: QuickShareProvider.defaultProvider.id)
     static let copyOnDrag = Key<Bool>("copyOnDrag", default: false)
