@@ -21,6 +21,7 @@ struct ShelfView: View {
     @Default(.showTimerTab) private var showTimerTab
     @Default(.showNotesTab) private var showNotesTab
     @Default(.showAITab) private var showAITab
+    @Default(.showDevicesTab) private var showDevicesTab
     @Default(.boringShelf) private var shelfEnabled
     @Default(.topBarSlots) private var topBarSlots
     private let spacing: CGFloat = 8
@@ -35,6 +36,7 @@ struct ShelfView: View {
             showTimer: showTimerTab,
             showNotes: showNotesTab,
             showAI: showAITab,
+            showDevices: showDevicesTab,
             shelfEnabled: shelfEnabled
         )
         .map(\.notchView)

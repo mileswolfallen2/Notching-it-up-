@@ -84,7 +84,8 @@ struct ContentView: View {
                 chinWidth += betterSneakPeekExtraWidth
             }
         } else if Defaults[.bluetoothLiveActivityEnabled]
-            && bluetoothManager.activity != nil && vm.notchState == .closed && !vm.hideOnClosed {
+            && bluetoothManager.activity != nil
+            && vm.notchState == .closed && !vm.hideOnClosed {
             chinWidth += max(90, vm.effectiveClosedNotchHeight + 50)
         } else if !coordinator.expandingView.show && vm.notchState == .closed
             && (!musicManager.isPlaying && musicManager.isPlayerIdle) && Defaults[.showNotHumanFace]
@@ -304,9 +305,20 @@ struct ContentView: View {
                           InlineHUD(type: $coordinator.sneakPeek.type, value: $coordinator.sneakPeek.value, icon: $coordinator.sneakPeek.icon, hoverAnimation: $isHovering, gestureProgress: $gestureProgress)
                               .transition(.opacity)
                       } else if Defaults[.bluetoothLiveActivityEnabled]
-                          && bluetoothManager.activity != nil && vm.notchState == .closed && !vm.hideOnClosed {
+                          && bluetoothManager.activity != nil
+                          && vm.notchState == .closed && !vm.hideOnClosed {
                           BluetoothLiveActivity(activity: bluetoothManager.activity!)
-                              .transition(.opacity.combined(with: .scale))
+                              .id("\(bluetoothManager.activity!.name)-\(bluetoothManager.activity!.connected)")
+                              .transition(
+                                  Defaults[.bluetoothConnectionAnimationEnabled]
+                                      ? .asymmetric(
+                                          insertion: .scale(scale: 0.82, anchor: .center)
+                                              .combined(with: .opacity),
+                                          removal: .scale(scale: 1.08, anchor: .center)
+                                              .combined(with: .opacity)
+                                      )
+                                      : .opacity
+                              )
                       } else if (!coordinator.expandingView.show || coordinator.expandingView.type == .music) && vm.notchState == .closed && (musicManager.isPlaying || !musicManager.isPlayerIdle) && coordinator.musicLiveActivityEnabled && !vm.hideOnClosed {
                           MusicLiveActivity()
                               .frame(alignment: .center)
@@ -401,6 +413,8 @@ struct ContentView: View {
                         NotchNotesView()
                     case .ai:
                         AIUsageView()
+                    case .devices:
+                        BluetoothDevicesView()
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -531,32 +545,37 @@ struct ContentView: View {
 
     @ViewBuilder
     func BluetoothLiveActivity(activity: BluetoothActivityManager.Activity) -> some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 0) {
             Image(systemName: activity.kind.iconName)
-                .font(.system(size: 16, weight: .semibold))
+                .font(.system(size: 17, weight: .semibold))
                 .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(activity.connected ? .white : .white.opacity(0.7))
+                .foregroundStyle(activity.connected ? .cyan : .white.opacity(0.7))
+                .frame(
+                    width: max(0, vm.effectiveClosedNotchHeight - 12),
+                    height: max(0, vm.effectiveClosedNotchHeight - 12)
+                )
                 .contentTransition(.symbolEffect(.replace))
 
-            VStack(alignment: .leading, spacing: 1) {
-                Text(activity.connected ? "Connected" : "Disconnected")
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.7))
-                Text(activity.name)
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
-            }
-            .frame(maxWidth: 120, alignment: .leading)
+            Rectangle()
+                .fill(.black)
+                .frame(width: vm.closedNotchSize.width)
 
             Image(systemName: activity.connected ? "checkmark.circle.fill" : "xmark.circle.fill")
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(activity.connected ? .green : .white.opacity(0.6))
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(activity.connected ? .green : .white.opacity(0.65))
+                .contentTransition(.symbolEffect(.replace))
+            .frame(
+                width: max(0, vm.effectiveClosedNotchHeight - 12),
+                height: max(0, vm.effectiveClosedNotchHeight - 12)
+            )
         }
-        .padding(.horizontal, 10)
-        .frame(height: vm.effectiveClosedNotchHeight)
-        .animation(.smooth, value: activity)
+        .frame(height: vm.effectiveClosedNotchHeight, alignment: .center)
+        .animation(
+            Defaults[.bluetoothConnectionAnimationEnabled]
+                ? .interactiveSpring(response: 0.38, dampingFraction: 0.82)
+                : .smooth(duration: 0.2),
+            value: activity
+        )
     }
 
     @ViewBuilder

@@ -22,6 +22,7 @@ struct TabSelectionView: View {
     @Default(.showTimerTab) private var showTimerTab
     @Default(.showNotesTab) private var showNotesTab
     @Default(.showAITab) private var showAITab
+    @Default(.showDevicesTab) private var showDevicesTab
     @Default(.boringShelf) private var shelfEnabled
     @Default(.topBarSlots) private var topBarSlots
     @Namespace var animation
@@ -35,6 +36,7 @@ struct TabSelectionView: View {
             showTimer: showTimerTab,
             showNotes: showNotesTab,
             showAI: showAITab,
+            showDevices: showDevicesTab,
             shelfEnabled: shelfEnabled
         )
         .map { tab in
@@ -46,8 +48,7 @@ struct TabSelectionView: View {
         visibleTabs.map { String(describing: $0.view) }.joined(separator: ",")
     }
 
-    /// Collapse the tab strip before it can run into the physical notch. The
-    /// top bar has at most five tabs, so compact padding always fits.
+    /// Collapse the tab strip before it can run into the physical notch.
     private var tabButtonPadding: CGFloat {
         switch visibleTabs.count {
         case 0...3: return 15

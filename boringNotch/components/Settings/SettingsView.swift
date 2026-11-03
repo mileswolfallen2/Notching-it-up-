@@ -688,6 +688,9 @@ struct Media: View {
                 Defaults.Toggle(key: .bluetoothLiveActivityEnabled) {
                     Text("Show Bluetooth live activity")
                 }
+                Defaults.Toggle(key: .bluetoothConnectionAnimationEnabled) {
+                    Text("Animate Bluetooth connections")
+                }
                 Defaults.Toggle(key: .showMusicProgressBar) {
                     Text("Show track progress bar")
                 }

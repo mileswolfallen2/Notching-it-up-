@@ -17,6 +17,7 @@ struct TopBarSlotConfigurationView: View {
     @Default(.showTimerTab) private var showTimerTab
     @Default(.showNotesTab) private var showNotesTab
     @Default(.showAITab) private var showAITab
+    @Default(.showDevicesTab) private var showDevicesTab
     @Default(.boringShelf) private var shelfEnabled
 
     @State private var draggedTab: TopBarTab?
@@ -38,6 +39,7 @@ struct TopBarSlotConfigurationView: View {
             showTimer: showTimerTab,
             showNotes: showNotesTab,
             showAI: showAITab,
+            showDevices: showDevicesTab,
             shelfEnabled: shelfEnabled
         )
     }
@@ -65,6 +67,7 @@ struct TopBarSlotConfigurationView: View {
                         showTimerTab = true
                         showNotesTab = true
                         showAITab = true
+                        showDevicesTab = false
                     }
                 }
                 .buttonStyle(.borderless)
@@ -217,6 +220,7 @@ struct TopBarSlotConfigurationView: View {
         case .timer: return "Pomodoro sessions"
         case .notes: return "A quick persistent scratchpad"
         case .ai:    return "AI usage limits across your tools"
+        case .devices: return "Connected headphones, speakers, and their battery status"
         }
     }
 
@@ -227,6 +231,7 @@ struct TopBarSlotConfigurationView: View {
         case .timer: return showTimerTab
         case .notes: return showNotesTab
         case .ai:    return showAITab
+        case .devices: return showDevicesTab
         }
     }
 
@@ -237,6 +242,7 @@ struct TopBarSlotConfigurationView: View {
         case .timer: return $showTimerTab
         case .notes: return $showNotesTab
         case .ai:    return $showAITab
+        case .devices: return $showDevicesTab
         }
     }
 

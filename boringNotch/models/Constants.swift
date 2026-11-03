@@ -76,6 +76,7 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
     case timer = "timer"
     case notes = "notes"
     case ai    = "ai"
+    case devices = "devices"
 
     var id: String { rawValue }
 
@@ -86,6 +87,7 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
         case .timer: return "Timer"
         case .notes: return "Notes"
         case .ai:    return "AI"
+        case .devices: return "Devices"
         }
     }
 
@@ -96,6 +98,7 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
         case .timer: return "timer"
         case .notes: return "note.text"
         case .ai:    return "sparkles"
+        case .devices: return "headphones"
         }
     }
 
@@ -106,11 +109,12 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
         case .timer: return .timer
         case .notes: return .notes
         case .ai:    return .ai
+        case .devices: return .devices
         }
     }
 
     /// Default ordered layout shown in the top bar.
-    static let defaultLayout: [TopBarTab] = [.home, .shelf, .timer, .ai, .notes]
+    static let defaultLayout: [TopBarTab] = [.home, .shelf, .timer, .ai, .notes, .devices]
 
     /// Returns the stored order with any missing tabs appended, then filters out
     /// tabs the user has hidden. This keeps existing installations working when
@@ -122,6 +126,7 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
         showTimer: Bool,
         showNotes: Bool,
         showAI: Bool,
+        showDevices: Bool,
         shelfEnabled: Bool
     ) -> [TopBarTab] {
         var ordered = slots
@@ -135,6 +140,7 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
             case .timer: return showTimer
             case .notes: return showNotes
             case .ai:    return showAI
+            case .devices: return showDevices
             }
         }
     }
@@ -403,6 +409,7 @@ extension Defaults.Keys {
     // MARK: AI usage
     static let aiUsageEntries = Key<[AIUsageEntry]>("aiUsageEntries", default: AIUsageEntry.defaultEntries)
     static let showAITab = Key<Bool>("showAITab", default: false)
+    static let showDevicesTab = Key<Bool>("showDevicesTab", default: false)
     static let aiSortByLowest = Key<Bool>("aiSortByLowest", default: false)
     static let aiCompactCards = Key<Bool>("aiCompactCards", default: false)
     static let aiColorStyle = Key<AIUsageColorStyle>("aiColorStyle", default: .monochrome)
@@ -475,6 +482,10 @@ extension Defaults.Keys {
         default: MusicControlButton.defaultLayout.count
     )
     static let bluetoothLiveActivityEnabled = Key<Bool>("bluetoothLiveActivityEnabled", default: true)
+    static let bluetoothConnectionAnimationEnabled = Key<Bool>(
+        "bluetoothConnectionAnimationEnabled",
+        default: true
+    )
     
     // MARK: Battery
     static let showPowerStatusNotifications = Key<Bool>("showPowerStatusNotifications", default: true)

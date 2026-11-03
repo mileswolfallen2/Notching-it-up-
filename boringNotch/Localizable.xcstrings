@@ -3664,6 +3664,9 @@
         }
       }
     },
+    "Battery unavailable" : {
+
+    },
     "Blur intensity" : {
 
     },
@@ -5895,6 +5898,9 @@
 
     },
     "Configure AI usage" : {
+
+    },
+    "Connect headphones or speakers to see them here." : {
 
     },
     "Connected" : {

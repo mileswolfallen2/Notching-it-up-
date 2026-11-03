@@ -229,4 +229,4 @@ For a full list of licenses and attributions, see [Third-Party Licenses](./THIRD
 - [x] **Quick notes tab** - Keep a persistent scratchpad in the notch
 - [x] **AI usage dashboard** - Live account sync for supported providers, manual fallback, reset countdowns, and low-usage alerts
 - [x] Customizable Layout options 🛠️
-- [x]  Bluetooth Live Activity (connect/disconnect for bluetooth devices)
+- [x]  Bluetooth device activity and Devices tab (connected headphones/speakers with battery status when reported by macOS)

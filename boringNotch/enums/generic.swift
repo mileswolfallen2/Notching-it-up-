@@ -30,6 +30,7 @@ public enum NotchViews: Hashable {
     case timer
     case notes
     case ai
+    case devices
 }
 
 enum SettingsEnum {

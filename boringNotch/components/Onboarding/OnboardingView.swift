@@ -196,9 +196,10 @@ private struct FeatureSelectionView: View {
     @State private var showTimerTab = Defaults[.showTimerTab]
     @State private var showNotesTab = Defaults[.showNotesTab]
     @State private var showAITab = Defaults[.showAITab]
+    @State private var showDevicesTab = Defaults[.showDevicesTab]
 
     private var hasSelection: Bool {
-        showHomeTab || showShelfTab || showTimerTab || showNotesTab || showAITab
+        showHomeTab || showShelfTab || showTimerTab || showNotesTab || showAITab || showDevicesTab
     }
 
     var body: some View {
@@ -220,6 +221,7 @@ private struct FeatureSelectionView: View {
                     featureToggle("Timer", icon: "timer", isOn: $showTimerTab)
                     featureToggle("Notes", icon: "note.text", isOn: $showNotesTab)
                     featureToggle("AI", icon: "sparkles", isOn: $showAITab)
+                    featureToggle("Devices", icon: "headphones", isOn: $showDevicesTab)
                 }
                 .padding()
             }
@@ -230,6 +232,7 @@ private struct FeatureSelectionView: View {
                 Defaults[.showTimerTab] = showTimerTab
                 Defaults[.showNotesTab] = showNotesTab
                 Defaults[.showAITab] = showAITab
+                Defaults[.showDevicesTab] = showDevicesTab
                 onContinue(showAITab)
             }
             .buttonStyle(.borderedProminent)
