@@ -710,26 +710,6 @@
         }
       }
     },
-    "%@ — %@ left. %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ — %2$@ left. %3$@"
-          }
-        }
-      }
-    },
-    "%@ — %@ left. %@." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ — %2$@ left. %3$@."
-          }
-        }
-      }
-    },
     "%@, %@ remaining, %@" : {
       "localizations" : {
         "en" : {
@@ -949,9 +929,6 @@
           }
         }
       }
-    },
-    "%lld characters" : {
-
     },
     "%lld%%" : {
       "localizations" : {
@@ -1859,9 +1836,6 @@
         }
       }
     },
-    "Add AI provider" : {
-
-    },
     "Add manually" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2062,6 +2036,9 @@
           }
         }
       }
+    },
+    "Add plan" : {
+
     },
     "Additional features" : {
       "localizations" : {
@@ -5302,9 +5279,6 @@
         }
       }
     },
-    "Click a provider to view live usage or adjust a manual plan." : {
-
-    },
     "Click to copy to clipboard" : {
 
     },
@@ -6714,7 +6688,11 @@
         }
       }
     },
+    "Custom visualizers (Lottie)" : {
+
+    },
     "Custom vizualizers (Lottie)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -7720,9 +7698,6 @@
           }
         }
       }
-    },
-    "Drag chips to reorder" : {
-
     },
     "Drag items in the preview to reorder or drop from the palette" : {
       "localizations" : {
@@ -9138,7 +9113,7 @@
         }
       }
     },
-    "Enter this code on the provider’s site:" : {
+    "Enter this code on the website:" : {
 
     },
     "Expanded drag detection area" : {
@@ -11955,7 +11930,11 @@
     "Last synced %@" : {
 
     },
+    "Layout preview" : {
+
+    },
     "Layout Preview" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -12775,6 +12754,7 @@
       }
     },
     "Match menubar height" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -14578,7 +14558,7 @@
         }
       }
     },
-    "No AI providers added yet" : {
+    "No AI plans added yet" : {
 
     },
     "No custom animation available" : {
@@ -15688,19 +15668,20 @@
         }
       }
     },
-    "Notes" : {
-
-    },
     "Notify when a plan runs low" : {
 
     },
     "Open AI settings" : {
 
     },
-    "Open Browser Again" : {
+    "Open browser again" : {
+
+    },
+    "Open Calendar settings" : {
 
     },
     "Open Calendar Settings" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -16001,6 +15982,7 @@
       }
     },
     "Open Reminder Settings" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -16099,6 +16081,9 @@
           }
         }
       }
+    },
+    "Open Reminders settings" : {
+
     },
     "Open shelf by default if items are present" : {
       "localizations" : {
@@ -16299,6 +16284,9 @@
           }
         }
       }
+    },
+    "Overview" : {
+
     },
     "Pause" : {
 
@@ -17115,9 +17103,6 @@
         }
       }
     },
-    "Refresh" : {
-
-    },
     "Refresh now" : {
 
     },
@@ -17846,7 +17831,11 @@
     "Reset time" : {
 
     },
+    "Reset to defaults" : {
+
+    },
     "Reset to Defaults" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ar" : {
           "stringUnit" : {
@@ -18156,7 +18145,7 @@
     "Restore default providers" : {
 
     },
-    "Rings show how much is left. Hover a ring for plan and reset details. Signed-in providers update automatically; manual plans follow their own countdown." : {
+    "Ring color" : {
 
     },
     "Running" : {
@@ -18260,7 +18249,7 @@
         }
       }
     },
-    "Saved locally" : {
+    "Select a plan to view live usage or adjust it manually." : {
 
     },
     "Select the music source you want to use. You can change this later in the app settings." : {
@@ -19490,6 +19479,9 @@
         }
       }
     },
+    "Show manual plans in the notch" : {
+
+    },
     "Show menu bar icon" : {
       "localizations" : {
         "ar" : {
@@ -20390,6 +20382,9 @@
         }
       }
     },
+    "Show this tab in the top bar" : {
+
+    },
     "Show timer in the closed notch" : {
 
     },
@@ -20411,16 +20406,19 @@
     "Sign in from Accounts above to keep this plan in sync automatically." : {
 
     },
-    "Sign in once and Notching it up reads the same usage numbers your provider shows. Tokens stay in this app’s private storage and are only sent to your provider. Cursor, Gemini and OpenCode are tracked manually." : {
+    "Sign in once and Notching it up reads the same usage numbers your provider shows. Tokens stay in this app’s private storage and are only sent to your provider. Cursor, Gemini, and OpenCode are tracked manually." : {
 
     },
-    "Sign in to Claude, ChatGPT, Copilot or Antigravity, or add any plan manually." : {
+    "Sign in to Claude, ChatGPT, GitHub Copilot, or Antigravity, or show manual plans in AI settings." : {
 
     },
     "Sign out" : {
 
     },
     "Signed in as %@" : {
+
+    },
+    "Signed-in providers appear automatically. Manual plans stay out of the notch unless you turn them on below." : {
 
     },
     "Skip phase" : {
@@ -20829,7 +20827,7 @@
     "Sort by lowest remaining" : {
 
     },
-    "Sorting and card size apply to both the notch panel and the preview above." : {
+    "Sorting, card size, and ring color apply to the notch panel and the preview above." : {
 
     },
     "Speed" : {
@@ -21449,6 +21447,9 @@
     "The shelf is disabled, so its tab stays hidden." : {
 
     },
+    "These actions apply to every tracked plan." : {
+
+    },
     "Time to Full Charge: %lld min" : {
       "localizations" : {
         "ar" : {
@@ -21855,13 +21856,13 @@
     "Top Bar Layout" : {
 
     },
-    "Top Bar Preview" : {
+    "Top bar preview" : {
 
     },
     "Track your AI limits" : {
 
     },
-    "Tracked AIs" : {
+    "Tracked plans" : {
 
     },
     "Transition speed" : {
@@ -23792,7 +23793,7 @@
         }
       }
     },
-    "Your browser should have opened automatically. If it didn’t, use the button below." : {
+    "Your browser should have opened automatically. If it didn’t, open it again below." : {
 
     },
     "Your macOS system accent color" : {
