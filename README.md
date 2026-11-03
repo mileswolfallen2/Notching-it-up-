@@ -202,7 +202,6 @@ For a full list of licenses and attributions, see [Third-Party Licenses](./THIRD
 - [ ] **AI provider expansion** - Add more providers and clearer account-health and reset-time details to the usage dashboard
 - [ ]  Bluetooth Live Activity (connect/disconnect for bluetooth devices)
 - [ ]  Weather integration ⛅️
-- [x]  Customizable Layout options 🛠️
 - [ ]  Lock Screen Widgets 🔒
 - [ ]  Extension system 🧩
 - [ ]  Notifications (under consideration) 🔔
@@ -230,3 +229,4 @@ For a full list of licenses and attributions, see [Third-Party Licenses](./THIRD
 - [x] **Pomodoro timer foundation** - Configure work, short-break, and long-break durations
 - [x] **Quick notes tab** - Keep a persistent scratchpad in the notch
 - [x] **AI usage dashboard** - Live account sync for supported providers, manual fallback, reset countdowns, and low-usage alerts
+- [x] Customizable Layout options 🛠️
