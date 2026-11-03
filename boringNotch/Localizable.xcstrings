@@ -1330,6 +1330,9 @@
         }
       }
     },
+    "A quick permissions guide" : {
+
+    },
     "About" : {
       "localizations" : {
         "ar" : {
@@ -6992,6 +6995,9 @@
         }
       }
     },
+    "Danger zone" : {
+
+    },
     "Default" : {
       "localizations" : {
         "ar" : {
@@ -12339,6 +12345,9 @@
           }
         }
       }
+    },
+    "macOS only asks when a feature needs access. Here is what each permission is for." : {
+
     },
     "Made with ❤️ by miles allen" : {
 
@@ -17822,7 +17831,19 @@
     "Reset" : {
 
     },
+    "Reset and Restart" : {
+
+    },
+    "Reset app" : {
+
+    },
     "Reset in 5 hours" : {
+
+    },
+    "Reset Notching it up?" : {
+
+    },
+    "Reset Notching it up…" : {
 
     },
     "Reset plans automatically" : {
@@ -18143,6 +18164,9 @@
       }
     },
     "Restore default providers" : {
+
+    },
+    "Restore every setting to its default and remove local sign-ins, notes, and saved shelf entries. Notching it up will restart." : {
 
     },
     "Ring color" : {
@@ -21450,6 +21474,9 @@
     "These actions apply to every tracked plan." : {
 
     },
+    "This restores all settings, signs out AI accounts, clears notes and saved shelf entries, and restarts the app. This cannot be undone." : {
+
+    },
     "Time to Full Charge: %lld min" : {
       "localizations" : {
         "ar" : {
@@ -23692,6 +23719,9 @@
           }
         }
       }
+    },
+    "You can review or revoke access anytime in System Settings > Privacy & Security." : {
+
     },
     "You're All Set!" : {
       "localizations" : {

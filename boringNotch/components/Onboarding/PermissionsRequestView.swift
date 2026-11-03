@@ -7,6 +7,129 @@
 
 import SwiftUI
 
+// MARK: - Permissions guide
+
+private struct PermissionGuideItem: Identifiable {
+    let icon: String
+    let title: String
+    let detail: String
+
+    var id: String { title }
+}
+
+private let permissionGuideItems: [PermissionGuideItem] = [
+    PermissionGuideItem(
+        icon: "calendar",
+        title: "Calendar",
+        detail: "Shows upcoming events and reminders in the notch. macOS asks when you turn on the Calendar tab."
+    ),
+    PermissionGuideItem(
+        icon: "music.note",
+        title: "Media",
+        detail: "Reads and controls Spotify or Apple Music. macOS asks for Automation access when you choose a direct music source."
+    ),
+    PermissionGuideItem(
+        icon: "hand.raised.fill",
+        title: "Accessibility",
+        detail: "Powers volume, brightness, and media-key HUDs in the notch. macOS asks when you enable HUD replacement or media-key handling."
+    ),
+    PermissionGuideItem(
+        icon: "bell.badge.fill",
+        title: "Notifications",
+        detail: "Sends low-usage alerts for AI plans. macOS asks when you turn on “Notify when a plan runs low.”"
+    )
+]
+
+/// First-run overview that explains when each macOS permission is requested.
+struct PermissionsGuideView: View {
+    let onContinue: () -> Void
+
+    var body: some View {
+        VStack(spacing: 18) {
+            Image(systemName: "lock.shield.fill")
+                .font(.system(size: 42, weight: .semibold))
+                .foregroundStyle(Color.effectiveAccent)
+                .padding(.top, 24)
+
+            VStack(spacing: 6) {
+                Text("A quick permissions guide")
+                    .font(.title)
+                    .fontWeight(.semibold)
+
+                Text("macOS only asks when a feature needs access. Here is what each permission is for.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 28)
+            }
+
+            ScrollView {
+                VStack(spacing: 10) {
+                    ForEach(permissionGuideItems) { item in
+                        PermissionGuideRow(item: item)
+                    }
+                }
+                .padding(.horizontal, 24)
+            }
+            .scrollIndicators(.never)
+
+            Text("You can review or revoke access anytime in System Settings > Privacy & Security.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+
+            Button("Continue", action: onContinue)
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .keyboardShortcut(.defaultAction)
+                .padding(.bottom, 24)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(
+            VisualEffectView(material: .underWindowBackground, blendingMode: .behindWindow)
+                .ignoresSafeArea()
+        )
+    }
+}
+
+private struct PermissionGuideRow: View {
+    let item: PermissionGuideItem
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: item.icon)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(Color.effectiveAccent)
+                .frame(width: 26)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(item.title)
+                    .font(.headline)
+
+                Text(item.detail)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(Color.primary.opacity(0.04))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .strokeBorder(Color.primary.opacity(0.08), lineWidth: 1)
+        )
+    }
+}
+
+// MARK: - Permission request
+
 struct PermissionRequestView: View {
     let icon: Image
     let title: String

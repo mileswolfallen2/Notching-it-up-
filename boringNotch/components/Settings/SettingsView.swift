@@ -1557,6 +1557,7 @@ struct Advanced: View {
     
     @State private var customAccentColor: Color = .accentColor
     @State private var selectedPresetColor: PresetAccentColor? = nil
+    @State private var showingResetConfirmation = false
     let icons: [String] = ["logo2"]
     @State private var selectedIcon: String = "logo2"
     
@@ -1773,9 +1774,38 @@ struct Advanced: View {
             } header: {
                 Text("Window Behavior")
             }
+
+            Section {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Reset app")
+                    Text("Restore every setting to its default and remove local sign-ins, notes, and saved shelf entries. Notching it up will restart.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Button(role: .destructive) {
+                    showingResetConfirmation = true
+                } label: {
+                    Label("Reset Notching it up…", systemImage: "arrow.counterclockwise")
+                        .foregroundStyle(.red)
+                }
+                .buttonStyle(.bordered)
+                .tint(.red)
+            } header: {
+                Text("Danger zone")
+            }
         }
         .accentColor(.effectiveAccent)
         .navigationTitle("Advanced")
+        .alert("Reset Notching it up?", isPresented: $showingResetConfirmation) {
+            Button("Cancel", role: .cancel) {}
+            Button("Reset and Restart", role: .destructive) {
+                AppReset.reset()
+            }
+        } message: {
+            Text("This restores all settings, signs out AI accounts, clears notes and saved shelf entries, and restarts the app. This cannot be undone.")
+        }
         .onAppear {
             loadCustomColor()
         }

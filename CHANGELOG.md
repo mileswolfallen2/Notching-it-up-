@@ -1,6 +1,13 @@
 # Changelog
 
 All notable changes to Notching it up are documented here.
+## [incommented]
+
+
+## Added 
+- First-run permissions guide that explains when Calendar, Media, Accessibility, and Notification access is requested as features are enabled.
+- “Reset Notching it up” in Advanced. The red destructive action restores every setting, removes local AI sign-ins, notes, and saved shelf entries, then restarts the app.
+
 
 ## [0.2.6.1]
 
