@@ -200,6 +200,12 @@ For a full list of licenses and attributions, see [Third-Party Licenses](./THIRD
 - [ ] **More media integrations** - Improve parity across Apple Music, Spotify, YouTube Music, and browser playback
 - [ ] **Shortcuts integration** - Expose notch actions to macOS Shortcuts and support automation triggers
 - [ ] **AI provider expansion** - Add more providers and clearer account-health and reset-time details to the usage dashboard
+- [ ]  Bluetooth Live Activity (connect/disconnect for bluetooth devices)
+- [ ]  Weather integration ⛅️
+- [ ]  Customizable Layout options 🛠️
+- [ ]  Lock Screen Widgets 🔒
+- [ ]  Extension system 🧩
+- [ ]  Notifications (under consideration) 🔔
 
 ### High effort: ambitious, but cool
 - [ ] **True system audio reactive visualizer** - Tap system audio via CoreAudio/ScreenCaptureKit for real music visualization
