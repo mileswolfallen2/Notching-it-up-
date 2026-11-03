@@ -10,7 +10,7 @@ import AppKit
 import Combine
 import Defaults
 import Foundation
-import UserNotifications
+@preconcurrency import UserNotifications
 
 @MainActor
 final class AIUsageStore: ObservableObject {
@@ -27,12 +27,14 @@ final class AIUsageStore: ObservableObject {
     private var timer: Timer?
     private var activationObserver: NSObjectProtocol?
     private var signInTask: Task<Void, Never>?
+    /// Guards against a cancelled sign-in finishing after a newer one starts.
+    private var signInGeneration = 0
 
     private init() {
         entries = Defaults[.aiUsageEntries]
 
         for provider in AIProvider.liveProviders {
-            if let account = AIKeychain.load(provider) {
+            if let account = AIAccountStore.load(provider) {
                 accounts[provider] = account
             }
         }
@@ -103,39 +105,57 @@ final class AIUsageStore: ObservableObject {
         cancelSignIn()
         lastError[provider] = nil
 
-        if !entries.contains(where: { $0.provider == provider }) {
+        let addedEntry = !entries.contains(where: { $0.provider == provider })
+        if addedEntry {
             add(provider)
         }
 
+        let generation = signInGeneration
         signInTask = Task { [weak self] in
             guard let self else { return }
             do {
                 let account = try await AIAuthService.shared.signIn(provider: provider)
-                try AIKeychain.save(account)
+                guard self.signInGeneration == generation else { return }
+                try AIAccountStore.save(account)
                 self.accounts[provider] = account
                 self.authPrompt = nil
                 self.syncEntry(with: account)
                 await self.fetchLive(provider: provider, force: true)
             } catch is CancellationError {
+                guard self.signInGeneration == generation else { return }
                 self.authPrompt = nil
+                if addedEntry { self.removePlaceholder(for: provider) }
             } catch AIAuthError.cancelled {
+                guard self.signInGeneration == generation else { return }
                 self.authPrompt = nil
+                if addedEntry { self.removePlaceholder(for: provider) }
             } catch {
+                guard self.signInGeneration == generation else { return }
                 self.authPrompt = nil
+                if addedEntry { self.removePlaceholder(for: provider) }
                 self.lastError[provider] = error.localizedDescription
             }
-            self.signInTask = nil
         }
     }
 
+    /// Drops a card that was only added to hold a sign-in that never completed.
+    private func removePlaceholder(for provider: AIProvider) {
+        guard let entry = entries.first(where: { $0.provider == provider }),
+              entry.lastSyncDate == nil,
+              entry.accountLabel == nil
+        else { return }
+        remove(id: entry.id)
+    }
+
     func cancelSignIn() {
+        signInGeneration &+= 1
         signInTask?.cancel()
         signInTask = nil
         authPrompt = nil
     }
 
     func disconnect(_ provider: AIProvider) {
-        AIKeychain.delete(provider)
+        AIAccountStore.delete(provider)
         accounts[provider] = nil
         syncing.remove(provider)
         lastError[provider] = nil
@@ -188,15 +208,19 @@ final class AIUsageStore: ObservableObject {
         do {
             let account = try await AIAuthService.shared.validAccount(for: provider)
             accounts[provider] = account
-            try? AIKeychain.save(account)
+            try? AIAccountStore.save(account)
 
             let usage = try await AIUsageAPI.fetch(provider: provider, account: account)
             apply(usage, provider: provider, account: account)
             lastError[provider] = nil
             lastLiveFetch = Date()
         } catch let error as AIAuthError {
-            if case .notSignedIn = error {
+            switch error {
+            case .notSignedIn, .signInExpired:
+                AIAccountStore.delete(provider)
                 accounts[provider] = nil
+            default:
+                break
             }
             record(error.localizedDescription, for: provider)
         } catch {
@@ -211,35 +235,32 @@ final class AIUsageStore: ObservableObject {
         let threshold = Defaults[.aiLowUsageThreshold]
 
         if let index = updated.firstIndex(where: { $0.provider == provider }) {
-            updated[index].percentRemaining = percent
-            if let reset = usage.resetDate {
-                updated[index].resetDate = reset
+            let previousReset = updated[index].resetDate
+            let resetChanged: Bool
+            switch (previousReset, usage.resetDate) {
+            case let (old?, new?):
+                resetChanged = abs(old.timeIntervalSince(new)) > 60
+            case (nil, nil):
+                resetChanged = false
+            default:
+                resetChanged = true
             }
+
+            updated[index].percentRemaining = percent
+            updated[index].resetDate = usage.resetDate
             if !planName.isEmpty {
                 updated[index].planName = planName
             }
             updated[index].accountLabel = account.accountLabel
             updated[index].lastSyncDate = Date()
             updated[index].syncError = nil
-            if updated[index].clampedPercent > threshold {
+            if resetChanged || updated[index].clampedPercent > threshold {
                 updated[index].lastAlertDate = nil
             }
-        } else {
-            updated.append(
-                AIUsageEntry(
-                    provider: provider,
-                    planName: planName,
-                    percentRemaining: percent,
-                    resetDate: usage.resetDate,
-                    enabled: true,
-                    accountLabel: account.accountLabel,
-                    lastSyncDate: Date()
-                )
-            )
-        }
 
-        persist(updated)
-        notifyIfNeeded(for: provider)
+            persist(updated)
+            notifyIfNeeded(for: provider)
+        }
     }
 
     private func syncEntry(with account: AIAccount) {
@@ -308,6 +329,13 @@ final class AIUsageStore: ObservableObject {
             )
         )
         persist(updated)
+
+        // A re-added provider that is already signed in should show real numbers right away.
+        if account != nil {
+            Task { [weak self] in
+                await self?.fetchLive(provider: provider, force: true)
+            }
+        }
     }
 
     func remove(id: UUID) {

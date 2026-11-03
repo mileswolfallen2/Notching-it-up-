@@ -12,7 +12,10 @@ import SwiftUI
 private func openAIUsageSettings() {
     DispatchQueue.main.async {
         SettingsWindowController.shared.showWindow()
-        NotificationCenter.default.post(name: .openAISettings, object: nil)
+        // On a cold open the pane starts observing only after the window mounts.
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: .openAISettings, object: nil)
+        }
     }
 }
 
@@ -71,7 +74,7 @@ struct AIUsageView: View {
         HStack(spacing: 7) {
             Image(systemName: "sparkles")
                 .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(Color.effectiveAccent)
+                .foregroundStyle(.white.opacity(0.9))
 
             Text("AI Usage")
                 .font(.system(size: 12, weight: .semibold, design: .rounded))
@@ -79,7 +82,7 @@ struct AIUsageView: View {
 
             Text(summaryText)
                 .font(.system(size: 9, weight: .medium, design: .rounded))
-                .foregroundStyle(store.lowPlanCount > 0 ? .orange : .white.opacity(0.42))
+                .foregroundStyle(.white.opacity(store.lowPlanCount > 0 ? 0.9 : 0.42))
                 .lineLimit(1)
 
             if !store.syncing.isEmpty {
@@ -123,7 +126,7 @@ struct AIUsageView: View {
                         .fill(Color.white.opacity(0.06))
                     Image(systemName: "sparkles")
                         .font(.system(size: 15, weight: .medium))
-                        .foregroundStyle(Color.effectiveAccent)
+                        .foregroundStyle(.white.opacity(0.85))
                 }
                 .frame(width: 34, height: 34)
 
@@ -163,8 +166,6 @@ private struct AIUsageCard: View {
     let entry: AIUsageEntry
 
     @ObservedObject private var store = AIUsageStore.shared
-    @Default(.aiShowPlanName) private var showPlanName
-    @Default(.aiShowResetTime) private var showResetTime
     @State private var appeared = false
     @State private var hovering = false
 
@@ -176,63 +177,24 @@ private struct AIUsageCard: View {
         "\(Int(entry.clampedPercent.rounded()))%"
     }
 
-    private var showsReset: Bool {
-        showResetTime && entry.resetDate != nil
-    }
-
     var body: some View {
-        VStack(spacing: 4) {
+        VStack(spacing: 7) {
             ring
 
-            HStack(spacing: 3) {
-                Image(systemName: entry.provider.iconName)
-                    .font(.system(size: 8, weight: .semibold))
-                Text(entry.provider.label)
-                    .font(.system(size: 10, weight: .semibold, design: .rounded))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.85)
-                if store.isConnected(entry.provider) {
-                    Circle()
-                        .fill(Color.green)
-                        .frame(width: 4, height: 4)
-                        .help("Live from your account")
-                }
-            }
-            .foregroundStyle(.white)
-
-            if showPlanName {
-                Text(entry.displayPlanName)
-                    .font(.system(size: 8, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.42))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-            }
-
-            if showsReset {
-                HStack(spacing: 2) {
-                    Image(systemName: "clock")
-                        .font(.system(size: 7, weight: .semibold))
-                    Text(entry.resetText)
-                        .font(.system(size: 8, weight: .medium))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                }
-                .foregroundStyle(.white.opacity(0.6))
-                .padding(.horizontal, 6)
-                .padding(.vertical, 2)
-                .background(Capsule().fill(Color.white.opacity(0.06)))
-            }
+            Text(entry.provider.label)
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white.opacity(hovering ? 1 : 0.85))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
         }
-        .padding(.vertical, 6)
-        .padding(.horizontal, 6)
-        .frame(width: 112, height: 106, alignment: .top)
+        .frame(width: 106, height: 104)
         .background(cardBackground)
         .overlay(cardBorder)
-        .scaleEffect(hovering ? 1.025 : 1)
+        .scaleEffect(hovering ? 1.02 : 1)
         .animation(.spring(response: 0.28, dampingFraction: 0.72), value: hovering)
         .onHover { hovering = $0 }
         .contextMenu { AIUsageCardMenu(entry: entry) }
-        .help("\(entry.provider.label) — \(percentageText) left. \(entry.resetText).")
+        .help(helpText)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(entry.provider.label), \(percentageText) remaining, \(entry.resetText)")
     }
@@ -240,61 +202,45 @@ private struct AIUsageCard: View {
     private var ring: some View {
         ZStack {
             Circle()
-                .stroke(Color.white.opacity(0.08), lineWidth: 4)
+                .stroke(Color.white.opacity(0.12), lineWidth: 4)
 
             Circle()
                 .trim(from: 0, to: appeared ? progress : 0)
                 .stroke(
-                    AngularGradient(
-                        colors: [
-                            entry.statusColor.opacity(0.55),
-                            entry.statusColor,
-                            entry.statusColor.opacity(0.8)
-                        ],
-                        center: .center
-                    ),
+                    Color.white.opacity(0.88),
                     style: StrokeStyle(lineWidth: 4, lineCap: .round)
                 )
                 .rotationEffect(.degrees(-90))
-                .shadow(color: entry.statusColor.opacity(0.35), radius: 3)
                 .animation(.easeOut(duration: 0.65), value: appeared)
                 .animation(.easeOut(duration: 0.35), value: entry.clampedPercent)
 
             Text(percentageText)
-                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .font(.system(size: 15, weight: .bold, design: .rounded))
                 .monospacedDigit()
                 .foregroundStyle(.white)
                 .contentTransition(.numericText())
         }
-        .frame(width: 42, height: 42)
+        .frame(width: 62, height: 62)
         .onAppear { appeared = true }
+    }
+
+    private var helpText: String {
+        var text = "\(entry.provider.label) — \(percentageText) left. \(entry.resetText)."
+        if let error = store.error(for: entry.provider) {
+            text += " \(error)"
+        }
+        return text
     }
 
     private var cardBackground: some View {
         RoundedRectangle(cornerRadius: 14, style: .continuous)
-            .fill(
-                LinearGradient(
-                    colors: [
-                        entry.provider.tint.opacity(0.14),
-                        Color.white.opacity(0.035)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
+            .fill(Color.white.opacity(hovering ? 0.075 : 0.045))
     }
 
     private var cardBorder: some View {
         RoundedRectangle(cornerRadius: 14, style: .continuous)
             .strokeBorder(
-                LinearGradient(
-                    colors: [
-                        entry.provider.tint.opacity(hovering ? 0.5 : 0.22),
-                        Color.white.opacity(0.06)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ),
+                Color.white.opacity(hovering ? 0.24 : 0.10),
                 lineWidth: 1
             )
     }
@@ -304,7 +250,6 @@ private struct AICompactUsageCard: View {
     let entry: AIUsageEntry
 
     @ObservedObject private var store = AIUsageStore.shared
-    @Default(.aiShowResetTime) private var showResetTime
     @State private var appeared = false
     @State private var hovering = false
 
@@ -312,72 +257,48 @@ private struct AICompactUsageCard: View {
         CGFloat(entry.clampedPercent / 100)
     }
 
+    private var percentageText: String {
+        "\(Int(entry.clampedPercent.rounded()))%"
+    }
+
     var body: some View {
-        HStack(spacing: 7) {
+        VStack(spacing: 5) {
             ZStack {
                 Circle()
-                    .stroke(Color.white.opacity(0.08), lineWidth: 3)
+                    .stroke(Color.white.opacity(0.12), lineWidth: 3)
 
                 Circle()
                     .trim(from: 0, to: appeared ? progress : 0)
                     .stroke(
-                        entry.statusColor,
+                        Color.white.opacity(0.88),
                         style: StrokeStyle(lineWidth: 3, lineCap: .round)
                     )
                     .rotationEffect(.degrees(-90))
                     .animation(.easeOut(duration: 0.55), value: appeared)
 
-                Text("\(Int(entry.clampedPercent.rounded()))%")
-                    .font(.system(size: 7.5, weight: .bold, design: .rounded))
+                Text(percentageText)
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(.white)
             }
-            .frame(width: 30, height: 30)
+            .frame(width: 46, height: 46)
             .onAppear { appeared = true }
 
-            VStack(alignment: .leading, spacing: 1) {
-                HStack(spacing: 4) {
-                    Text(entry.provider.label)
-                        .font(.system(size: 10, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .lineLimit(1)
-
-                    if store.isConnected(entry.provider) {
-                        Circle()
-                            .fill(Color.green)
-                            .frame(width: 4, height: 4)
-                    }
-                }
-
-                Text(showsReset ? entry.resetText : entry.displayPlanName)
-                    .font(.system(size: 8, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.5))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-            }
-
-            Spacer(minLength: 0)
+            Text(entry.provider.label)
+                .font(.system(size: 10.5, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white.opacity(hovering ? 1 : 0.85))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
         }
-        .padding(.horizontal, 7)
-        .padding(.vertical, 6)
-        .frame(width: 136, height: 46)
+        .frame(width: 84, height: 80)
         .background(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            entry.provider.tint.opacity(0.12),
-                            Color.white.opacity(0.035)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .fill(Color.white.opacity(hovering ? 0.075 : 0.045))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .strokeBorder(
-                    entry.provider.tint.opacity(hovering ? 0.45 : 0.2),
+                    Color.white.opacity(hovering ? 0.24 : 0.10),
                     lineWidth: 1
                 )
         )
@@ -385,11 +306,12 @@ private struct AICompactUsageCard: View {
         .animation(.spring(response: 0.28, dampingFraction: 0.72), value: hovering)
         .onHover { hovering = $0 }
         .contextMenu { AIUsageCardMenu(entry: entry) }
-        .help("\(entry.provider.label) — \(Int(entry.clampedPercent.rounded()))% left. \(entry.resetText).")
-    }
-
-    private var showsReset: Bool {
-        showResetTime && entry.resetDate != nil
+        .help(
+            store.error(for: entry.provider).map { "\(entry.provider.label) — \(percentageText) left. \($0)" }
+                ?? "\(entry.provider.label) — \(percentageText) left. \(entry.resetText)."
+        )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(entry.provider.label), \(percentageText) remaining, \(entry.resetText)")
     }
 }
 
@@ -409,6 +331,11 @@ private struct AIUsageCardMenu: View {
             }
             if let error = store.error(for: entry.provider) {
                 Text(error)
+            }
+            Divider()
+        } else if entry.provider.supportsLiveUsage {
+            Button("Sign in for live usage…") {
+                openAIUsageSettings()
             }
             Divider()
         }
@@ -440,10 +367,7 @@ struct AIUsageSettings: View {
     @ObservedObject private var store = AIUsageStore.shared
 
     @Default(.showAITab) private var showAITab
-    @Default(.aiLiveSync) private var liveSync
     @Default(.aiSortByLowest) private var sortByLowest
-    @Default(.aiShowPlanName) private var showPlanName
-    @Default(.aiShowResetTime) private var showResetTime
     @Default(.aiCompactCards) private var compactCards
     @Default(.aiAutoReset) private var autoReset
     @Default(.aiLowUsageAlerts) private var lowUsageAlerts
@@ -477,7 +401,7 @@ struct AIUsageSettings: View {
             trackedSection
             maintenanceSection
         }
-        .accentColor(.effectiveAccent)
+        .tint(.primary)
         .navigationTitle("AI Usage")
         .sheet(item: promptBinding) { prompt in
             AISignInSheet(prompt: prompt) {
@@ -513,7 +437,9 @@ struct AIUsageSettings: View {
                     Spacer()
 
                     Button("Refresh now") {
-                        store.refreshLiveIfNeeded(force: true)
+                        for provider in AIProvider.liveProviders where store.isConnected(provider) {
+                            Task { await store.fetchLive(provider: provider, force: true) }
+                        }
                     }
                     .controlSize(.small)
                 }
@@ -521,7 +447,7 @@ struct AIUsageSettings: View {
         } header: {
             Text("Accounts")
         } footer: {
-            Text("Sign in once and Notching it up reads the same usage numbers your provider shows. Tokens are kept in your Mac’s Keychain and never leave this device. Cursor, Gemini and OpenCode are tracked manually.")
+            Text("Sign in once and Notching it up reads the same usage numbers your provider shows. Tokens stay in this app’s private storage and are only sent to your provider. Cursor, Gemini and OpenCode are tracked manually.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -531,10 +457,10 @@ struct AIUsageSettings: View {
         HStack(spacing: 10) {
             ZStack {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(provider.tint.opacity(0.16))
+                    .fill(Color.primary.opacity(0.06))
                 Image(systemName: provider.iconName)
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(provider.tint)
+                    .foregroundStyle(.primary.opacity(0.7))
             }
             .frame(width: 30, height: 30)
 
@@ -546,10 +472,10 @@ struct AIUsageSettings: View {
                     if store.isConnected(provider) {
                         Text("Live")
                             .font(.system(size: 9, weight: .bold))
-                            .foregroundStyle(.green)
+                            .foregroundStyle(.secondary)
                             .padding(.horizontal, 5)
                             .padding(.vertical, 1)
-                            .background(Capsule().fill(Color.green.opacity(0.14)))
+                            .background(Capsule().fill(Color.primary.opacity(0.07)))
                     }
                 }
 
@@ -558,17 +484,17 @@ struct AIUsageSettings: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
-
-                    if let error = store.error(for: provider) {
-                        Text(error)
-                            .font(.caption2)
-                            .foregroundStyle(.orange)
-                            .lineLimit(2)
-                    }
                 } else {
                     Text(provider.signInHint)
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                }
+
+                if let error = store.error(for: provider) {
+                    Label(error, systemImage: "exclamationmark.triangle.fill")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
                 }
             }
 
@@ -583,17 +509,17 @@ struct AIUsageSettings: View {
                 }
                 .controlSize(.small)
 
-                Button("Sign out", role: .destructive) {
+                Button("Sign out") {
                     store.disconnect(provider)
                 }
                 .controlSize(.small)
+                .foregroundStyle(.secondary)
             } else {
-                Button("Sign in") {
+                Button(store.error(for: provider) == nil ? "Sign in" : "Sign in again") {
                     store.connect(provider)
                 }
                 .controlSize(.small)
                 .buttonStyle(.borderedProminent)
-                .disabled(!liveSync)
             }
         }
     }
@@ -612,7 +538,7 @@ struct AIUsageSettings: View {
         } header: {
             Text("AI Usage")
         } footer: {
-            Text("Rings show how much is left and when each plan refreshes. Signed-in providers update automatically; manual plans follow their own countdown.")
+            Text("Rings show how much is left. Hover a ring for plan and reset details. Signed-in providers update automatically; manual plans follow their own countdown.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -620,19 +546,9 @@ struct AIUsageSettings: View {
 
     private var preview: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text("Notch preview")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-
-                Spacer()
-
-                if store.lowPlanCount > 0 {
-                    Label("\(store.lowPlanCount) low", systemImage: "exclamationmark.triangle.fill")
-                        .font(.caption2.weight(.medium))
-                        .foregroundStyle(.orange)
-                }
-            }
+            Text("Notch preview")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
 
             ScrollView(.horizontal) {
                 HStack(spacing: 10) {
@@ -655,7 +571,7 @@ struct AIUsageSettings: View {
                 .padding(10)
             }
             .scrollIndicators(.never)
-            .frame(height: compactCards ? 66 : 126)
+            .frame(height: compactCards ? 100 : 124)
         }
         .padding(10)
         .background(
@@ -673,13 +589,11 @@ struct AIUsageSettings: View {
     private var displaySection: some View {
         Section {
             Toggle("Sort by lowest remaining", isOn: $sortByLowest)
-            Toggle("Show plan names", isOn: $showPlanName)
-            Toggle("Show reset times", isOn: $showResetTime)
-            Toggle("Compact cards", isOn: $compactCards)
+            Toggle("Compact rings", isOn: $compactCards)
         } header: {
             Text("Display")
         } footer: {
-            Text("Sorting and card style apply to both the notch panel and the preview above.")
+            Text("Sorting and card size apply to both the notch panel and the preview above.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -769,7 +683,7 @@ struct AIUsageSettings: View {
                     .foregroundStyle(.secondary)
             }
         } footer: {
-            Text("Click a provider to edit its plan name, usage, and reset time.")
+            Text("Click a provider to view live usage or adjust a manual plan.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -779,19 +693,19 @@ struct AIUsageSettings: View {
 
     private var maintenanceSection: some View {
         Section {
-            Button("Mark all plans as full") {
-                store.markAllFull()
+            Menu {
+                Button("Mark all plans as full") {
+                    store.markAllFull()
+                }
+                Button("Restart all countdowns") {
+                    store.restartCountdowns()
+                }
+                Button("Restore default providers") {
+                    store.restoreDefaults()
+                }
+            } label: {
+                Text("Maintenance actions")
             }
-
-            Button("Restart all countdowns") {
-                store.restartCountdowns()
-            }
-
-            Button("Restore default providers") {
-                store.restoreDefaults()
-            }
-        } header: {
-            Text("Maintenance")
         }
     }
 
@@ -846,10 +760,11 @@ private struct AIUsageEntryEditor: View {
                 }
 
                 HStack {
-                    Button(role: .destructive, action: onRemove) {
+                    Button(action: onRemove) {
                         Label("Remove", systemImage: "trash")
                     }
                     .buttonStyle(.borderless)
+                    .foregroundStyle(.secondary)
 
                     Spacer()
 
@@ -870,8 +785,8 @@ private struct AIUsageEntryEditor: View {
         VStack(alignment: .leading, spacing: 7) {
             HStack(spacing: 6) {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
-                Text("Synced automatically")
+                    .foregroundStyle(.primary.opacity(0.7))
+                Text(entry.lastSyncDate == nil ? "Checking your account…" : "Synced automatically")
                     .font(.caption.weight(.medium))
 
                 if let last = entry.lastSyncDate {
@@ -907,9 +822,9 @@ private struct AIUsageEntryEditor: View {
             }
 
             if let error, !error.isEmpty {
-                Text(error)
+                Label(error, systemImage: "exclamationmark.triangle.fill")
                     .font(.caption)
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(.secondary)
             }
         }
     }
@@ -936,11 +851,11 @@ private struct AIUsageEntryEditor: View {
                 Text("\(Int(entry.clampedPercent.rounded()))%")
                     .font(.system(.caption, design: .rounded).weight(.bold))
                     .monospacedDigit()
-                    .foregroundStyle(entry.statusColor)
+                    .foregroundStyle(.primary)
             }
 
             Slider(value: $entry.percentRemaining, in: 0...100, step: 1)
-                .tint(entry.statusColor)
+                .tint(.primary)
 
             HStack(spacing: 6) {
                 ForEach([100, 75, 50, 25, 0], id: \.self) { value in
@@ -986,10 +901,10 @@ private struct AIUsageEntryEditor: View {
         HStack(spacing: 10) {
             ZStack {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
-                    .fill(entry.provider.tint.opacity(0.16))
+                    .fill(Color.primary.opacity(0.06))
                 Image(systemName: entry.provider.iconName)
                     .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(entry.provider.tint)
+                    .foregroundStyle(.primary.opacity(0.7))
             }
             .frame(width: 32, height: 32)
 
@@ -1001,22 +916,22 @@ private struct AIUsageEntryEditor: View {
                     if isLive {
                         Text("Live")
                             .font(.system(size: 8, weight: .bold))
-                            .foregroundStyle(.green)
+                            .foregroundStyle(.secondary)
                             .padding(.horizontal, 4)
                             .padding(.vertical, 1)
-                            .background(Capsule().fill(Color.green.opacity(0.14)))
+                            .background(Capsule().fill(Color.primary.opacity(0.07)))
                     }
 
                     if entry.isLow(threshold: lowThreshold) {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.system(size: 9))
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(.primary.opacity(0.7))
                     }
 
                     if error != nil {
                         Image(systemName: "exclamationmark.circle.fill")
                             .font(.system(size: 9))
-                            .foregroundStyle(.orange)
+                            .foregroundStyle(.primary.opacity(0.7))
                     }
                 }
 
@@ -1035,12 +950,12 @@ private struct AIUsageEntryEditor: View {
             Text("\(Int(entry.clampedPercent.rounded()))%")
                 .font(.system(.caption, design: .rounded).weight(.bold))
                 .monospacedDigit()
-                .foregroundStyle(entry.statusColor)
+                .foregroundStyle(.primary)
                 .padding(.horizontal, 7)
                 .padding(.vertical, 3)
                 .background(
                     Capsule()
-                        .fill(entry.statusColor.opacity(0.14))
+                        .fill(Color.primary.opacity(0.07))
                 )
 
             Toggle("", isOn: $entry.enabled)
@@ -1084,10 +999,10 @@ struct AISignInSheet: View {
             HStack(spacing: 12) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(provider.tint.opacity(0.16))
+                        .fill(Color.primary.opacity(0.06))
                     Image(systemName: provider.iconName)
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(provider.tint)
+                        .foregroundStyle(.primary.opacity(0.7))
                 }
                 .frame(width: 42, height: 42)
 

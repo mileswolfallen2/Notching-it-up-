@@ -660,3 +660,75 @@ struct PomodoroTimerView: View {
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
+
+// MARK: - Quick notes
+
+struct NotchNotesView: View {
+    @Default(.notesText) private var notes
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            HStack(spacing: 7) {
+                Image(systemName: "note.text")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.9))
+
+                Text("Notes")
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+
+                Text(notes.isEmpty ? "Saved locally" : "\(notes.count) characters")
+                    .font(.system(size: 9, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.42))
+                    .lineLimit(1)
+
+                Spacer()
+
+                if !notes.isEmpty {
+                    Button {
+                        notes = ""
+                    } label: {
+                        Image(systemName: "trash")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.65))
+                            .padding(4)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .help("Clear notes")
+                }
+            }
+
+            ZStack(alignment: .topLeading) {
+                if notes.isEmpty {
+                    Text("Type a quick note…")
+                        .font(.system(size: 12))
+                        .foregroundStyle(.white.opacity(0.3))
+                        .padding(.top, 8)
+                        .padding(.leading, 9)
+                        .allowsHitTesting(false)
+                }
+
+                TextEditor(text: $notes)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.white)
+                    .scrollContentBackground(.hidden)
+                    .scrollIndicators(.never)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 3)
+            }
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Color.white.opacity(0.045))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(Color.white.opacity(0.10), lineWidth: 1)
+            )
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .padding(.horizontal, 3)
+        .padding(.bottom, 8)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    }
+}

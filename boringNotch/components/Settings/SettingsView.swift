@@ -113,6 +113,9 @@ struct SettingsView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            // Give each pane a fresh identity so switching sections starts at the top
+            // instead of inheriting the previous pane's scroll offset.
+            .id(selectedTab)
         }
         .navigationSplitViewStyle(.balanced)
         .toolbar(removing: .sidebarToggle)

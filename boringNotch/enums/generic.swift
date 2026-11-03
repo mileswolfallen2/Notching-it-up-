@@ -28,6 +28,7 @@ public enum NotchViews: Hashable {
     case home
     case shelf
     case timer
+    case notes
     case ai
 }
 

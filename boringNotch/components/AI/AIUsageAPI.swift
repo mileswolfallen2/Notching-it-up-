@@ -132,17 +132,29 @@ enum AIUsageAPI {
 
         var windows: [AIUsageWindow] = []
         if let rateLimit = body["rate_limit"] as? [String: Any] {
-            let specs: [(key: String, label: String)] = [
+            let slots: [(key: String, fallback: String)] = [
                 ("primary_window", "Session"),
                 ("secondary_window", "Weekly")
             ]
-            for spec in specs {
-                guard let window = rateLimit[spec.key] as? [String: Any],
+            for slot in slots {
+                guard let window = rateLimit[slot.key] as? [String: Any],
                       let used = number(window["used_percent"])
                 else { continue }
+
+                // Some plans swap which slot holds which period; the window length is authoritative.
+                let seconds = number(window["limit_window_seconds"])
+                let label: String
+                if let seconds, seconds >= 6 * 86_400 {
+                    label = "Weekly"
+                } else if let seconds, seconds > 0 {
+                    label = "Session"
+                } else {
+                    label = slot.fallback
+                }
+
                 windows.append(
                     AIUsageWindow(
-                        label: spec.label,
+                        label: label,
                         percentRemaining: clamp(100 - used),
                         resetDate: codexReset(window)
                     )
@@ -187,8 +199,31 @@ enum AIUsageAPI {
 
     // MARK: Antigravity / Google
 
+    private static let antigravityBaseURLs = [
+        "https://cloudcode-pa.googleapis.com",
+        "https://daily-cloudcode-pa.googleapis.com"
+    ]
+
+    private static let antigravityLabels: [String: String] = [
+        "gemini-5h": "Session",
+        "gemini-weekly": "Weekly",
+        "3p-5h": "Claude Session",
+        "3p-weekly": "Claude Weekly"
+    ]
+
+    private struct AntigravityBucket {
+        let id: String
+        let percentRemaining: Double
+        let resetDate: Date?
+    }
+
     private static func fetchAntigravity(_ account: AIAccount) async throws -> AILiveUsage {
-        let userAgent = "antigravity/2.24.0 (aidev_client; os_type=darwin; arch=arm64)"
+        #if arch(arm64)
+        let arch = "arm64"
+        #else
+        let arch = "amd64"
+        #endif
+        let userAgent = "antigravity/2.24.0 (aidev_client; os_type=darwin; arch=\(arch))"
         let headers = [
             "Accept": "application/json",
             "Content-Type": "application/json",
@@ -204,18 +239,27 @@ enum AIUsageAPI {
             ]
         ]
 
-        let loadResponse = try await AIHTTP.postJSON(
-            URL(string: "https://cloudcode-pa.googleapis.com/v1internal:loadCodeAssist")!,
-            fields: loadPayload,
-            headers: headers,
-            allowFailure: true
-        )
-        if [401, 403].contains(loadResponse.statusCode) {
-            throw AIAuthError.signInExpired(.antigravity)
+        // `loadCodeAssist` needs Antigravity's client metadata for the plan to be readable.
+        var loadBody: [String: Any]?
+        for base in Self.antigravityBaseURLs {
+            guard let url = URL(string: base + "/v1internal:loadCodeAssist") else { continue }
+            guard let response = try? await AIHTTP.postJSON(
+                url,
+                fields: loadPayload,
+                headers: headers,
+                allowFailure: true
+            ) else { continue }
+
+            if [401, 403].contains(response.statusCode) {
+                throw AIAuthError.signInExpired(.antigravity)
+            }
+            if response.isSuccess {
+                let root = response.jsonObject()
+                loadBody = (root?["response"] as? [String: Any]) ?? root
+                break
+            }
         }
 
-        let loadRoot = loadResponse.jsonObject()
-        let loadBody = (loadRoot?["response"] as? [String: Any]) ?? loadRoot
         let project = (loadBody?["cloudaicompanionProject"] as? String)
             ?? (loadBody?["cloudAiCompanionProject"] as? String)
         let plan = antigravityPlan(loadBody)
@@ -223,45 +267,60 @@ enum AIUsageAPI {
         var quotaPayload: [String: Any] = [:]
         if let project, !project.isEmpty { quotaPayload["project"] = project }
 
-        let quotaResponse: AIHTTPResponse
-        do {
-            quotaResponse = try await AIHTTP.postJSON(
-                URL(string: "https://cloudcode-pa.googleapis.com/v1internal:retrieveUserQuotaSummary")!,
-                fields: quotaPayload,
-                headers: headers
-            )
-        } catch let error as AIAuthError {
-            throw mapAuthFailure(error, provider: .antigravity)
+        // Production sometimes omits Gemini buckets from an otherwise successful response,
+        // so fall back to the daily endpoint when no known bucket came back.
+        var buckets: [AntigravityBucket] = []
+        var lastError: Error?
+        for base in Self.antigravityBaseURLs {
+            guard let url = URL(string: base + "/v1internal:retrieveUserQuotaSummary") else { continue }
+            do {
+                let response = try await AIHTTP.postJSON(
+                    url,
+                    fields: quotaPayload,
+                    headers: headers,
+                    allowFailure: true
+                )
+
+                if [401, 403].contains(response.statusCode) {
+                    if response.statusCode == 403,
+                       let error = response.jsonObject()?["error"] as? [String: Any],
+                       let details = error["details"] as? [[String: Any]],
+                       details.contains(where: { $0["reason"] as? String == "SUBSCRIPTION_REQUIRED" }) {
+                        throw AIAuthError.unavailable("Google reports no Antigravity quota for this account.")
+                    }
+                    throw AIAuthError.signInExpired(.antigravity)
+                }
+                guard response.isSuccess, let root = response.jsonObject() else { continue }
+
+                let parsed = antigravityBuckets(root)
+                buckets.append(contentsOf: parsed)
+                // Production can return a partial summary; only stop once every known pool is present.
+                if Self.antigravityLabels.keys.allSatisfy({ id in parsed.contains { $0.id == id } }) {
+                    break
+                }
+            } catch let error as AIAuthError {
+                if case .signInExpired = error { throw error }
+                lastError = error
+            } catch {
+                lastError = error
+            }
         }
 
-        guard let root = quotaResponse.jsonObject() else { throw AIAuthError.invalidResponse }
-        let groups = ((root["response"] as? [String: Any])?["groups"] as? [[String: Any]])
-            ?? (root["groups"] as? [[String: Any]])
-            ?? []
+        if buckets.isEmpty, let lastError {
+            throw lastError
+        }
 
-        let labels: [String: String] = [
-            "gemini-5h": "Session",
-            "gemini-weekly": "Weekly",
-            "3p-5h": "Claude Session",
-            "3p-weekly": "Claude Weekly"
-        ]
+        // Both endpoints may report the same bucket; keep the most constrained reading.
+        let unique = Dictionary(grouping: buckets, by: \.id).compactMap { _, group in
+            group.min { $0.percentRemaining < $1.percentRemaining }
+        }
 
-        var windows: [AIUsageWindow] = []
-        for group in groups {
-            guard let buckets = group["buckets"] as? [[String: Any]] else { continue }
-            for bucket in buckets {
-                guard let fraction = number(bucket["remainingFraction"]), fraction.isFinite else { continue }
-                if bucket["disabled"] as? Bool == true { continue }
-                let id = (bucket["bucketId"] as? String) ?? "usage"
-                let label = labels[id] ?? id
-                windows.append(
-                    AIUsageWindow(
-                        label: label,
-                        percentRemaining: clamp(fraction * 100),
-                        resetDate: parseDate(bucket["resetTime"])
-                    )
-                )
-            }
+        let windows = unique.map { bucket in
+            AIUsageWindow(
+                label: Self.antigravityLabels[bucket.id] ?? bucket.id,
+                percentRemaining: bucket.percentRemaining,
+                resetDate: bucket.resetDate
+            )
         }
 
         guard let primary = windows.min(by: { $0.percentRemaining < $1.percentRemaining }) else {
@@ -274,6 +333,34 @@ enum AIUsageAPI {
             planName: plan ?? account.planName ?? "Google AI",
             windows: windows
         )
+    }
+
+    private static func antigravityBuckets(_ root: [String: Any]) -> [AntigravityBucket] {
+        let groups = ((root["response"] as? [String: Any])?["groups"] as? [[String: Any]])
+            ?? (root["groups"] as? [[String: Any]])
+            ?? []
+
+        return groups.flatMap { group -> [AntigravityBucket] in
+            // Argon weekly is a separate pool with its own labelling rules; skip it here.
+            guard (group["displayName"] as? String) != "Gemini 4 Argon",
+                  let buckets = group["buckets"] as? [[String: Any]]
+            else { return [] }
+
+            return buckets.compactMap { bucket in
+                guard let id = bucket["bucketId"] as? String,
+                      Self.antigravityLabels[id] != nil,
+                      bucket["disabled"] as? Bool != true,
+                      let fraction = number(bucket["remainingFraction"]),
+                      fraction.isFinite
+                else { return nil }
+
+                return AntigravityBucket(
+                    id: id,
+                    percentRemaining: clamp(fraction * 100),
+                    resetDate: parseDate(bucket["resetTime"])
+                )
+            }
+        }
     }
 
     private static func antigravityPlan(_ body: [String: Any]?) -> String? {
@@ -423,11 +510,23 @@ enum AIUsageAPI {
         if let text = value as? String {
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
             if !trimmed.isEmpty {
-                if let date = isoWithFractional.date(from: trimmed) ?? iso.date(from: trimmed) {
+                // Formatter instances are not thread-safe and providers sync concurrently.
+                let fractional = ISO8601DateFormatter()
+                fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+                let plain = ISO8601DateFormatter()
+                plain.formatOptions = [.withInternetDateTime]
+                if let date = fractional.date(from: trimmed) ?? plain.date(from: trimmed) {
                     return date
                 }
-                if let date = dayOnly.date(from: trimmed) {
-                    return date
+                if trimmed.count == 10 {
+                    let dayOnly = DateFormatter()
+                    dayOnly.calendar = Calendar(identifier: .gregorian)
+                    dayOnly.locale = Locale(identifier: "en_US_POSIX")
+                    dayOnly.timeZone = TimeZone(secondsFromGMT: 0)
+                    dayOnly.dateFormat = "yyyy-MM-dd"
+                    if let date = dayOnly.date(from: trimmed) {
+                        return date
+                    }
                 }
             }
         }
@@ -437,25 +536,4 @@ enum AIUsageAPI {
         }
         return nil
     }
-
-    private static let isoWithFractional: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return formatter
-    }()
-
-    private static let iso: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime]
-        return formatter
-    }()
-
-    private static let dayOnly: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.calendar = Calendar(identifier: .gregorian)
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter
-    }()
 }

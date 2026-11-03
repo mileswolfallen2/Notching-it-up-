@@ -389,6 +389,8 @@ struct ContentView: View {
                         ShelfView()
                     case .timer:
                         PomodoroTimerView()
+                    case .notes:
+                        NotchNotesView()
                     case .ai:
                         AIUsageView()
                     }

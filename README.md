@@ -31,7 +31,8 @@ I believe the core app should come first. It should be fast, polished, useful, c
 - **HUD Replacement** - Replace macOS volume, brightness, and keyboard backlight HUDs with sleek notch overlays (enabled by default)
 - **Camera Mirror** - Quick mirror view right from the notch
 - **Pomodoro Timer** - Run focused work and break sessions without leaving the notch
-- **AI Usage Dashboard** - Track supported AI subscriptions and their usage windows in one place
+- **Quick Notes** - Keep a persistent scratchpad in the notch for short notes and reminders
+- **AI Usage Dashboard** - Sign in to Claude, ChatGPT, GitHub Copilot, or Antigravity for live limits, track other plans manually, and keep credentials in local app storage
 - **Customizable** - Tweak the notch to fit your needs with gestures, sizing, and more
 - **Configurable layout** - Choose which tabs appear in the open notch and arrange them to fit your workflow
 - **Keyboard shortcuts** - Open the notch, trigger sneak peek, and access supported panels without reaching for the mouse
@@ -39,7 +40,7 @@ I believe the core app should come first. It should be fast, polished, useful, c
 
 ## Project status
 
-Notching it up is an actively developed fork. The core notch, media controls, shelf, calendar, HUD replacement, lyrics, timer, and customization features are usable today. Some integrations and advanced ideas below are still exploratory, so the roadmap is directional rather than a promise of release dates.
+Notching it up is an actively developed fork. The core notch, media controls, shelf, calendar, HUD replacement, lyrics, timer, notes, AI usage, and customization features are usable today. Some integrations and advanced ideas below are still exploratory, so the roadmap is directional rather than a promise of release dates.
 
 ---
 
@@ -221,4 +222,5 @@ For a full list of licenses and attributions, see [Third-Party Licenses](./THIRD
 - [x] Lyrics display in closed notch live activity
 - [x] **Configurable top-bar tabs** - Choose and reorder the panels shown in the open notch
 - [x] **Pomodoro timer foundation** - Configure work, short-break, and long-break durations
-- [x] **AI usage dashboard foundation** - Track usage windows for supported providers with optional low-usage alerts
+- [x] **Quick notes tab** - Keep a persistent scratchpad in the notch
+- [x] **AI usage dashboard** - Live account sync for supported providers, manual fallback, reset countdowns, and low-usage alerts

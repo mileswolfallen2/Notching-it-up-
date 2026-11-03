@@ -19,6 +19,7 @@ struct ShelfView: View {
     @Default(.showHomeTab) private var showHomeTab
     @Default(.showShelfTab) private var showShelfTab
     @Default(.showTimerTab) private var showTimerTab
+    @Default(.showNotesTab) private var showNotesTab
     @Default(.showAITab) private var showAITab
     @Default(.boringShelf) private var shelfEnabled
     @Default(.topBarSlots) private var topBarSlots
@@ -32,6 +33,7 @@ struct ShelfView: View {
             showHome: showHomeTab,
             showShelf: showShelfTab,
             showTimer: showTimerTab,
+            showNotes: showNotesTab,
             showAI: showAITab,
             shelfEnabled: shelfEnabled
         )

@@ -15,6 +15,7 @@ struct TopBarSlotConfigurationView: View {
     @Default(.showHomeTab) private var showHomeTab
     @Default(.showShelfTab) private var showShelfTab
     @Default(.showTimerTab) private var showTimerTab
+    @Default(.showNotesTab) private var showNotesTab
     @Default(.showAITab) private var showAITab
     @Default(.boringShelf) private var shelfEnabled
 
@@ -35,6 +36,7 @@ struct TopBarSlotConfigurationView: View {
             showHome: showHomeTab,
             showShelf: showShelfTab,
             showTimer: showTimerTab,
+            showNotes: showNotesTab,
             showAI: showAITab,
             shelfEnabled: shelfEnabled
         )
@@ -61,6 +63,7 @@ struct TopBarSlotConfigurationView: View {
                         showHomeTab = true
                         showShelfTab = true
                         showTimerTab = true
+                        showNotesTab = true
                         showAITab = true
                     }
                 }
@@ -216,6 +219,7 @@ struct TopBarSlotConfigurationView: View {
         case .home:  return "Music, calendar and live activity"
         case .shelf: return "Files and clipboard items"
         case .timer: return "Pomodoro sessions"
+        case .notes: return "A quick persistent scratchpad"
         case .ai:    return "Plan limits across your AI tools"
         }
     }
@@ -225,6 +229,7 @@ struct TopBarSlotConfigurationView: View {
         case .home:  return showHomeTab
         case .shelf: return showShelfTab && shelfEnabled
         case .timer: return showTimerTab
+        case .notes: return showNotesTab
         case .ai:    return showAITab
         }
     }
@@ -234,6 +239,7 @@ struct TopBarSlotConfigurationView: View {
         case .home:  return $showHomeTab
         case .shelf: return $showShelfTab
         case .timer: return $showTimerTab
+        case .notes: return $showNotesTab
         case .ai:    return $showAITab
         }
     }
@@ -284,12 +290,14 @@ struct TopBarSlotConfigurationView: View {
 
                 DispatchQueue.main.async {
                     var slots = self.orderedTabs
-                    guard let from = slots.firstIndex(of: dragged),
-                          let to = slots.firstIndex(of: target)
-                    else { return }
+                    guard let from = slots.firstIndex(of: dragged) else { return }
 
                     withAnimation(.snappy) {
-                        slots.swapAt(from, to)
+                        slots.remove(at: from)
+                        // Re-find the target after removal so dragging across
+                        // several tabs inserts instead of swapping endpoints.
+                        let to = slots.firstIndex(of: target) ?? slots.count
+                        slots.insert(dragged, at: to)
                         self.topBarSlots = slots
                     }
                 }

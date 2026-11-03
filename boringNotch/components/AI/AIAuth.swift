@@ -2,20 +2,18 @@
 //  AIAuth.swift
 //  boringNotch
 //
-//  OAuth / device-code sign-in for AI usage providers, plus Keychain storage.
+//  OAuth / device-code sign-in for AI usage providers, plus local token storage.
 //
 
 import AppKit
 import CryptoKit
-import Defaults
 import Foundation
 import Network
-import Security
 
 // MARK: - Account
 
 /// Credentials and identity for one signed-in provider. Tokens never touch Defaults;
-/// they are stored in the login Keychain by `AIKeychain`.
+/// they are stored in the app's sandboxed Application Support folder.
 struct AIAccount: Codable, Equatable, Sendable {
     var provider: AIProvider
     var accountLabel: String
@@ -53,7 +51,7 @@ enum AIAuthError: LocalizedError {
     case unsupported(AIProvider)
     case invalidResponse
     case http(Int, String)
-    case keychain(OSStatus)
+    case storage(String)
     case unavailable(String)
 
     var errorDescription: String? {
@@ -71,52 +69,84 @@ enum AIAuthError: LocalizedError {
         case .http(let status, let body):
             let detail = body.trimmingCharacters(in: .whitespacesAndNewlines)
             return detail.isEmpty ? "Request failed with HTTP \(status)." : "HTTP \(status): \(detail)"
-        case .keychain(let status):
-            return "Could not save the sign-in to Keychain (error \(status))."
+        case .storage(let message):
+            return "Could not save the sign-in securely. \(message)"
         case .unavailable(let message):
             return message
         }
     }
 }
 
-// MARK: - Keychain
+// MARK: - Local account storage
 
-enum AIKeychain {
-    private static let service = "com.notchingitup.aiusage"
+/// Stores provider tokens outside the Keychain so rebuilding or updating the
+/// ad-hoc signed app never triggers a Keychain access prompt.
+enum AIAccountStore {
+    private static let lock = NSLock()
 
-    private static func query(for provider: AIProvider) -> [String: Any] {
-        [
-            kSecClass as String: kSecClassGenericPassword,
-            kSecAttrService as String: service,
-            kSecAttrAccount as String: provider.rawValue
-        ]
+    private static var directoryURL: URL? {
+        FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first?
+            .appendingPathComponent("AI Usage", isDirectory: true)
+    }
+
+    private static var fileURL: URL? {
+        directoryURL?.appendingPathComponent("accounts.json", isDirectory: false)
     }
 
     static func save(_ account: AIAccount) throws {
-        let data = try JSONEncoder().encode(account)
-        let base = query(for: account.provider)
-        SecItemDelete(base as CFDictionary)
+        lock.lock()
+        defer { lock.unlock() }
 
-        var attributes = base
-        attributes[kSecValueData as String] = data
-        attributes[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
-        let status = SecItemAdd(attributes as CFDictionary, nil)
-        guard status == errSecSuccess else { throw AIAuthError.keychain(status) }
+        var accounts = readAllLocked()
+        accounts[account.provider.rawValue] = account
+        try writeLocked(accounts)
     }
 
     static func load(_ provider: AIProvider) -> AIAccount? {
-        var attributes = query(for: provider)
-        attributes[kSecReturnData as String] = true
-        attributes[kSecMatchLimit as String] = kSecMatchLimitOne
-
-        var item: CFTypeRef?
-        let status = SecItemCopyMatching(attributes as CFDictionary, &item)
-        guard status == errSecSuccess, let data = item as? Data else { return nil }
-        return try? JSONDecoder().decode(AIAccount.self, from: data)
+        lock.lock()
+        defer { lock.unlock() }
+        return readAllLocked()[provider.rawValue]
     }
 
     static func delete(_ provider: AIProvider) {
-        SecItemDelete(query(for: provider) as CFDictionary)
+        lock.lock()
+        defer { lock.unlock() }
+
+        var accounts = readAllLocked()
+        guard accounts.removeValue(forKey: provider.rawValue) != nil else { return }
+        try? writeLocked(accounts)
+    }
+
+    private static func readAllLocked() -> [String: AIAccount] {
+        guard let url = fileURL, let data = try? Data(contentsOf: url) else { return [:] }
+        return (try? JSONDecoder().decode([String: AIAccount].self, from: data)) ?? [:]
+    }
+
+    private static func writeLocked(_ accounts: [String: AIAccount]) throws {
+        guard let directory = directoryURL, let file = fileURL else {
+            throw AIAuthError.storage("Application Support is unavailable.")
+        }
+
+        do {
+            try FileManager.default.createDirectory(
+                at: directory,
+                withIntermediateDirectories: true,
+                attributes: [.posixPermissions: 0o700]
+            )
+            let data = try JSONEncoder().encode(accounts)
+            try data.write(to: file, options: .atomic)
+            try FileManager.default.setAttributes(
+                [.posixPermissions: 0o600],
+                ofItemAtPath: file.path
+            )
+
+            var resourceValues = URLResourceValues()
+            resourceValues.isExcludedFromBackup = true
+            var mutableFile = file
+            try? mutableFile.setResourceValues(resourceValues)
+        } catch {
+            throw AIAuthError.storage(error.localizedDescription)
+        }
     }
 }
 
@@ -410,8 +440,11 @@ final class LoopbackCallbackServer: @unchecked Sendable {
         receive(on: connection, buffer: Data())
     }
 
+    private static let headerLimit = 16_384
+
     private func receive(on connection: NWConnection, buffer: Data) {
-        connection.receive(minimumIncompleteLength: 1, maximumLength: 65_536) { [weak self] data, _, isComplete, error in
+        let remaining = max(Self.headerLimit - buffer.count, 1)
+        connection.receive(minimumIncompleteLength: 1, maximumLength: remaining) { [weak self] data, _, isComplete, error in
             guard let self else {
                 connection.cancel()
                 return
@@ -428,8 +461,9 @@ final class LoopbackCallbackServer: @unchecked Sendable {
                     return
                 }
                 self.handle(requestLine: requestLine, connection: connection)
-            } else if isComplete || error != nil {
+            } else if isComplete || error != nil || combined.count >= Self.headerLimit {
                 connection.cancel()
+                self.resolve(.failure(AIAuthError.invalidResponse))
             } else {
                 self.receive(on: connection, buffer: combined)
             }
@@ -529,14 +563,14 @@ final class AIAuthService {
 
     /// Returns a usable account, refreshing the access token first when it is close to expiry.
     func validAccount(for provider: AIProvider) async throws -> AIAccount {
-        guard var account = AIKeychain.load(provider) else {
+        guard var account = AIAccountStore.load(provider) else {
             throw AIAuthError.notSignedIn(provider)
         }
 
         let needsRefresh = account.expiresAt.map { $0.timeIntervalSinceNow < 120 } ?? false
         if needsRefresh {
             account = try await refresh(account)
-            try AIKeychain.save(account)
+            try AIAccountStore.save(account)
         }
         return account
     }
@@ -600,12 +634,30 @@ final class AIAuthService {
     }
 
     private func claudePlanName(from profile: ClaudeProfile?) -> String? {
-        guard let type = profile?.organization?.organizationType?.lowercased() else { return "Claude" }
-        if type.contains("max") { return "Claude Max" }
-        if type.contains("pro") { return "Claude Pro" }
-        if type.contains("team") { return "Claude Team" }
-        if type.contains("enterprise") { return "Claude Enterprise" }
-        return "Claude"
+        guard let organization = profile?.organization else { return "Claude" }
+        let type = organization.organizationType?.lowercased() ?? ""
+
+        let base: String
+        if type.contains("ultra") {
+            base = "Claude Ultra"
+        } else if type.contains("max") {
+            base = "Claude Max"
+        } else if type.contains("pro") {
+            base = "Claude Pro"
+        } else if type.contains("team") {
+            base = "Claude Team"
+        } else if type.contains("enterprise") {
+            base = "Claude Enterprise"
+        } else {
+            return "Claude"
+        }
+
+        // The rate-limit tier carries the multiplier ("…max_20x").
+        if let tier = organization.rateLimitTier,
+           let multiplier = tier.range(of: #"\d+x"#, options: .regularExpression) {
+            return "\(base) \(tier[multiplier])"
+        }
+        return base
     }
 
     private func claudeHeaders(_ token: String, includeBeta: Bool) -> [String: String] {

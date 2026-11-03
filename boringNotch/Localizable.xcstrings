@@ -710,22 +710,22 @@
         }
       }
     },
+    "%@ — %@ left. %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ — %2$@ left. %3$@"
+          }
+        }
+      }
+    },
     "%@ — %@ left. %@." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$@ — %2$@ left. %3$@."
-          }
-        }
-      }
-    },
-    "%@ — %lld%% left. %@." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ — %2$lld%% left. %3$@."
           }
         }
       }
@@ -950,7 +950,7 @@
         }
       }
     },
-    "%lld low" : {
+    "%lld characters" : {
 
     },
     "%lld%%" : {
@@ -4690,6 +4690,9 @@
         }
       }
     },
+    "Checking your account…" : {
+
+    },
     "Choose a Music Source" : {
       "localizations" : {
         "ar" : {
@@ -5196,6 +5199,9 @@
     "Clear" : {
 
     },
+    "Clear notes" : {
+
+    },
     "Clear slot" : {
       "localizations" : {
         "ar" : {
@@ -5296,7 +5302,7 @@
         }
       }
     },
-    "Click a provider to edit its plan name, usage, and reset time." : {
+    "Click a provider to view live usage or adjust a manual plan." : {
 
     },
     "Click to copy to clipboard" : {
@@ -5902,7 +5908,7 @@
         }
       }
     },
-    "Compact cards" : {
+    "Compact rings" : {
 
     },
     "Configure AI usage" : {
@@ -12459,7 +12465,7 @@
         }
       }
     },
-    "Maintenance" : {
+    "Maintenance actions" : {
 
     },
     "Mark all plans as full" : {
@@ -15682,6 +15688,9 @@
         }
       }
     },
+    "Notes" : {
+
+    },
     "Notify when a plan runs low" : {
 
     },
@@ -18147,7 +18156,7 @@
     "Restore default providers" : {
 
     },
-    "Rings show how much is left and when each plan refreshes. Signed-in providers update automatically; manual plans follow their own countdown." : {
+    "Rings show how much is left. Hover a ring for plan and reset details. Signed-in providers update automatically; manual plans follow their own countdown." : {
 
     },
     "Running" : {
@@ -18250,6 +18259,9 @@
           }
         }
       }
+    },
+    "Saved locally" : {
+
     },
     "Select the music source you want to use. You can change this later in the app settings." : {
       "localizations" : {
@@ -19978,9 +19990,6 @@
         }
       }
     },
-    "Show plan names" : {
-
-    },
     "Show power status icons" : {
       "localizations" : {
         "ar" : {
@@ -20180,9 +20189,6 @@
           }
         }
       }
-    },
-    "Show reset times" : {
-
     },
     "Show settings icon in notch" : {
       "localizations" : {
@@ -20396,10 +20402,16 @@
     "Sign in" : {
 
     },
+    "Sign in again" : {
+
+    },
+    "Sign in for live usage…" : {
+
+    },
     "Sign in from Accounts above to keep this plan in sync automatically." : {
 
     },
-    "Sign in once and Notching it up reads the same usage numbers your provider shows. Tokens are kept in your Mac’s Keychain and never leave this device. Cursor, Gemini and OpenCode are tracked manually." : {
+    "Sign in once and Notching it up reads the same usage numbers your provider shows. Tokens stay in this app’s private storage and are only sent to your provider. Cursor, Gemini and OpenCode are tracked manually." : {
 
     },
     "Sign in to Claude, ChatGPT, Copilot or Antigravity, or add any plan manually." : {
@@ -20817,7 +20829,7 @@
     "Sort by lowest remaining" : {
 
     },
-    "Sorting and card style apply to both the notch panel and the preview above." : {
+    "Sorting and card size apply to both the notch panel and the preview above." : {
 
     },
     "Speed" : {
@@ -21954,6 +21966,9 @@
           }
         }
       }
+    },
+    "Type a quick note…" : {
+
     },
     "Uninstall" : {
       "extractionState" : "stale",

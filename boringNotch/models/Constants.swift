@@ -74,6 +74,7 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
     case home  = "home"
     case shelf = "shelf"
     case timer = "timer"
+    case notes = "notes"
     case ai    = "ai"
 
     var id: String { rawValue }
@@ -83,6 +84,7 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
         case .home:  return "Home"
         case .shelf: return "Shelf"
         case .timer: return "Timer"
+        case .notes: return "Notes"
         case .ai:    return "AI"
         }
     }
@@ -92,6 +94,7 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
         case .home:  return "house.fill"
         case .shelf: return "tray.fill"
         case .timer: return "timer"
+        case .notes: return "note.text"
         case .ai:    return "sparkles"
         }
     }
@@ -101,12 +104,13 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
         case .home:  return .home
         case .shelf: return .shelf
         case .timer: return .timer
+        case .notes: return .notes
         case .ai:    return .ai
         }
     }
 
     /// Default ordered layout shown in the top bar.
-    static let defaultLayout: [TopBarTab] = [.home, .shelf, .timer, .ai]
+    static let defaultLayout: [TopBarTab] = [.home, .shelf, .timer, .ai, .notes]
 
     /// Returns the stored order with any missing tabs appended, then filters out
     /// tabs the user has hidden. This keeps existing installations working when
@@ -116,6 +120,7 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
         showHome: Bool,
         showShelf: Bool,
         showTimer: Bool,
+        showNotes: Bool,
         showAI: Bool,
         shelfEnabled: Bool
     ) -> [TopBarTab] {
@@ -128,6 +133,7 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
             case .home:  return showHome
             case .shelf: return showShelf && shelfEnabled
             case .timer: return showTimer
+            case .notes: return showNotes
             case .ai:    return showAI
             }
         }
@@ -169,18 +175,6 @@ enum AIProvider: String, CaseIterable, Codable, Identifiable, Defaults.Serializa
         case .copilot:     return "chevron.left.forwardslash.chevron.right"
         case .gemini:      return "diamond.fill"
         case .opencode:    return "brain.head.profile"
-        }
-    }
-
-    var tint: Color {
-        switch self {
-        case .claude:      return Color(red: 0.85, green: 0.47, blue: 0.34)
-        case .codex:       return Color(red: 0.10, green: 0.72, blue: 0.55)
-        case .cursor:      return Color(red: 0.24, green: 0.52, blue: 1.00)
-        case .antigravity: return Color(red: 0.62, green: 0.42, blue: 1.00)
-        case .copilot:     return Color(red: 0.45, green: 0.55, blue: 0.95)
-        case .gemini:      return Color(red: 0.35, green: 0.62, blue: 0.98)
-        case .opencode:    return Color(red: 0.20, green: 0.75, blue: 0.78)
         }
     }
 
@@ -277,12 +271,6 @@ struct AIUsageEntry: Codable, Hashable, Identifiable, Defaults.Serializable {
         min(max(percentRemaining, 0), 100)
     }
 
-    var statusColor: Color {
-        if clampedPercent <= 15 { return .red }
-        if clampedPercent <= 35 { return .orange }
-        return provider.tint
-    }
-
     func isLow(threshold: Double) -> Bool {
         clampedPercent <= threshold
     }
@@ -363,8 +351,6 @@ extension Defaults.Keys {
     static let aiUsageEntries = Key<[AIUsageEntry]>("aiUsageEntries", default: AIUsageEntry.defaultEntries)
     static let showAITab = Key<Bool>("showAITab", default: true)
     static let aiSortByLowest = Key<Bool>("aiSortByLowest", default: false)
-    static let aiShowPlanName = Key<Bool>("aiShowPlanName", default: true)
-    static let aiShowResetTime = Key<Bool>("aiShowResetTime", default: true)
     static let aiCompactCards = Key<Bool>("aiCompactCards", default: false)
     static let aiAutoReset = Key<Bool>("aiAutoReset", default: true)
     static let aiLiveSync = Key<Bool>("aiLiveSync", default: true)
@@ -382,6 +368,8 @@ extension Defaults.Keys {
     static let showHomeTab = Key<Bool>("showHomeTab", default: true)
     static let showShelfTab = Key<Bool>("showShelfTab", default: true)
     static let showTimerTab = Key<Bool>("showTimerTab", default: true)
+    static let showNotesTab = Key<Bool>("showNotesTab", default: true)
+    static let notesText = Key<String>("notesText", default: "")
     // MARK: Appearance
     static let showEmojis = Key<Bool>("showEmojis", default: false)
     //static let alwaysShowTabs = Key<Bool>("alwaysShowTabs", default: true)
