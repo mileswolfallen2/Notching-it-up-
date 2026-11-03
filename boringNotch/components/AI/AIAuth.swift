@@ -119,7 +119,16 @@ enum AIAccountStore {
 
     private static func readAllLocked() -> [String: AIAccount] {
         guard let url = fileURL, let data = try? Data(contentsOf: url) else { return [:] }
-        return (try? JSONDecoder().decode([String: AIAccount].self, from: data)) ?? [:]
+        if let accounts = try? JSONDecoder().decode([String: AIAccount].self, from: data) {
+            return accounts
+        }
+
+        // Keep an unreadable file around instead of overwriting it, so a
+        // corrupt write never silently signs the user out for good.
+        let backup = url.appendingPathExtension("corrupt")
+        try? FileManager.default.removeItem(at: backup)
+        try? FileManager.default.moveItem(at: url, to: backup)
+        return [:]
     }
 
     private static func writeLocked(_ accounts: [String: AIAccount]) throws {
@@ -133,17 +142,31 @@ enum AIAccountStore {
                 withIntermediateDirectories: true,
                 attributes: [.posixPermissions: 0o700]
             )
+
             let data = try JSONEncoder().encode(accounts)
             try data.write(to: file, options: .atomic)
+
+            // `createDirectory` keeps existing attributes, and atomic writes
+            // can replace the file, so enforce permissions and the backup
+            // exclusion every time.
+            try? FileManager.default.setAttributes(
+                [.posixPermissions: 0o700],
+                ofItemAtPath: directory.path
+            )
             try FileManager.default.setAttributes(
                 [.posixPermissions: 0o600],
                 ofItemAtPath: file.path
             )
 
-            var resourceValues = URLResourceValues()
-            resourceValues.isExcludedFromBackup = true
+            var directoryValues = URLResourceValues()
+            directoryValues.isExcludedFromBackup = true
+            var mutableDirectory = directory
+            try? mutableDirectory.setResourceValues(directoryValues)
+
+            var fileValues = URLResourceValues()
+            fileValues.isExcludedFromBackup = true
             var mutableFile = file
-            try? mutableFile.setResourceValues(resourceValues)
+            try? mutableFile.setResourceValues(fileValues)
         } catch {
             throw AIAuthError.storage(error.localizedDescription)
         }
@@ -176,12 +199,42 @@ struct AIHTTPResponse {
 }
 
 enum AIHTTP {
+    /// Dedicated session so provider requests have predictable timeouts and
+    /// never read or write a shared disk cache.
+    private static let session: URLSession = {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.timeoutIntervalForRequest = 25
+        configuration.timeoutIntervalForResource = 45
+        configuration.requestCachePolicy = .reloadIgnoringLocalAndRemoteCacheData
+        configuration.urlCache = nil
+        return URLSession(configuration: configuration)
+    }()
+
     static func send(_ request: URLRequest, allowFailure: Bool = false) async throws -> AIHTTPResponse {
         var request = request
         if request.timeoutInterval <= 0 || request.timeoutInterval > 25 {
             request.timeoutInterval = 25
         }
-        let (data, response) = try await URLSession.shared.data(for: request)
+
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await session.data(for: request)
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch let error as URLError {
+            switch error.code {
+            case .cancelled:
+                throw CancellationError()
+            case .timedOut:
+                throw AIAuthError.unavailable("The provider took too long to respond. Try again in a moment.")
+            case .notConnectedToInternet, .networkConnectionLost:
+                throw AIAuthError.unavailable("No internet connection. Usage will refresh when you reconnect.")
+            default:
+                throw AIAuthError.unavailable("Could not reach the provider. \(error.localizedDescription)")
+            }
+        }
+
         guard let http = response as? HTTPURLResponse else { throw AIAuthError.invalidResponse }
 
         var headers: [String: String] = [:]

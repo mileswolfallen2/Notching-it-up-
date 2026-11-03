@@ -46,6 +46,16 @@ struct TabSelectionView: View {
         visibleTabs.map { String(describing: $0.view) }.joined(separator: ",")
     }
 
+    /// Collapse the tab strip before it can run into the physical notch. The
+    /// top bar has at most five tabs, so compact padding always fits.
+    private var tabButtonPadding: CGFloat {
+        switch visibleTabs.count {
+        case 0...3: return 15
+        case 4:     return 10
+        default:    return 7
+        }
+    }
+
     func switchTab(by offset: Int) {
         guard let currentIndex = visibleTabs.firstIndex(where: { $0.view == coordinator.currentView }) else { return }
         let newIndex = currentIndex + offset
@@ -63,7 +73,7 @@ struct TabSelectionView: View {
             } else {
                 HStack(spacing: 0) {
                     ForEach(visibleTabs) { tab in
-                        TabButton(label: tab.label, icon: tab.icon, selected: coordinator.currentView == tab.view) {
+                        TabButton(label: tab.label, icon: tab.icon, selected: coordinator.currentView == tab.view, horizontalPadding: tabButtonPadding) {
                             withAnimation(.smooth) {
                                 coordinator.currentView = tab.view
                             }

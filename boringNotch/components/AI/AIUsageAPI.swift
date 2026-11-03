@@ -503,7 +503,8 @@ enum AIUsageAPI {
     }
 
     private static func clamp(_ value: Double) -> Double {
-        min(max(value, 0), 100)
+        guard value.isFinite else { return 0 }
+        return min(max(value, 0), 100)
     }
 
     private static func parseDate(_ value: Any?) -> Date? {

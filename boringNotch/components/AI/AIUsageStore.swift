@@ -29,6 +29,9 @@ final class AIUsageStore: ObservableObject {
     private var signInTask: Task<Void, Never>?
     /// Guards against a cancelled sign-in finishing after a newer one starts.
     private var signInGeneration = 0
+    /// Per-provider token used to discard sync results that finish after a
+    /// sign-out or reconnect.
+    private var providerEpochs: [AIProvider: Int] = [:]
 
     private init() {
         entries = Defaults[.aiUsageEntries]
@@ -69,13 +72,24 @@ final class AIUsageStore: ObservableObject {
         entries.filter(\.enabled)
     }
 
+    /// Plans the notch should show. Signed-in providers always appear; manual
+    /// plans stay hidden until the user explicitly turns them on.
+    var notchEntries: [AIUsageEntry] {
+        let showManual = Defaults[.aiShowManualPlans]
+        return entries.filter { entry in
+            guard entry.enabled else { return false }
+            if accounts[entry.provider] != nil { return true }
+            return showManual
+        }
+    }
+
     var lowestRemaining: Double? {
-        enabledEntries.map(\.clampedPercent).min()
+        notchEntries.map(\.clampedPercent).min()
     }
 
     var lowPlanCount: Int {
         let threshold = Defaults[.aiLowUsageThreshold]
-        return enabledEntries.filter { $0.isLow(threshold: threshold) }.count
+        return notchEntries.filter { $0.isLow(threshold: threshold) }.count
     }
 
     func entry(with id: UUID) -> AIUsageEntry? {
@@ -103,6 +117,8 @@ final class AIUsageStore: ObservableObject {
     func connect(_ provider: AIProvider) {
         guard provider.supportsLiveUsage else { return }
         cancelSignIn()
+        bumpEpoch(for: provider)
+        syncing.remove(provider)
         lastError[provider] = nil
 
         let addedEntry = !entries.contains(where: { $0.provider == provider })
@@ -155,6 +171,7 @@ final class AIUsageStore: ObservableObject {
     }
 
     func disconnect(_ provider: AIProvider) {
+        bumpEpoch(for: provider)
         AIAccountStore.delete(provider)
         accounts[provider] = nil
         syncing.remove(provider)
@@ -202,19 +219,28 @@ final class AIUsageStore: ObservableObject {
             return
         }
 
+        let epoch = currentEpoch(for: provider)
         syncing.insert(provider)
-        defer { syncing.remove(provider) }
+        defer {
+            if currentEpoch(for: provider) == epoch {
+                syncing.remove(provider)
+            }
+        }
 
         do {
             let account = try await AIAuthService.shared.validAccount(for: provider)
+            guard currentEpoch(for: provider) == epoch, accounts[provider] != nil else { return }
             accounts[provider] = account
             try? AIAccountStore.save(account)
 
             let usage = try await AIUsageAPI.fetch(provider: provider, account: account)
+            guard currentEpoch(for: provider) == epoch, accounts[provider] != nil else { return }
+            guard usage.percentRemaining.isFinite else { throw AIAuthError.invalidResponse }
             apply(usage, provider: provider, account: account)
             lastError[provider] = nil
             lastLiveFetch = Date()
         } catch let error as AIAuthError {
+            guard currentEpoch(for: provider) == epoch, accounts[provider] != nil else { return }
             switch error {
             case .notSignedIn, .signInExpired:
                 AIAccountStore.delete(provider)
@@ -223,14 +249,18 @@ final class AIUsageStore: ObservableObject {
                 break
             }
             record(error.localizedDescription, for: provider)
+        } catch is CancellationError {
+            return
         } catch {
+            guard currentEpoch(for: provider) == epoch, accounts[provider] != nil else { return }
             record(error.localizedDescription, for: provider)
         }
     }
 
     private func apply(_ usage: AILiveUsage, provider: AIProvider, account: AIAccount) {
         var updated = entries
-        let percent = min(max(usage.percentRemaining, 0), 100)
+        let rawPercent = usage.percentRemaining.isFinite ? usage.percentRemaining : 0
+        let percent = min(max(rawPercent, 0), 100)
         let planName = usage.planName ?? account.planName ?? ""
         let threshold = Defaults[.aiLowUsageThreshold]
 
@@ -482,6 +512,14 @@ final class AIUsageStore: ObservableObject {
     }
 
     // MARK: - Private
+
+    private func currentEpoch(for provider: AIProvider) -> Int {
+        providerEpochs[provider, default: 0]
+    }
+
+    private func bumpEpoch(for provider: AIProvider) {
+        providerEpochs[provider, default: 0] &+= 1
+    }
 
     private func persist(_ updated: [AIUsageEntry]) {
         entries = updated

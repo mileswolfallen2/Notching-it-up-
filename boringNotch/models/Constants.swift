@@ -178,6 +178,19 @@ enum AIProvider: String, CaseIterable, Codable, Identifiable, Defaults.Serializa
         }
     }
 
+    /// Optional brand tint used when the user enables provider colors.
+    var tint: Color {
+        switch self {
+        case .claude:      return Color(red: 0.85, green: 0.48, blue: 0.35)
+        case .codex:       return Color(red: 0.10, green: 0.72, blue: 0.54)
+        case .cursor:      return Color(red: 0.30, green: 0.72, blue: 0.95)
+        case .antigravity: return Color(red: 0.60, green: 0.48, blue: 0.98)
+        case .copilot:     return Color(red: 0.42, green: 0.62, blue: 0.98)
+        case .gemini:      return Color(red: 0.36, green: 0.66, blue: 1.0)
+        case .opencode:    return Color(red: 0.72, green: 0.72, blue: 0.78)
+        }
+    }
+
     var defaultPlanName: String {
         switch self {
         case .claude:      return "Claude Pro"
@@ -240,6 +253,45 @@ enum AIProvider: String, CaseIterable, Codable, Identifiable, Defaults.Serializa
     }
 }
 
+/// How AI usage rings are tinted in the notch.
+enum AIUsageColorStyle: String, CaseIterable, Identifiable, Defaults.Serializable {
+    case monochrome
+    case provider
+    case accent
+    case usage
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .monochrome: return "Monochrome"
+        case .provider:   return "Provider"
+        case .accent:     return "Accent"
+        case .usage:      return "Usage"
+        }
+    }
+
+    func color(for provider: AIProvider, percentRemaining: Double) -> Color {
+        switch self {
+        case .monochrome:
+            return .white.opacity(0.88)
+        case .provider:
+            return provider.tint
+        case .accent:
+            return .effectiveAccent
+        case .usage:
+            let percent = percentRemaining.isFinite ? percentRemaining : 0
+            if percent <= 20 {
+                return Color(red: 0.95, green: 0.42, blue: 0.42)
+            }
+            if percent <= 50 {
+                return Color(red: 0.95, green: 0.75, blue: 0.30)
+            }
+            return Color(red: 0.35, green: 0.82, blue: 0.55)
+        }
+    }
+}
+
 /// A single tracked AI plan. Usage is kept locally so no credentials or
 /// network requests are required.
 struct AIUsageEntry: Codable, Hashable, Identifiable, Defaults.Serializable {
@@ -268,7 +320,8 @@ struct AIUsageEntry: Codable, Hashable, Identifiable, Defaults.Serializable {
     }
 
     var clampedPercent: Double {
-        min(max(percentRemaining, 0), 100)
+        guard percentRemaining.isFinite else { return 0 }
+        return min(max(percentRemaining, 0), 100)
     }
 
     func isLow(threshold: Double) -> Bool {
@@ -352,6 +405,8 @@ extension Defaults.Keys {
     static let showAITab = Key<Bool>("showAITab", default: true)
     static let aiSortByLowest = Key<Bool>("aiSortByLowest", default: false)
     static let aiCompactCards = Key<Bool>("aiCompactCards", default: false)
+    static let aiColorStyle = Key<AIUsageColorStyle>("aiColorStyle", default: .monochrome)
+    static let aiShowManualPlans = Key<Bool>("aiShowManualPlans", default: false)
     static let aiAutoReset = Key<Bool>("aiAutoReset", default: true)
     static let aiLiveSync = Key<Bool>("aiLiveSync", default: true)
     static let aiLowUsageAlerts = Key<Bool>("aiLowUsageAlerts", default: true)

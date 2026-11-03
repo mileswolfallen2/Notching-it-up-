@@ -27,7 +27,7 @@ struct AIUsageView: View {
     @Default(.aiCompactCards) private var compactCards
 
     private var visibleEntries: [AIUsageEntry] {
-        let base = store.entries.filter(\.enabled)
+        let base = store.notchEntries
         return sortByLowest
             ? base.sorted { $0.clampedPercent < $1.clampedPercent }
             : base
@@ -40,7 +40,7 @@ struct AIUsageView: View {
             let lowNoun = store.lowPlanCount == 1 ? "plan low" : "plans low"
             return "\(store.lowPlanCount) \(lowNoun) · \(lowestText)"
         }
-        let count = store.enabledEntries.count
+        let count = store.notchEntries.count
         return "\(count) \(count == 1 ? "plan" : "plans") · \(lowestText)"
     }
 
@@ -134,7 +134,7 @@ struct AIUsageView: View {
                     Text("Track your AI limits")
                         .font(.system(size: 12, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
-                    Text("Sign in to Claude, ChatGPT, Copilot or Antigravity, or add any plan manually.")
+                    Text("Sign in to Claude, ChatGPT, Copilot or Antigravity, or show manual plans in AI settings.")
                         .font(.system(size: 10))
                         .foregroundStyle(.white.opacity(0.5))
                         .lineLimit(2)
@@ -166,6 +166,7 @@ private struct AIUsageCard: View {
     let entry: AIUsageEntry
 
     @ObservedObject private var store = AIUsageStore.shared
+    @Default(.aiColorStyle) private var colorStyle
     @State private var appeared = false
     @State private var hovering = false
 
@@ -175,6 +176,10 @@ private struct AIUsageCard: View {
 
     private var percentageText: String {
         "\(Int(entry.clampedPercent.rounded()))%"
+    }
+
+    private var ringColor: Color {
+        colorStyle.color(for: entry.provider, percentRemaining: entry.clampedPercent)
     }
 
     var body: some View {
@@ -207,7 +212,7 @@ private struct AIUsageCard: View {
             Circle()
                 .trim(from: 0, to: appeared ? progress : 0)
                 .stroke(
-                    Color.white.opacity(0.88),
+                    ringColor,
                     style: StrokeStyle(lineWidth: 4, lineCap: .round)
                 )
                 .rotationEffect(.degrees(-90))
@@ -250,6 +255,7 @@ private struct AICompactUsageCard: View {
     let entry: AIUsageEntry
 
     @ObservedObject private var store = AIUsageStore.shared
+    @Default(.aiColorStyle) private var colorStyle
     @State private var appeared = false
     @State private var hovering = false
 
@@ -261,6 +267,10 @@ private struct AICompactUsageCard: View {
         "\(Int(entry.clampedPercent.rounded()))%"
     }
 
+    private var ringColor: Color {
+        colorStyle.color(for: entry.provider, percentRemaining: entry.clampedPercent)
+    }
+
     var body: some View {
         VStack(spacing: 5) {
             ZStack {
@@ -270,11 +280,12 @@ private struct AICompactUsageCard: View {
                 Circle()
                     .trim(from: 0, to: appeared ? progress : 0)
                     .stroke(
-                        Color.white.opacity(0.88),
+                        ringColor,
                         style: StrokeStyle(lineWidth: 3, lineCap: .round)
                     )
                     .rotationEffect(.degrees(-90))
                     .animation(.easeOut(duration: 0.55), value: appeared)
+                    .animation(.easeOut(duration: 0.35), value: entry.clampedPercent)
 
                 Text(percentageText)
                     .font(.system(size: 12, weight: .bold, design: .rounded))
@@ -369,6 +380,8 @@ struct AIUsageSettings: View {
     @Default(.showAITab) private var showAITab
     @Default(.aiSortByLowest) private var sortByLowest
     @Default(.aiCompactCards) private var compactCards
+    @Default(.aiColorStyle) private var colorStyle
+    @Default(.aiShowManualPlans) private var showManualPlans
     @Default(.aiAutoReset) private var autoReset
     @Default(.aiLowUsageAlerts) private var lowUsageAlerts
     @Default(.aiLowUsageThreshold) private var lowThreshold
@@ -377,6 +390,13 @@ struct AIUsageSettings: View {
         AIProvider.allCases.filter { provider in
             !store.entries.contains { $0.provider == provider }
         }
+    }
+
+    private var previewEntries: [AIUsageEntry] {
+        let base = store.notchEntries
+        return sortByLowest
+            ? base.sorted { $0.clampedPercent < $1.clampedPercent }
+            : base
     }
 
     private var promptBinding: Binding<AISignInPrompt?> {
@@ -538,7 +558,7 @@ struct AIUsageSettings: View {
         } header: {
             Text("AI Usage")
         } footer: {
-            Text("Rings show how much is left. Hover a ring for plan and reset details. Signed-in providers update automatically; manual plans follow their own countdown.")
+            Text("Signed-in providers appear automatically. Manual plans stay out of the notch unless you turn them on below.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -552,14 +572,14 @@ struct AIUsageSettings: View {
 
             ScrollView(.horizontal) {
                 HStack(spacing: 10) {
-                    if store.enabledEntries.isEmpty {
+                    if previewEntries.isEmpty {
                         Text("No plans visible")
                             .font(.caption)
                             .foregroundStyle(.white.opacity(0.45))
                             .padding(.vertical, 30)
                             .padding(.horizontal, 12)
                     } else {
-                        ForEach(store.enabledEntries) { entry in
+                        ForEach(previewEntries) { entry in
                             if compactCards {
                                 AICompactUsageCard(entry: entry)
                             } else {
@@ -590,10 +610,19 @@ struct AIUsageSettings: View {
         Section {
             Toggle("Sort by lowest remaining", isOn: $sortByLowest)
             Toggle("Compact rings", isOn: $compactCards)
+
+            Picker("Ring color", selection: $colorStyle) {
+                ForEach(AIUsageColorStyle.allCases) { style in
+                    Text(style.label).tag(style)
+                }
+            }
+            .pickerStyle(.segmented)
+
+            Toggle("Show manual plans in the notch", isOn: $showManualPlans)
         } header: {
             Text("Display")
         } footer: {
-            Text("Sorting and card size apply to both the notch panel and the preview above.")
+            Text("Signed-in providers always appear. Manual plans stay hidden until you turn them on. Sorting and card size apply to the notch panel and the preview above.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -666,6 +695,9 @@ struct AIUsageSettings: View {
                 ForEach(availableProviders) { provider in
                     Button {
                         store.add(provider)
+                        if store.accounts[provider] == nil {
+                            showManualPlans = true
+                        }
                     } label: {
                         Label(provider.label, systemImage: provider.iconName)
                     }

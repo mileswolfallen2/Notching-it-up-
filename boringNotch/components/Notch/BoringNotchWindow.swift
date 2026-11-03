@@ -7,6 +7,27 @@
 
 import Cocoa
 
+/// Tracks whether the notch panel is allowed to become key so the Notes tab can
+/// accept keyboard input. Every other tab keeps the original non-key behavior.
+enum NotchTextInput {
+    static var isEnabled = false
+
+    static func begin() {
+        isEnabled = true
+    }
+
+    static func end() {
+        isEnabled = false
+        guard let window = notchWindow, window.isKeyWindow else { return }
+        window.makeFirstResponder(nil)
+        window.resignKey()
+    }
+
+    private static var notchWindow: NSWindow? {
+        NSApp.windows.first { $0 is BoringNotchSkyLightWindow || $0 is BoringNotchWindow }
+    }
+}
+
 class BoringNotchWindow: NSPanel {
     override init(
         contentRect: NSRect,
@@ -41,7 +62,7 @@ class BoringNotchWindow: NSPanel {
     }
     
     override var canBecomeKey: Bool {
-        false
+        NotchTextInput.isEnabled
     }
     
     override var canBecomeMain: Bool {

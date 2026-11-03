@@ -32,7 +32,7 @@ I believe the core app should come first. It should be fast, polished, useful, c
 - **Camera Mirror** - Quick mirror view right from the notch
 - **Pomodoro Timer** - Run focused work and break sessions without leaving the notch
 - **Quick Notes** - Keep a persistent scratchpad in the notch for short notes and reminders
-- **AI Usage Dashboard** - Sign in to Claude, ChatGPT, GitHub Copilot, or Antigravity for live limits, track other plans manually, and keep credentials in local app storage
+- **AI Usage Dashboard** - Sign in to Claude, ChatGPT, GitHub Copilot, or Antigravity for live limits, choose a ring color style, track other plans manually, and keep credentials in local app storage. Signed-in accounts appear in the notch automatically; manual plans are opt-in.
 - **Customizable** - Tweak the notch to fit your needs with gestures, sizing, and more
 - **Configurable layout** - Choose which tabs appear in the open notch and arrange them to fit your workflow
 - **Keyboard shortcuts** - Open the notch, trigger sneak peek, and access supported panels without reaching for the mouse

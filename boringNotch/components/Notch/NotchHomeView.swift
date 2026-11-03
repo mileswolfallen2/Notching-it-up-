@@ -665,6 +665,7 @@ struct PomodoroTimerView: View {
 
 struct NotchNotesView: View {
     @Default(.notesText) private var notes
+    @FocusState private var isFocused: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 7) {
@@ -714,6 +715,7 @@ struct NotchNotesView: View {
                     .foregroundStyle(.white)
                     .scrollContentBackground(.hidden)
                     .scrollIndicators(.never)
+                    .focused($isFocused)
                     .padding(.horizontal, 4)
                     .padding(.vertical, 3)
             }
@@ -730,5 +732,7 @@ struct NotchNotesView: View {
         .padding(.horizontal, 3)
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .onAppear { NotchTextInput.begin() }
+        .onDisappear { NotchTextInput.end() }
     }
 }

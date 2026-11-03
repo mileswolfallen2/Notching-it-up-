@@ -2,6 +2,24 @@
 
 All notable changes to Notching it up are documented here.
 
+## [Unreleased]
+
+### Added
+
+- AI ring color styles: Monochrome (default), Provider, Accent, and Usage. The Usage style switches from green to amber to red as a plan runs low.
+- “Show manual plans in the notch” setting. Adding a provider that is not signed in turns it on automatically.
+
+### Changed
+
+- The notch now shows signed-in AI providers by default. Manual plans stay hidden until you enable them in AI settings.
+- Monochrome remains the default AI card style. Color is only applied when a different ring style is chosen.
+
+### Fixed
+
+- Fixed Notes not accepting keyboard input. The notch panel can become key only while the Notes tab is visible, so typing works without changing how the other tabs behave.
+- Fixed the top bar running under the physical notch when all five tabs were enabled. Tab buttons now tighten their spacing as more tabs are shown.
+- Hardened AI sync and storage: stale sign-in results are discarded, provider requests time out cleanly, and an unreadable account file is preserved as a backup instead of being overwritten.
+
 ## [0.2.6] - 2026-11-02
 
 ### Added
