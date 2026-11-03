@@ -5897,6 +5897,9 @@
     "Configure AI usage" : {
 
     },
+    "Connected" : {
+
+    },
     "Continue" : {
       "localizations" : {
         "ar" : {
@@ -7407,6 +7410,9 @@
           }
         }
       }
+    },
+    "Disconnected" : {
+
     },
     "Display" : {
 
@@ -19103,6 +19109,9 @@
           }
         }
       }
+    },
+    "Show Bluetooth live activity" : {
+
     },
     "Show calendar" : {
       "localizations" : {

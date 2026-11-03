@@ -200,7 +200,6 @@ For a full list of licenses and attributions, see [Third-Party Licenses](./THIRD
 - [ ] **More media integrations** - Improve parity across Apple Music, Spotify, YouTube Music, and browser playback
 - [ ] **Shortcuts integration** - Expose notch actions to macOS Shortcuts and support automation triggers
 - [ ] **AI provider expansion** - Add more providers and clearer account-health and reset-time details to the usage dashboard
-- [ ]  Bluetooth Live Activity (connect/disconnect for bluetooth devices)
 - [ ]  Weather integration ⛅️
 - [ ]  Lock Screen Widgets 🔒
 - [ ]  Extension system 🧩
@@ -230,3 +229,4 @@ For a full list of licenses and attributions, see [Third-Party Licenses](./THIRD
 - [x] **Quick notes tab** - Keep a persistent scratchpad in the notch
 - [x] **AI usage dashboard** - Live account sync for supported providers, manual fallback, reset countdowns, and low-usage alerts
 - [x] Customizable Layout options 🛠️
+- [x]  Bluetooth Live Activity (connect/disconnect for bluetooth devices)

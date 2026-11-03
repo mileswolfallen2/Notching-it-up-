@@ -23,6 +23,7 @@ struct ContentView: View {
     @ObservedObject var batteryModel = BatteryStatusViewModel.shared
     @ObservedObject var brightnessManager = BrightnessManager.shared
     @ObservedObject var volumeManager = VolumeManager.shared
+    @ObservedObject var bluetoothManager = BluetoothActivityManager.shared
     @ObservedObject var pomodoroTimer = PomodoroTimer.shared
     @State private var hoverTask: Task<Void, Never>?
     @State private var isHovering: Bool = false
@@ -82,6 +83,9 @@ struct ContentView: View {
             {
                 chinWidth += betterSneakPeekExtraWidth
             }
+        } else if Defaults[.bluetoothLiveActivityEnabled]
+            && bluetoothManager.activity != nil && vm.notchState == .closed && !vm.hideOnClosed {
+            chinWidth += max(90, vm.effectiveClosedNotchHeight + 50)
         } else if !coordinator.expandingView.show && vm.notchState == .closed
             && (!musicManager.isPlaying && musicManager.isPlayerIdle) && Defaults[.showNotHumanFace]
             && !vm.hideOnClosed
@@ -299,6 +303,10 @@ struct ContentView: View {
                       } else if coordinator.sneakPeek.show && Defaults[.inlineHUD] && (coordinator.sneakPeek.type != .music) && (coordinator.sneakPeek.type != .battery) && vm.notchState == .closed {
                           InlineHUD(type: $coordinator.sneakPeek.type, value: $coordinator.sneakPeek.value, icon: $coordinator.sneakPeek.icon, hoverAnimation: $isHovering, gestureProgress: $gestureProgress)
                               .transition(.opacity)
+                      } else if Defaults[.bluetoothLiveActivityEnabled]
+                          && bluetoothManager.activity != nil && vm.notchState == .closed && !vm.hideOnClosed {
+                          BluetoothLiveActivity(activity: bluetoothManager.activity!)
+                              .transition(.opacity.combined(with: .scale))
                       } else if (!coordinator.expandingView.show || coordinator.expandingView.type == .music) && vm.notchState == .closed && (musicManager.isPlaying || !musicManager.isPlayerIdle) && coordinator.musicLiveActivityEnabled && !vm.hideOnClosed {
                           MusicLiveActivity()
                               .frame(alignment: .center)
@@ -465,10 +473,12 @@ struct ContentView: View {
                             AudioSpectrumView(isPlaying: $musicManager.isPlaying)
                                 .frame(width: 16, height: 12)
                         }
+
                 } else {
                     LottieAnimationContainer()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
+
             }
             .frame(
                 width: max(
@@ -517,6 +527,36 @@ struct ContentView: View {
             height: vm.effectiveClosedNotchHeight,
             alignment: .center
         )
+    }
+
+    @ViewBuilder
+    func BluetoothLiveActivity(activity: BluetoothActivityManager.Activity) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: activity.kind.iconName)
+                .font(.system(size: 16, weight: .semibold))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(activity.connected ? .white : .white.opacity(0.7))
+                .contentTransition(.symbolEffect(.replace))
+
+            VStack(alignment: .leading, spacing: 1) {
+                Text(activity.connected ? "Connected" : "Disconnected")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.7))
+                Text(activity.name)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+            }
+            .frame(maxWidth: 120, alignment: .leading)
+
+            Image(systemName: activity.connected ? "checkmark.circle.fill" : "xmark.circle.fill")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(activity.connected ? .green : .white.opacity(0.6))
+        }
+        .padding(.horizontal, 10)
+        .frame(height: vm.effectiveClosedNotchHeight)
+        .animation(.smooth, value: activity)
     }
 
     @ViewBuilder

@@ -685,6 +685,9 @@ struct Media: View {
                     "Show music live activity",
                     isOn: $coordinator.musicLiveActivityEnabled.animation()
                 )
+                Defaults.Toggle(key: .bluetoothLiveActivityEnabled) {
+                    Text("Show Bluetooth live activity")
+                }
                 Defaults.Toggle(key: .showMusicProgressBar) {
                     Text("Show track progress bar")
                 }

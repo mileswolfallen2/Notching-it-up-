@@ -5,6 +5,7 @@ All notable changes to Notching it up are documented here.
 
 
 ## Added 
+- Bluetooth Live Activity for speaker and headphone connect/disconnect events, with a setting to disable it. Non-audio Bluetooth devices, including cameras, are ignored.
 - First-run setup now defaults to Home and Files, lets users choose which tabs to enable, and opens AI settings when AI is selected.
 - First-run permissions guide that explains when Calendar, Media, Accessibility, and Notification access is requested as features are enabled.
 - “Reset Notching it up” in Advanced. The red destructive action restores every setting, removes local AI sign-ins, notes, and saved shelf entries, then restarts the app.
