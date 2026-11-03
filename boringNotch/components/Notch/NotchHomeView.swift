@@ -10,6 +10,81 @@ import Combine
 import Defaults
 import SwiftUI
 
+// MARK: - Shared notch panel styling
+
+/// Shared metrics for the panels inside the open notch. Keeping these in one
+/// place keeps cards, headers, and focus states consistent as tabs are added.
+enum NotchPanelStyle {
+    static let cornerRadius: CGFloat = 12
+    static let spacing: CGFloat = 7
+    static let background = Color.white.opacity(0.045)
+    static let activeBackground = Color.white.opacity(0.06)
+    static let hoverBackground = Color.white.opacity(0.075)
+    static let border = Color.white.opacity(0.10)
+    static let activeBorder = Color.white.opacity(0.22)
+    static let hoverBorder = Color.white.opacity(0.24)
+    static let secondaryText = Color.white.opacity(0.42)
+}
+
+/// Icon, title, optional detail, and trailing controls for a notch tab.
+struct NotchPanelHeader<Trailing: View>: View {
+    let icon: String
+    let title: String
+    var detail: String = ""
+    var detailTint: Color = NotchPanelStyle.secondaryText
+    let trailing: Trailing
+
+    init(
+        icon: String,
+        title: String,
+        detail: String = "",
+        detailTint: Color = NotchPanelStyle.secondaryText,
+        @ViewBuilder trailing: () -> Trailing
+    ) {
+        self.icon = icon
+        self.title = title
+        self.detail = detail
+        self.detailTint = detailTint
+        self.trailing = trailing()
+    }
+
+    var body: some View {
+        HStack(spacing: NotchPanelStyle.spacing) {
+            Image(systemName: icon)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.9))
+
+            Text(title)
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .foregroundStyle(.white)
+
+            if !detail.isEmpty {
+                Text(detail)
+                    .font(.system(size: 9, weight: .medium, design: .rounded))
+                    .foregroundStyle(detailTint)
+                    .lineLimit(1)
+            }
+
+            Spacer(minLength: 6)
+
+            trailing
+        }
+    }
+}
+
+extension NotchPanelHeader where Trailing == EmptyView {
+    init(
+        icon: String,
+        title: String,
+        detail: String = "",
+        detailTint: Color = NotchPanelStyle.secondaryText
+    ) {
+        self.init(icon: icon, title: title, detail: detail, detailTint: detailTint) {
+            EmptyView()
+        }
+    }
+}
+
 // MARK: - Music Player Components
 
 struct MusicPlayerView: View {
@@ -650,14 +725,14 @@ struct PomodoroTimerView: View {
         .padding(.vertical, 6)
         .frame(maxWidth: 240)
         .background(
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: NotchPanelStyle.cornerRadius)
                 .fill(.black)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .strokeBorder(Color.white.opacity(0.1), lineWidth: 1)
+            RoundedRectangle(cornerRadius: NotchPanelStyle.cornerRadius)
+                .strokeBorder(NotchPanelStyle.border, lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .clipShape(RoundedRectangle(cornerRadius: NotchPanelStyle.cornerRadius))
     }
 }
 
@@ -667,27 +742,19 @@ struct NotchNotesView: View {
     @Default(.notesText) private var notes
     @FocusState private var isFocused: Bool
 
+    private var detail: String {
+        guard !notes.isEmpty else { return "Saved locally" }
+        return notes.count == 1 ? "1 character" : "\(notes.count) characters"
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 7) {
-            HStack(spacing: 7) {
-                Image(systemName: "note.text")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.9))
-
-                Text("Notes")
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-
-                Text(notes.isEmpty ? "Saved locally" : "\(notes.count) characters")
-                    .font(.system(size: 9, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.42))
-                    .lineLimit(1)
-
-                Spacer()
-
+        VStack(alignment: .leading, spacing: NotchPanelStyle.spacing) {
+            NotchPanelHeader(icon: "note.text", title: "Notes", detail: detail) {
                 if !notes.isEmpty {
                     Button {
-                        notes = ""
+                        withAnimation(.easeOut(duration: 0.15)) {
+                            notes = ""
+                        }
                     } label: {
                         Image(systemName: "trash")
                             .font(.system(size: 11, weight: .semibold))
@@ -697,6 +764,7 @@ struct NotchNotesView: View {
                     }
                     .buttonStyle(.plain)
                     .help("Clear notes")
+                    .transition(.opacity)
                 }
             }
 
@@ -720,13 +788,19 @@ struct NotchNotesView: View {
                     .padding(.vertical, 3)
             }
             .background(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Color.white.opacity(0.045))
+                RoundedRectangle(cornerRadius: NotchPanelStyle.cornerRadius, style: .continuous)
+                    .fill(isFocused ? NotchPanelStyle.activeBackground : NotchPanelStyle.background)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .strokeBorder(Color.white.opacity(0.10), lineWidth: 1)
+                RoundedRectangle(cornerRadius: NotchPanelStyle.cornerRadius, style: .continuous)
+                    .strokeBorder(
+                        isFocused ? NotchPanelStyle.activeBorder : NotchPanelStyle.border,
+                        lineWidth: 1
+                    )
             )
+            .contentShape(Rectangle())
+            .simultaneousGesture(TapGesture().onEnded { isFocused = true })
+            .animation(.easeOut(duration: 0.18), value: isFocused)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .padding(.horizontal, 3)

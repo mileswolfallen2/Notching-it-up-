@@ -57,7 +57,7 @@ struct TopBarSlotConfigurationView: View {
 
                 Spacer()
 
-                Button("Reset to Defaults") {
+                Button("Reset to defaults") {
                     withAnimation(.snappy) {
                         topBarSlots = TopBarTab.defaultLayout
                         showHomeTab = true
@@ -78,11 +78,11 @@ struct TopBarSlotConfigurationView: View {
     private var previewSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text("Top Bar Preview")
+                Text("Top bar preview")
                     .font(.headline)
                     .foregroundStyle(.secondary)
                 Spacer()
-                Text("Drag chips to reorder")
+                Text("Drag to reorder")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -130,10 +130,6 @@ struct TopBarSlotConfigurationView: View {
             HStack {
                 Text("Tabs")
                     .font(.headline)
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Text("Drag to reorder")
-                    .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
 
@@ -189,7 +185,7 @@ struct TopBarSlotConfigurationView: View {
                 .toggleStyle(.switch)
                 .disabled(shelfBlocked)
                 .accessibilityLabel("Show \(tab.label) tab")
-                .help(shelfBlocked ? "Enable the shelf to show this tab" : "")
+                .help(shelfBlocked ? "Enable the shelf to show this tab" : "Show this tab in the top bar")
         }
         .padding(.vertical, 6)
         .padding(.horizontal, 8)
@@ -220,7 +216,7 @@ struct TopBarSlotConfigurationView: View {
         case .shelf: return "Files and clipboard items"
         case .timer: return "Pomodoro sessions"
         case .notes: return "A quick persistent scratchpad"
-        case .ai:    return "Plan limits across your AI tools"
+        case .ai:    return "AI usage limits across your tools"
         }
     }
 

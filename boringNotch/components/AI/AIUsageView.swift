@@ -25,6 +25,7 @@ struct AIUsageView: View {
     @ObservedObject private var store = AIUsageStore.shared
     @Default(.aiSortByLowest) private var sortByLowest
     @Default(.aiCompactCards) private var compactCards
+    @State private var emptyStateHovering = false
 
     private var visibleEntries: [AIUsageEntry] {
         let base = store.notchEntries
@@ -35,7 +36,7 @@ struct AIUsageView: View {
 
     private var summaryText: String {
         guard let lowest = store.lowestRemaining else { return "No plans" }
-        let lowestText = "\(Int(lowest.rounded()))% lowest"
+        let lowestText = "lowest \(Int(lowest.rounded()))%"
         if store.lowPlanCount > 0 {
             let lowNoun = store.lowPlanCount == 1 ? "plan low" : "plans low"
             return "\(store.lowPlanCount) \(lowNoun) · \(lowestText)"
@@ -45,7 +46,7 @@ struct AIUsageView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 7) {
+        VStack(alignment: .leading, spacing: NotchPanelStyle.spacing) {
             header
 
             if visibleEntries.isEmpty {
@@ -71,39 +72,31 @@ struct AIUsageView: View {
     }
 
     private var header: some View {
-        HStack(spacing: 7) {
-            Image(systemName: "sparkles")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(.white.opacity(0.9))
+        NotchPanelHeader(
+            icon: "sparkles",
+            title: "AI Usage",
+            detail: summaryText,
+            detailTint: .white.opacity(store.lowPlanCount > 0 ? 0.9 : 0.42)
+        ) {
+            HStack(spacing: 4) {
+                if !store.syncing.isEmpty {
+                    ProgressView()
+                        .controlSize(.mini)
+                        .scaleEffect(0.7)
+                }
 
-            Text("AI Usage")
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-
-            Text(summaryText)
-                .font(.system(size: 9, weight: .medium, design: .rounded))
-                .foregroundStyle(.white.opacity(store.lowPlanCount > 0 ? 0.9 : 0.42))
-                .lineLimit(1)
-
-            if !store.syncing.isEmpty {
-                ProgressView()
-                    .controlSize(.mini)
-                    .scaleEffect(0.7)
+                Button {
+                    openAIUsageSettings()
+                } label: {
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.65))
+                        .padding(4)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .help("Configure AI usage")
             }
-
-            Spacer()
-
-            Button {
-                openAIUsageSettings()
-            } label: {
-                Image(systemName: "slider.horizontal.3")
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.65))
-                    .padding(4)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .help("Configure AI usage")
         }
     }
 
@@ -134,7 +127,7 @@ struct AIUsageView: View {
                     Text("Track your AI limits")
                         .font(.system(size: 12, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
-                    Text("Sign in to Claude, ChatGPT, Copilot or Antigravity, or show manual plans in AI settings.")
+                    Text("Sign in to Claude, ChatGPT, GitHub Copilot, or Antigravity, or show manual plans in AI settings.")
                         .font(.system(size: 10))
                         .foregroundStyle(.white.opacity(0.5))
                         .lineLimit(2)
@@ -144,19 +137,25 @@ struct AIUsageView: View {
 
                 Image(systemName: "plus.circle.fill")
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(.white.opacity(0.35))
+                    .foregroundStyle(.white.opacity(emptyStateHovering ? 0.65 : 0.35))
             }
             .padding(10)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                RoundedRectangle(cornerRadius: NotchPanelStyle.cornerRadius, style: .continuous)
+                    .fill(emptyStateHovering ? Color.white.opacity(0.05) : Color.clear)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: NotchPanelStyle.cornerRadius, style: .continuous)
                     .strokeBorder(
-                        Color.white.opacity(0.12),
+                        Color.white.opacity(emptyStateHovering ? 0.22 : 0.12),
                         style: StrokeStyle(lineWidth: 1, dash: [4, 4])
                     )
             )
         }
         .buttonStyle(.plain)
+        .onHover { emptyStateHovering = $0 }
+        .animation(.easeOut(duration: 0.15), value: emptyStateHovering)
     }
 }
 
@@ -193,10 +192,7 @@ private struct AIUsageCard: View {
                 .minimumScaleFactor(0.8)
         }
         .frame(width: 106, height: 104)
-        .background(cardBackground)
-        .overlay(cardBorder)
-        .scaleEffect(hovering ? 1.02 : 1)
-        .animation(.spring(response: 0.28, dampingFraction: 0.72), value: hovering)
+        .aiUsageCardChrome(hovering: hovering)
         .onHover { hovering = $0 }
         .contextMenu { AIUsageCardMenu(entry: entry) }
         .help(helpText)
@@ -230,24 +226,11 @@ private struct AIUsageCard: View {
     }
 
     private var helpText: String {
-        var text = "\(entry.provider.label) — \(percentageText) left. \(entry.resetText)."
+        var text = "\(entry.provider.label) — \(percentageText) remaining. \(entry.resetText)."
         if let error = store.error(for: entry.provider) {
             text += " \(error)"
         }
         return text
-    }
-
-    private var cardBackground: some View {
-        RoundedRectangle(cornerRadius: 14, style: .continuous)
-            .fill(Color.white.opacity(hovering ? 0.075 : 0.045))
-    }
-
-    private var cardBorder: some View {
-        RoundedRectangle(cornerRadius: 14, style: .continuous)
-            .strokeBorder(
-                Color.white.opacity(hovering ? 0.24 : 0.10),
-                lineWidth: 1
-            )
     }
 }
 
@@ -291,6 +274,7 @@ private struct AICompactUsageCard: View {
                     .font(.system(size: 12, weight: .bold, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(.white)
+                    .contentTransition(.numericText())
             }
             .frame(width: 46, height: 46)
             .onAppear { appeared = true }
@@ -302,27 +286,41 @@ private struct AICompactUsageCard: View {
                 .minimumScaleFactor(0.8)
         }
         .frame(width: 84, height: 80)
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(Color.white.opacity(hovering ? 0.075 : 0.045))
+        .aiUsageCardChrome(hovering: hovering)
+        .onHover { hovering = $0 }
+        .contextMenu { AIUsageCardMenu(entry: entry) }
+        .help(helpText)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(entry.provider.label), \(percentageText) remaining, \(entry.resetText)")
+    }
+
+    private var helpText: String {
+        var text = "\(entry.provider.label) — \(percentageText) remaining. \(entry.resetText)."
+        if let error = store.error(for: entry.provider) {
+            text += " \(error)"
+        }
+        return text
+    }
+}
+
+// MARK: - Card chrome
+
+private extension View {
+    /// Shared background, border, and hover treatment for AI usage cards.
+    func aiUsageCardChrome(hovering: Bool) -> some View {
+        background(
+            RoundedRectangle(cornerRadius: NotchPanelStyle.cornerRadius, style: .continuous)
+                .fill(hovering ? NotchPanelStyle.hoverBackground : NotchPanelStyle.background)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
+            RoundedRectangle(cornerRadius: NotchPanelStyle.cornerRadius, style: .continuous)
                 .strokeBorder(
-                    Color.white.opacity(hovering ? 0.24 : 0.10),
+                    hovering ? NotchPanelStyle.hoverBorder : NotchPanelStyle.border,
                     lineWidth: 1
                 )
         )
         .scaleEffect(hovering ? 1.02 : 1)
         .animation(.spring(response: 0.28, dampingFraction: 0.72), value: hovering)
-        .onHover { hovering = $0 }
-        .contextMenu { AIUsageCardMenu(entry: entry) }
-        .help(
-            store.error(for: entry.provider).map { "\(entry.provider.label) — \(percentageText) left. \($0)" }
-                ?? "\(entry.provider.label) — \(percentageText) left. \(entry.resetText)."
-        )
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(entry.provider.label), \(percentageText) remaining, \(entry.resetText)")
     }
 }
 
@@ -369,6 +367,17 @@ private struct AIUsageCardMenu: View {
         Button("Open AI settings") {
             openAIUsageSettings()
         }
+    }
+}
+
+private struct AILiveBadge: View {
+    var body: some View {
+        Text("Live")
+            .font(.system(size: 9, weight: .bold))
+            .foregroundStyle(.secondary)
+            .padding(.horizontal, 5)
+            .padding(.vertical, 1)
+            .background(Capsule().fill(Color.primary.opacity(0.07)))
     }
 }
 
@@ -467,7 +476,7 @@ struct AIUsageSettings: View {
         } header: {
             Text("Accounts")
         } footer: {
-            Text("Sign in once and Notching it up reads the same usage numbers your provider shows. Tokens stay in this app’s private storage and are only sent to your provider. Cursor, Gemini and OpenCode are tracked manually.")
+            Text("Sign in once and Notching it up reads the same usage numbers your provider shows. Tokens stay in this app’s private storage and are only sent to your provider. Cursor, Gemini, and OpenCode are tracked manually.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -490,12 +499,7 @@ struct AIUsageSettings: View {
                         .fontWeight(.medium)
 
                     if store.isConnected(provider) {
-                        Text("Live")
-                            .font(.system(size: 9, weight: .bold))
-                            .foregroundStyle(.secondary)
-                            .padding(.horizontal, 5)
-                            .padding(.vertical, 1)
-                            .background(Capsule().fill(Color.primary.opacity(0.07)))
+                        AILiveBadge()
                     }
                 }
 
@@ -524,7 +528,7 @@ struct AIUsageSettings: View {
                 ProgressView()
                     .controlSize(.small)
             } else if store.isConnected(provider) {
-                Button("Refresh") {
+                Button("Refresh now") {
                     Task { await store.fetchLive(provider: provider, force: true) }
                 }
                 .controlSize(.small)
@@ -556,7 +560,7 @@ struct AIUsageSettings: View {
                 preview
             }
         } header: {
-            Text("AI Usage")
+            Text("Overview")
         } footer: {
             Text("Signed-in providers appear automatically. Manual plans stay out of the notch unless you turn them on below.")
                 .font(.caption)
@@ -622,7 +626,7 @@ struct AIUsageSettings: View {
         } header: {
             Text("Display")
         } footer: {
-            Text("Signed-in providers always appear. Manual plans stay hidden until you turn them on. Sorting and card size apply to the notch panel and the preview above.")
+            Text("Sorting, card size, and ring color apply to the notch panel and the preview above.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -671,7 +675,7 @@ struct AIUsageSettings: View {
                 HStack(spacing: 10) {
                     Image(systemName: "sparkles")
                         .foregroundStyle(.secondary)
-                    Text("No AI providers added yet")
+                    Text("No AI plans added yet")
                         .foregroundStyle(.secondary)
                     Spacer()
                 }
@@ -703,19 +707,19 @@ struct AIUsageSettings: View {
                     }
                 }
             } label: {
-                Label("Add AI provider", systemImage: "plus.circle.fill")
+                Label("Add plan", systemImage: "plus.circle.fill")
             }
             .disabled(availableProviders.isEmpty)
         } header: {
             HStack {
-                Text("Tracked AIs")
+                Text("Tracked plans")
                 Spacer()
                 Text("\(store.entries.count)")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
         } footer: {
-            Text("Click a provider to view live usage or adjust a manual plan.")
+            Text("Select a plan to view live usage or adjust it manually.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -738,6 +742,10 @@ struct AIUsageSettings: View {
             } label: {
                 Text("Maintenance actions")
             }
+        } footer: {
+            Text("These actions apply to every tracked plan.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
     }
 
@@ -946,12 +954,7 @@ private struct AIUsageEntryEditor: View {
                         .fontWeight(.medium)
 
                     if isLive {
-                        Text("Live")
-                            .font(.system(size: 8, weight: .bold))
-                            .foregroundStyle(.secondary)
-                            .padding(.horizontal, 4)
-                            .padding(.vertical, 1)
-                            .background(Capsule().fill(Color.primary.opacity(0.07)))
+                        AILiveBadge()
                     }
 
                     if entry.isLow(threshold: lowThreshold) {
@@ -1050,19 +1053,19 @@ struct AISignInSheet: View {
             switch prompt {
             case .browser(_, let url):
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Your browser should have opened automatically. If it didn’t, use the button below.")
+                    Text("Your browser should have opened automatically. If it didn’t, open it again below.")
                         .font(.callout)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
 
-                    Button("Open Browser Again") {
+                    Button("Open browser again") {
                         openURL(url)
                     }
                 }
 
             case .deviceCode(_, let userCode, let url):
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Enter this code on the provider’s site:")
+                    Text("Enter this code on the website:")
                         .font(.callout)
                         .foregroundStyle(.secondary)
 

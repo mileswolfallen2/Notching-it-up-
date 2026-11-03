@@ -241,7 +241,7 @@ struct GeneralSettings: View {
                     }
                 }
                 Picker("Notch height on non-notch displays", selection: $nonNotchHeightMode) {
-                    Text("Match menubar height")
+                    Text("Match menu bar height")
                         .tag(WindowHeightMode.matchMenuBar)
                     Text("Match real notch height")
                         .tag(WindowHeightMode.matchRealNotchSize)
@@ -832,7 +832,7 @@ struct CalendarSettings: View {
                         .foregroundColor(.red)
                         .multilineTextAlignment(.center)
                         .padding()
-                    Button("Open Calendar Settings") {
+                    Button("Open Calendar settings") {
                         if let settingsURL = URL(
                             string:
                                 "x-apple.systempreferences:com.apple.preference.security?Privacy_Calendars"
@@ -868,7 +868,7 @@ struct CalendarSettings: View {
                         .foregroundColor(.red)
                         .multilineTextAlignment(.center)
                         .padding()
-                    Button("Open Reminder Settings") {
+                    Button("Open Reminders settings") {
                         if let settingsURL = URL(
                             string:
                                 "x-apple.systempreferences:com.apple.preference.security?Privacy_Reminders"
@@ -1504,7 +1504,7 @@ struct Appearance: View {
                 }
             } header: {
                 HStack(spacing: 0) {
-                    Text("Custom vizualizers (Lottie)")
+                    Text("Custom visualizers (Lottie)")
                     if !Defaults[.customVisualizers].isEmpty {
                         Text(" – \(Defaults[.customVisualizers].count)")
                             .foregroundStyle(.secondary)

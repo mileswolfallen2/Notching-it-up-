@@ -13,6 +13,7 @@ All notable changes to Notching it up are documented here.
 
 - The notch now shows signed-in AI providers by default. Manual plans stay hidden until you enable them in AI settings.
 - Monochrome remains the default AI card style. Color is only applied when a different ring style is chosen.
+- Standardized notch panel headers, card corners, focus states, and tab hover feedback, and clarified AI settings labels and copy.
 
 ### Fixed
 
