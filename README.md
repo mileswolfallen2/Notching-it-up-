@@ -202,7 +202,7 @@ For a full list of licenses and attributions, see [Third-Party Licenses](./THIRD
 - [ ] **AI provider expansion** - Add more providers and clearer account-health and reset-time details to the usage dashboard
 - [ ]  Bluetooth Live Activity (connect/disconnect for bluetooth devices)
 - [ ]  Weather integration ⛅️
-- [ ]  Customizable Layout options 🛠️
+- [x]  Customizable Layout options 🛠️
 - [ ]  Lock Screen Widgets 🔒
 - [ ]  Extension system 🧩
 - [ ]  Notifications (under consideration) 🔔
