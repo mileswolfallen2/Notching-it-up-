@@ -2,7 +2,7 @@
 
 All notable changes to Notching it up are documented here.
 
-## [Unreleased]
+## [0.2.6.1]
 
 ### Added
 
