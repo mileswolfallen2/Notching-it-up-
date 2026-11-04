@@ -86,7 +86,7 @@ struct ContentView: View {
         } else if Defaults[.bluetoothLiveActivityEnabled]
             && bluetoothManager.activity != nil
             && vm.notchState == .closed && !vm.hideOnClosed {
-            chinWidth += max(90, vm.effectiveClosedNotchHeight + 50)
+            chinWidth += max(130, vm.effectiveClosedNotchHeight + 90)
         } else if !coordinator.expandingView.show && vm.notchState == .closed
             && (!musicManager.isPlaying && musicManager.isPlayerIdle) && Defaults[.showNotHumanFace]
             && !vm.hideOnClosed
@@ -216,6 +216,12 @@ struct ContentView: View {
                     Rectangle()
                         .fill(Color.black.opacity(0.01))
                         .frame(width: computedChinWidth, height: vm.chinHeight)
+                        .animation(
+                            Defaults[.bluetoothConnectionAnimationEnabled]
+                                ? .spring(response: 0.36, dampingFraction: 0.66, blendDuration: 0)
+                                : .smooth(duration: 0.2),
+                            value: bluetoothManager.activity != nil
+                        )
                 }
             }
         }
@@ -312,10 +318,8 @@ struct ContentView: View {
                               .transition(
                                   Defaults[.bluetoothConnectionAnimationEnabled]
                                       ? .asymmetric(
-                                          insertion: .scale(scale: 0.82, anchor: .center)
-                                              .combined(with: .opacity),
-                                          removal: .scale(scale: 1.08, anchor: .center)
-                                              .combined(with: .opacity)
+                                          insertion: .opacity.combined(with: .scale(scale: 0.85, anchor: .center)),
+                                          removal:   .opacity.combined(with: .scale(scale: 0.85, anchor: .center))
                                       )
                                       : .opacity
                               )
@@ -399,6 +403,12 @@ struct ContentView: View {
                   view
                       .fixedSize()
               }
+              .animation(
+                  Defaults[.bluetoothConnectionAnimationEnabled]
+                      ? .spring(response: 0.36, dampingFraction: 0.66, blendDuration: 0)
+                      : .smooth(duration: 0.2),
+                  value: bluetoothManager.activity != nil
+              )
               .zIndex(2)
             if vm.notchState == .open {
                 VStack {
@@ -545,37 +555,7 @@ struct ContentView: View {
 
     @ViewBuilder
     func BluetoothLiveActivity(activity: BluetoothActivityManager.Activity) -> some View {
-        HStack(spacing: 0) {
-            Image(systemName: activity.kind.iconName)
-                .font(.system(size: 17, weight: .semibold))
-                .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(activity.connected ? .cyan : .white.opacity(0.7))
-                .frame(
-                    width: max(0, vm.effectiveClosedNotchHeight - 12),
-                    height: max(0, vm.effectiveClosedNotchHeight - 12)
-                )
-                .contentTransition(.symbolEffect(.replace))
-
-            Rectangle()
-                .fill(.black)
-                .frame(width: vm.closedNotchSize.width)
-
-            Image(systemName: activity.connected ? "checkmark.circle.fill" : "xmark.circle.fill")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(activity.connected ? .green : .white.opacity(0.65))
-                .contentTransition(.symbolEffect(.replace))
-            .frame(
-                width: max(0, vm.effectiveClosedNotchHeight - 12),
-                height: max(0, vm.effectiveClosedNotchHeight - 12)
-            )
-        }
-        .frame(height: vm.effectiveClosedNotchHeight, alignment: .center)
-        .animation(
-            Defaults[.bluetoothConnectionAnimationEnabled]
-                ? .interactiveSpring(response: 0.38, dampingFraction: 0.82)
-                : .smooth(duration: 0.2),
-            value: activity
-        )
+        BluetoothLiveActivityView(activity: activity, vm: vm)
     }
 
     @ViewBuilder
@@ -761,6 +741,55 @@ struct ContentView: View {
                 haptics.toggle()
             }
         }
+    }
+}
+
+// MARK: - Bluetooth Live Activity View
+
+struct BluetoothLiveActivityView: View {
+    let activity: BluetoothActivityManager.Activity
+    @ObservedObject var vm: BoringViewModel
+
+    private var accentColor: Color { activity.connected ? .cyan : .white.opacity(0.7) }
+    private var statusColor: Color { activity.connected ? .green : .white.opacity(0.55) }
+    private var statusIcon: String { activity.connected ? "checkmark.circle.fill" : "xmark.circle.fill" }
+
+    var body: some View {
+        HStack(spacing: 0) {
+            // ── Left: device-type icon ───────────────────────────────────
+            Image(systemName: activity.kind.iconName)
+                .font(.system(size: 14, weight: .semibold))
+                .symbolRenderingMode(.hierarchical)
+                .foregroundStyle(accentColor)
+                .frame(
+                    width: max(0, vm.effectiveClosedNotchHeight - 12),
+                    height: max(0, vm.effectiveClosedNotchHeight - 12)
+                )
+
+            // ── Device name ──────────────────────────────────────────────
+            Text(activity.name)
+                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .foregroundStyle(.white.opacity(0.85))
+                .lineLimit(1)
+                .fixedSize()
+                .padding(.leading, 5)
+
+            // ── Physical notch gap ───────────────────────────────────────
+            Rectangle()
+                .fill(.black)
+                .frame(width: vm.closedNotchSize.width)
+
+            // ── Right: status icon ───────────────────────────────────────
+            Image(systemName: statusIcon)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(statusColor)
+                .frame(
+                    width: max(0, vm.effectiveClosedNotchHeight - 12),
+                    height: max(0, vm.effectiveClosedNotchHeight - 12)
+                )
+                .contentTransition(.symbolEffect(.replace))
+        }
+        .frame(height: vm.effectiveClosedNotchHeight, alignment: .center)
     }
 }
 

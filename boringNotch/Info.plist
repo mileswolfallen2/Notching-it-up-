@@ -4,6 +4,14 @@
 <dict>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Notching it up uses Bluetooth to show connection animations and battery status for connected headphones and speakers.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Notching it up uses Bluetooth to show connection animations and battery status for connected headphones and speakers.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Notching it up uses the camera only when you choose to show the camera preview in the notch.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Notching it up uses your calendars to show events in the notch.</string>
+	<key>NSRemindersUsageDescription</key>
+	<string>Notching it up uses your reminders to show reminder items in the notch.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

@@ -2655,6 +2655,9 @@
         }
       }
     },
+    "Animate Bluetooth connections" : {
+
+    },
     "App icon" : {
       "localizations" : {
         "ar" : {
@@ -5903,9 +5906,6 @@
     "Connect headphones or speakers to see them here." : {
 
     },
-    "Connected" : {
-
-    },
     "Continue" : {
       "localizations" : {
         "ar" : {
@@ -7416,9 +7416,6 @@
           }
         }
       }
-    },
-    "Disconnected" : {
-
     },
     "Display" : {
 
