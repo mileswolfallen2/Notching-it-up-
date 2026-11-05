@@ -5,6 +5,7 @@
 //  Created by Alexander on 2025-06-23.
 //
 
+import CoreBluetooth
 import SwiftUI
 
 // MARK: - Permissions guide
@@ -27,6 +28,11 @@ private let permissionGuideItems: [PermissionGuideItem] = [
         icon: "music.note",
         title: "Media",
         detail: "Reads and controls Spotify or Apple Music. macOS asks for Automation access when you choose a direct music source."
+    ),
+    PermissionGuideItem(
+        icon: "antenna.radiowaves.left.and.right",
+        title: "Bluetooth",
+        detail: "Shows connected headphones and speakers, battery levels, and connection activity. macOS asks during setup so the notch can detect your audio devices."
     ),
     PermissionGuideItem(
         icon: "hand.raised.fill",
@@ -181,5 +187,60 @@ struct PermissionRequestView: View {
             VisualEffectView(material: .underWindowBackground, blendingMode: .behindWindow)
                 .ignoresSafeArea()
         )
+    }
+}
+
+// MARK: - Bluetooth permission
+
+/// Creates a Core Bluetooth manager so macOS can present the Bluetooth privacy
+/// prompt. The manager is retained while permission is pending so the prompt is
+/// not dismissed before the user answers it.
+@MainActor
+final class BluetoothPermissionRequester: NSObject, CBCentralManagerDelegate {
+    private var manager: CBCentralManager?
+    private var continuation: CheckedContinuation<CBManagerAuthorization, Never>?
+    private var timeoutTask: Task<Void, Never>?
+
+    func request() async -> CBManagerAuthorization {
+        if manager == nil {
+            manager = CBCentralManager(
+                delegate: self,
+                queue: .main,
+                options: [CBCentralManagerOptionShowPowerAlertKey: false]
+            )
+        }
+        manager?.scanForPeripherals(withServices: nil)
+
+        return await withCheckedContinuation { continuation in
+            self.continuation = continuation
+
+            timeoutTask?.cancel()
+            timeoutTask = Task { @MainActor [weak self] in
+                try? await Task.sleep(for: .seconds(2))
+                guard !Task.isCancelled else { return }
+                self?.finish()
+            }
+        }
+    }
+
+    nonisolated func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        Task { @MainActor [weak self] in
+            guard CBManager.authorization != .notDetermined else { return }
+            self?.finish()
+        }
+    }
+
+    private func finish() {
+        guard let continuation else { return }
+        self.continuation = nil
+        timeoutTask?.cancel()
+        timeoutTask = nil
+        manager?.stopScan()
+
+        let authorization = CBManager.authorization
+        if authorization != .notDetermined {
+            manager = nil
+        }
+        continuation.resume(returning: authorization)
     }
 }

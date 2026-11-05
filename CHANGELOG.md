@@ -3,15 +3,30 @@
 All notable changes to Notching it up are documented here.
 ## [Unreleased]
 
+### Added
 
-## Added 
-- Hidden Developer settings panel. Select About and press Command-7 to unlock permission controls, including a Bluetooth permission request, and app diagnostics for the current session.
-- Bluetooth Live Activity for speaker and headphone connect/disconnect events, with a setting to disable it. Non-audio Bluetooth devices, including cameras, are ignored.
-- Bluetooth devices tab for connected headphones and speakers, with battery levels, hover details, and a shortcut to Bluetooth settings.
-- First-run setup now defaults to Home and Files, lets users choose which tabs to enable, and opens AI settings when AI is selected.
-- First-run permissions guide that explains when Calendar, Media, Accessibility, and Notification access is requested as features are enabled.
+- Bluetooth support across the notch:
+  - First-run setup now asks for Bluetooth access, and the permissions guide explains what it is used for. The prompt is part of setup only, so normal launches do not ask again.
+  - Devices tab for connected headphones and speakers, with battery levels, hover details, and a shortcut to Bluetooth settings. The tab is optional and can be enabled during setup or in Settings.
+  - Bluetooth Live Activity for speaker and headphone connect and disconnect events. Non-audio Bluetooth devices, including cameras, are ignored, and the activity can be turned off in Settings.
+- Hidden Developer settings panel. Select About and press Command-7 to unlock permission controls, including Bluetooth request and reset, plus app diagnostics for the current session. Press Command-7 again to relock it.
+- First-run setup now defaults to Home and Files, lets users choose which tabs to enable, and opens AI settings when AI is selected. It also walks through Camera, Calendar, Reminders, Bluetooth, Accessibility, and media access.
+- First-run permissions guide that explains when Calendar, Media, Bluetooth, Accessibility, and Notification access is requested as features are enabled.
 - “Reset Notching it up” in Advanced. The red destructive action restores every setting, removes local AI sign-ins, notes, and saved shelf entries, then restarts the app.
 
+### Changed
+
+- Improved tab switching: the selection capsule glides between tabs with a smooth animation, drag gestures switch tabs and settle cleanly, and tab spacing compacts automatically so every enabled tab fits around the physical notch.
+- Bluetooth connection activity now enters with a softer spring, dismisses with a gentler fade and scale, and resizes the notch chin in step with the activity. The animation can be disabled in Settings.
+- Bluetooth device rows now show connection state and battery details with clearer hover feedback, while the live activity shows the device name and a clear connected or disconnected state.
+- Developer permission tools can reset individual privacy decisions through the helper, reset all permissions at once, and copy a full diagnostics snapshot.
+- Local test builds can be packaged as a DMG with `make_test_dmg.sh`. Test DMGs use an ad-hoc signature with hardened runtime disabled so the bundled MediaRemote adapter loads, and they are excluded from git.
+
+### Fixed
+
+- Kept onboarding and Bluetooth prompts first-run only. Completing setup prevents them from appearing on later launches.
+- Fixed the test DMG failing to launch because of library validation on the ad-hoc-signed MediaRemote adapter.
+- Fixed Bluetooth activity removal leaving a visible pop or clipped chin by fading and scaling it out inside the existing spring animation.
 
 ## [0.2.6.1]
 

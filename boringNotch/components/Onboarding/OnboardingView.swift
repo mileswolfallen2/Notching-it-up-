@@ -16,6 +16,7 @@ enum OnboardingStep {
     case cameraPermission
     case calendarPermission
     case remindersPermission
+    case bluetoothPermission
     case accessibilityPermission
     case musicPermission
     case finished
@@ -29,6 +30,7 @@ struct OnboardingView: View {
     let onOpenSettings: () -> Void
     let onOpenAISettings: () -> Void
     @State private var shouldOpenAISettings = false
+    @State private var bluetoothRequester = BluetoothPermissionRequester()
 
     var body: some View {
         ZStack {
@@ -112,18 +114,40 @@ struct OnboardingView: View {
                             Task {
                                 await requestRemindersPermission()
                                 withAnimation(.easeInOut(duration: 0.6)) {
-                                    step = .accessibilityPermission
+                                    step = .bluetoothPermission
                                 }
                             }
                         },
                         onSkip: {
                             withAnimation(.easeInOut(duration: 0.6)) {
-                                step = .accessibilityPermission
+                                step = .bluetoothPermission
                             }
                         }
                     )
                     .transition(.opacity)
-                
+
+            case .bluetoothPermission:
+                PermissionRequestView(
+                    icon: Image(systemName: "antenna.radiowaves.left.and.right"),
+                    title: "Enable Bluetooth Access",
+                    description: "Bluetooth access lets Notching it up show your connected headphones and speakers in the notch, including battery levels and a live activity when they connect or disconnect.",
+                    privacyNote: "Bluetooth access is only used to detect audio devices. Your device data stays on your Mac.",
+                    onAllow: {
+                        Task {
+                            await requestBluetoothPermission()
+                            withAnimation(.easeInOut(duration: 0.6)) {
+                                step = .accessibilityPermission
+                            }
+                        }
+                    },
+                    onSkip: {
+                        withAnimation(.easeInOut(duration: 0.6)) {
+                            step = .accessibilityPermission
+                        }
+                    }
+                )
+                .transition(.opacity)
+
             case .accessibilityPermission:
                 PermissionRequestView(
                     icon: Image(systemName: "hand.raised.fill"),
@@ -182,7 +206,11 @@ struct OnboardingView: View {
     func requestRemindersPermission() async {
         _ = try? await calendarService.requestAccess(to: .reminder)
     }
-    
+
+    func requestBluetoothPermission() async {
+        _ = await bluetoothRequester.request()
+    }
+
     func requestAccessibilityPermission() async {
         await XPCHelperClient.shared.ensureAccessibilityAuthorization(promptIfNeeded: true)
     }
