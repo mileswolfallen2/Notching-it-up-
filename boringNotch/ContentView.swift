@@ -750,8 +750,10 @@ struct BluetoothLiveActivityView: View {
     let activity: BluetoothActivityManager.Activity
     @ObservedObject var vm: BoringViewModel
 
-    private var accentColor: Color { activity.connected ? .cyan : .white.opacity(0.7) }
-    private var statusColor: Color { activity.connected ? .green : .white.opacity(0.55) }
+    private var accentColor: Color {
+        activity.connected ? Color.effectiveAccent : .white.opacity(0.6)
+    }
+    private var statusColor: Color { .white.opacity(activity.connected ? 0.85 : 0.5) }
     private var statusIcon: String { activity.connected ? "checkmark.circle.fill" : "xmark.circle.fill" }
 
     var body: some View {
@@ -765,14 +767,16 @@ struct BluetoothLiveActivityView: View {
                     width: max(0, vm.effectiveClosedNotchHeight - 12),
                     height: max(0, vm.effectiveClosedNotchHeight - 12)
                 )
+                .contentTransition(.symbolEffect(.replace))
 
             // ── Device name ──────────────────────────────────────────────
             Text(activity.name)
                 .font(.system(size: 11, weight: .medium, design: .rounded))
-                .foregroundStyle(.white.opacity(0.85))
+                .foregroundStyle(.white.opacity(0.9))
                 .lineLimit(1)
                 .fixedSize()
                 .padding(.leading, 5)
+                .contentTransition(.interpolate)
 
             // ── Physical notch gap ───────────────────────────────────────
             Rectangle()
@@ -788,8 +792,10 @@ struct BluetoothLiveActivityView: View {
                     height: max(0, vm.effectiveClosedNotchHeight - 12)
                 )
                 .contentTransition(.symbolEffect(.replace))
+                .symbolEffect(.bounce, value: activity.connected)
         }
         .frame(height: vm.effectiveClosedNotchHeight, alignment: .center)
+        .animation(.spring(response: 0.32, dampingFraction: 0.78), value: activity)
     }
 }
 
