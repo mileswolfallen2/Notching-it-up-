@@ -4073,6 +4073,9 @@
         }
       }
     },
+    "Calendar, Reminders, Camera, Accessibility, and Automation decisions will be cleared. macOS will ask again the next time the app requests access. Notification settings must be changed in System Settings." : {
+
+    },
     "Calendars" : {
       "localizations" : {
         "ar" : {
@@ -6003,6 +6006,9 @@
         }
       }
     },
+    "Copied" : {
+
+    },
     "Copy Device Name" : {
 
     },
@@ -6106,6 +6112,12 @@
         }
       }
     },
+    "Copy Report" : {
+
+    },
+    "Copy Report includes the values above and the current permission states." : {
+
+    },
     "Corner radius scaling" : {
       "localizations" : {
         "ar" : {
@@ -6205,6 +6217,9 @@
           }
         }
       }
+    },
+    "Crash Reports" : {
+
     },
     "Currently selected: %@" : {
       "localizations" : {
@@ -7014,6 +7029,12 @@
     "Danger zone" : {
 
     },
+    "Danger Zone" : {
+
+    },
+    "Data Folder" : {
+
+    },
     "Default" : {
       "localizations" : {
         "ar" : {
@@ -7214,6 +7235,15 @@
           }
         }
       }
+    },
+    "Developer" : {
+
+    },
+    "Developer mode" : {
+
+    },
+    "Diagnostics" : {
+
     },
     "Disable" : {
       "extractionState" : "stale",
@@ -11952,6 +11982,9 @@
     "Last synced %@" : {
 
     },
+    "Later" : {
+
+    },
     "Layout preview" : {
 
     },
@@ -12060,6 +12093,9 @@
 
     },
     "Live from your account" : {
+
+    },
+    "Lock Panel" : {
 
     },
     "Lottie JSON URL" : {
@@ -12468,6 +12504,9 @@
           }
         }
       }
+    },
+    "Maintenance" : {
+
     },
     "Maintenance actions" : {
 
@@ -16018,6 +16057,9 @@
         }
       }
     },
+    "Open Privacy Settings" : {
+
+    },
     "Open Reminder Settings" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -16326,6 +16368,12 @@
 
     },
     "Pause" : {
+
+    },
+    "Permissions" : {
+
+    },
+    "Permissions reset" : {
 
     },
     "Pick a Color" : {
@@ -17859,6 +17907,24 @@
     "Reset" : {
 
     },
+    "Reset & Ask clears the saved permission decision so macOS can prompt again. Notifications are managed by System Settings and cannot be reset from the app." : {
+
+    },
+    "Reset All App Data" : {
+
+    },
+    "Reset all app data?" : {
+
+    },
+    "Reset All Permissions" : {
+
+    },
+    "Reset all permissions?" : {
+
+    },
+    "Reset and Relaunch" : {
+
+    },
     "Reset and Restart" : {
 
     },
@@ -17872,6 +17938,9 @@
 
     },
     "Reset Notching it up…" : {
+
+    },
+    "Reset Permissions" : {
 
     },
     "Reset plans automatically" : {
@@ -17987,6 +18056,9 @@
     "Resets" : {
 
     },
+    "Resetting app data restores the first-run state and relaunches the app. It does not delete files that were added to the shelf." : {
+
+    },
     "Restart" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -18091,6 +18163,9 @@
     "Restart all countdowns" : {
 
     },
+    "Restart App" : {
+
+    },
     "Restart Notching it up" : {
       "localizations" : {
         "ar" : {
@@ -18190,6 +18265,9 @@
           }
         }
       }
+    },
+    "Restart Now" : {
+
     },
     "Restore default providers" : {
 
@@ -18302,6 +18380,9 @@
       }
     },
     "Select a plan to view live usage or adjust it manually." : {
+
+    },
+    "Select About and press Command-7 to unlock this panel." : {
 
     },
     "Select the music source you want to use. You can change this later in the app settings." : {
@@ -20879,6 +20960,9 @@
         }
       }
     },
+    "Some permissions may require a restart before they can be requested again." : {
+
+    },
     "Sort by lowest remaining" : {
 
     },
@@ -21503,6 +21587,9 @@
 
     },
     "These actions apply to every tracked plan." : {
+
+    },
+    "This clears settings, AI sign-ins, and the shelf index. Files on disk are not deleted. The app will relaunch." : {
 
     },
     "This restores all settings, signs out AI accounts, clears notes and saved shelf entries, and restarts the app. This cannot be undone." : {
