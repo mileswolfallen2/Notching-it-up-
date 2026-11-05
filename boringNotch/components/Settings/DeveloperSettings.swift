@@ -5,6 +5,7 @@
 
 import AppKit
 import AVFoundation
+import CoreBluetooth
 import EventKit
 import SwiftUI
 import UserNotifications
@@ -16,6 +17,7 @@ struct DeveloperSettings: View {
         case calendar
         case reminders
         case camera
+        case bluetooth
         case accessibility
         case notifications
         case automation
@@ -30,6 +32,8 @@ struct DeveloperSettings: View {
                 return "Reminders"
             case .camera:
                 return "Camera"
+            case .bluetooth:
+                return "Bluetooth"
             case .accessibility:
                 return "Accessibility"
             case .notifications:
@@ -47,6 +51,8 @@ struct DeveloperSettings: View {
                 return "checklist"
             case .camera:
                 return "camera"
+            case .bluetooth:
+                return "antenna.radiowaves.left.and.right"
             case .accessibility:
                 return "accessibility"
             case .notifications:
@@ -64,6 +70,8 @@ struct DeveloperSettings: View {
                 return "Reminders"
             case .camera:
                 return "Camera"
+            case .bluetooth:
+                return "Bluetooth"
             case .accessibility:
                 return "Accessibility"
             case .automation:
@@ -89,6 +97,11 @@ struct DeveloperSettings: View {
                 return URL(
                     string:
                         "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_Camera"
+                )
+            case .bluetooth:
+                return URL(
+                    string:
+                        "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_Bluetooth"
                 )
             case .accessibility:
                 return URL(
@@ -127,10 +140,12 @@ struct DeveloperSettings: View {
         for: .reminder)
     @State private var cameraStatus: AVAuthorizationStatus = AVCaptureDevice.authorizationStatus(
         for: .video)
+    @State private var bluetoothAuthorization: CBManagerAuthorization = CBManager.authorization
     @State private var accessibilityGranted = false
     @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
 
     @State private var eventStore = EKEventStore()
+    @State private var bluetoothRequester = BluetoothPermissionRequester()
     @State private var busyPermission: PermissionKind?
     @State private var actionMessage: String?
     @State private var didCopyReport = false
@@ -167,7 +182,7 @@ struct DeveloperSettings: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text(
-                "Calendar, Reminders, Camera, Accessibility, and Automation decisions will be cleared. macOS will ask again the next time the app requests access. Notification settings must be changed in System Settings."
+                "Calendar, Reminders, Camera, Bluetooth, Accessibility, and Automation decisions will be cleared. macOS will ask again the next time the app requests access. Notification settings must be changed in System Settings."
             )
         }
         .confirmationDialog(
@@ -392,6 +407,19 @@ struct DeveloperSettings: View {
             @unknown default:
                 return PermissionState(text: "Unknown", tint: .secondary, action: .openSettings)
             }
+        case .bluetooth:
+            switch bluetoothAuthorization {
+            case .allowedAlways:
+                return PermissionState(text: "Granted", tint: .green, action: .openSettings)
+            case .denied:
+                return PermissionState(text: "Denied", tint: .red, action: .resetAndRequest)
+            case .restricted:
+                return PermissionState(text: "Restricted", tint: .red, action: .openSettings)
+            case .notDetermined:
+                return PermissionState(text: "Not requested", tint: .secondary, action: .request)
+            @unknown default:
+                return PermissionState(text: "Unknown", tint: .secondary, action: .openSettings)
+            }
         case .accessibility:
             return accessibilityGranted
                 ? PermissionState(text: "Granted", tint: .green, action: .openSettings)
@@ -468,6 +496,22 @@ struct DeveloperSettings: View {
         case .camera:
             let granted = await AVCaptureDevice.requestAccess(for: .video)
             actionMessage = granted ? "Camera access granted." : "Camera access was not granted."
+        case .bluetooth:
+            let authorization = await bluetoothRequester.request()
+            bluetoothAuthorization = authorization
+            switch authorization {
+            case .allowedAlways:
+                actionMessage = "Bluetooth access granted."
+            case .denied:
+                actionMessage = "Bluetooth access was denied."
+            case .restricted:
+                actionMessage = "Bluetooth access is restricted."
+            case .notDetermined:
+                actionMessage =
+                    "Bluetooth permission is still pending. Respond to the system prompt, then return to Settings."
+            @unknown default:
+                actionMessage = "Bluetooth permission could not be determined."
+            }
         case .accessibility:
             let granted = await XPCHelperClient.shared.ensureAccessibilityAuthorization(
                 promptIfNeeded: true)
@@ -509,7 +553,7 @@ struct DeveloperSettings: View {
             Bundle.main.bundleIdentifier ?? "com.notchingitup.notchingitup"
         let helperBundleIdentifier = "com.notchingitup.BoringNotchXPCHelper"
 
-        for service in ["Calendar", "Reminders", "Camera", "AppleEvents"] {
+        for service in ["Calendar", "Reminders", "Camera", "Bluetooth", "AppleEvents"] {
             _ = await XPCHelperClient.shared.resetPrivacyPermission(
                 service,
                 bundleIdentifier: mainBundleIdentifier
@@ -531,6 +575,7 @@ struct DeveloperSettings: View {
         calendarStatus = EKEventStore.authorizationStatus(for: .event)
         reminderStatus = EKEventStore.authorizationStatus(for: .reminder)
         cameraStatus = AVCaptureDevice.authorizationStatus(for: .video)
+        bluetoothAuthorization = CBManager.authorization
 
         let settings = await UNUserNotificationCenter.current().notificationSettings()
         notificationStatus = settings.authorizationStatus
@@ -633,11 +678,65 @@ struct DeveloperSettings: View {
         Calendar: \(permissionState(for: .calendar).text)
         Reminders: \(permissionState(for: .reminders).text)
         Camera: \(permissionState(for: .camera).text)
+        Bluetooth: \(permissionState(for: .bluetooth).text)
         Accessibility: \(permissionState(for: .accessibility).text)
         Notifications: \(permissionState(for: .notifications).text)
         Automation: \(permissionState(for: .automation).text)
         AI accounts: \(AIUsageStore.shared.accounts.count)
         Bluetooth devices: \(BluetoothActivityManager.shared.connectedDevices.count)
         """
+    }
+}
+
+/// Creates a Core Bluetooth manager so macOS can present the Bluetooth privacy
+/// prompt. The manager is retained while permission is pending so the prompt is
+/// not dismissed before the user answers it.
+@MainActor
+private final class BluetoothPermissionRequester: NSObject, CBCentralManagerDelegate {
+    private var manager: CBCentralManager?
+    private var continuation: CheckedContinuation<CBManagerAuthorization, Never>?
+    private var timeoutTask: Task<Void, Never>?
+
+    func request() async -> CBManagerAuthorization {
+        if manager == nil {
+            manager = CBCentralManager(
+                delegate: self,
+                queue: .main,
+                options: [CBCentralManagerOptionShowPowerAlertKey: false]
+            )
+        }
+        manager?.scanForPeripherals(withServices: nil)
+
+        return await withCheckedContinuation { continuation in
+            self.continuation = continuation
+
+            timeoutTask?.cancel()
+            timeoutTask = Task { @MainActor [weak self] in
+                try? await Task.sleep(for: .seconds(2))
+                guard !Task.isCancelled else { return }
+                self?.finish()
+            }
+        }
+    }
+
+    nonisolated func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        Task { @MainActor [weak self] in
+            guard CBManager.authorization != .notDetermined else { return }
+            self?.finish()
+        }
+    }
+
+    private func finish() {
+        guard let continuation else { return }
+        self.continuation = nil
+        timeoutTask?.cancel()
+        timeoutTask = nil
+        manager?.stopScan()
+
+        let authorization = CBManager.authorization
+        if authorization != .notDetermined {
+            manager = nil
+        }
+        continuation.resume(returning: authorization)
     }
 }

@@ -4073,7 +4073,7 @@
         }
       }
     },
-    "Calendar, Reminders, Camera, Accessibility, and Automation decisions will be cleared. macOS will ask again the next time the app requests access. Notification settings must be changed in System Settings." : {
+    "Calendar, Reminders, Camera, Bluetooth, Accessibility, and Automation decisions will be cleared. macOS will ask again the next time the app requests access. Notification settings must be changed in System Settings." : {
 
     },
     "Calendars" : {
