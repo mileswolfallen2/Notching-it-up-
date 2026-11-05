@@ -319,7 +319,7 @@ struct ContentView: View {
                                   Defaults[.bluetoothConnectionAnimationEnabled]
                                       ? .asymmetric(
                                           insertion: .opacity.combined(with: .scale(scale: 0.85, anchor: .center)),
-                                          removal:   .opacity.combined(with: .scale(scale: 0.85, anchor: .center))
+                                          removal:   .opacity.combined(with: .scale(scale: 0.94, anchor: .center))
                                       )
                                       : .opacity
                               )

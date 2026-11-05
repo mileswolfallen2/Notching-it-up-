@@ -59,6 +59,11 @@ fi
 echo "Building ${APP_NAME} (${CONFIGURATION})…"
 echo "Build log: ${LOG_FILE}"
 
+# Hardened runtime stays off for this local test image. The bundled
+# MediaRemoteAdapter framework is ad-hoc signed, and macOS library validation
+# rejects it when an ad-hoc app enables the hardened runtime. The release
+# script handles signing separately.
+
 if ! xcodebuild \
     -project "$PROJECT" \
     -scheme "$SCHEME" \
@@ -66,6 +71,7 @@ if ! xcodebuild \
     -destination "platform=macOS" \
     -derivedDataPath "$DERIVED_DATA" \
     CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
+    ENABLE_HARDENED_RUNTIME=NO \
     build > "$LOG_FILE" 2>&1
 then
     echo "" >&2

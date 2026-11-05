@@ -6,6 +6,7 @@
 import Combine
 import Foundation
 import IOBluetooth
+import SwiftUI
 
 @MainActor
 final class BluetoothActivityManager: ObservableObject {
@@ -241,7 +242,9 @@ final class BluetoothActivityManager: ObservableObject {
         dismissTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(4))
             guard !Task.isCancelled else { return }
-            self?.activity = nil
+            withAnimation(.spring(response: 0.34, dampingFraction: 0.86, blendDuration: 0)) {
+                self?.activity = nil
+            }
         }
     }
 }
