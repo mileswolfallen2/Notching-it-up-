@@ -17,6 +17,7 @@ import SwiftUIIntrospect
 struct SettingsView: View {
     @State private var selectedTab = "General"
     @State private var accentColorUpdateTrigger = UUID()
+    @State private var developerModeUnlocked = false
     @Default(.showAdvancedSettings) var showAdvancedSettings
 
     let updaterController: SPUStandardUpdaterController?
@@ -66,6 +67,11 @@ struct SettingsView: View {
                 NavigationLink(value: "About") {
                     Label("About", systemImage: "info.circle")
                 }
+                if developerModeUnlocked {
+                    NavigationLink(value: "Developer") {
+                        Label("Developer", systemImage: "wrench.and.screwdriver")
+                    }
+                }
             }
             .listStyle(SidebarListStyle())
             .tint(.effectiveAccent)
@@ -108,6 +114,13 @@ struct SettingsView: View {
                                 startingUpdater: false, updaterDelegate: nil,
                                 userDriverDelegate: nil))
                     }
+                case "Developer":
+                    DeveloperSettings {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            developerModeUnlocked = false
+                            selectedTab = "About"
+                        }
+                    }
                 default:
                     GeneralSettings()
                 }
@@ -136,6 +149,21 @@ struct SettingsView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .openAISettings)) { _ in
             selectedTab = "AI Usage"
+        }
+        .background {
+            if selectedTab == "About" && !developerModeUnlocked {
+                Button("") {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        developerModeUnlocked = true
+                        selectedTab = "Developer"
+                    }
+                }
+                .keyboardShortcut("7", modifiers: .command)
+                .buttonStyle(.plain)
+                .frame(width: 0, height: 0)
+                .opacity(0)
+                .accessibilityHidden(true)
+            }
         }
     }
 }

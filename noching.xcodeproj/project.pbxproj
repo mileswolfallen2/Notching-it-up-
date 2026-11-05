@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1100290C2E847E2800035A57 /* NSItemProvider+LoadHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1100290B2E847E2800035A57 /* NSItemProvider+LoadHelpers.swift */; };
+		11D0A0022F00000100ABCDEF /* DeveloperSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11D0A0012F00000100ABCDEF /* DeveloperSettings.swift */; };
 		110029272E84FD4C00035A57 /* TemporaryFileStorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110029262E84FD4C00035A57 /* TemporaryFileStorageService.swift */; };
 		1100292A2E8691B400035A57 /* FileShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110029292E8691B400035A57 /* FileShareView.swift */; };
 		1100292E2E86940F00035A57 /* QuickShareService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1100292D2E86940F00035A57 /* QuickShareService.swift */; };
@@ -189,6 +190,7 @@
 
 /* Begin PBXFileReference section */
 		1100290B2E847E2800035A57 /* NSItemProvider+LoadHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSItemProvider+LoadHelpers.swift"; sourceTree = "<group>"; };
+		11D0A0012F00000100ABCDEF /* DeveloperSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeveloperSettings.swift; sourceTree = "<group>"; };
 		110029262E84FD4C00035A57 /* TemporaryFileStorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryFileStorageService.swift; sourceTree = "<group>"; };
 		110029292E8691B400035A57 /* FileShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileShareView.swift; sourceTree = "<group>"; };
 		1100292D2E86940F00035A57 /* QuickShareService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickShareService.swift; sourceTree = "<group>"; };
@@ -749,6 +751,7 @@
 				11F748862ECB27DC00F841DB /* TopBarSlotConfigurationView.swift */,
 				11C5E3152DFE88510065821E /* SettingsView.swift */,
 				11C5E3112DFE85970065821E /* SettingsWindowController.swift */,
+				11D0A0012F00000100ABCDEF /* DeveloperSettings.swift */,
 				B1D6FD422C6603730015F173 /* SoftwareUpdater.swift */,
 				B1B112902C6A572100093D8F /* EditPanelView.swift */,
 				B1C448972C972CC4001F0858 /* ListItemPopover.swift */,
@@ -1008,6 +1011,7 @@
 				B10F84A32C6C9596009F3026 /* TestView.swift in Sources */,
 				1443E7F32C609DCE0027C1FC /* matters.swift in Sources */,
 				11C5E3162DFE88510065821E /* SettingsView.swift in Sources */,
+				11D0A0022F00000100ABCDEF /* DeveloperSettings.swift in Sources */,
 				1153BD932D986E4300979FB0 /* AppleMusicController.swift in Sources */,
 				11C5E3132DFE85970065821E /* SettingsWindowController.swift in Sources */,
 				110029272E84FD4C00035A57 /* TemporaryFileStorageService.swift in Sources */,

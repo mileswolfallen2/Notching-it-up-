@@ -99,6 +99,42 @@ class BoringNotchXPCHelper: NSObject, BoringNotchXPCHelperProtocol {
     @objc func setKeyboardBrightness(_ value: Float, with reply: @escaping (Bool) -> Void) {
         reply(Self.keyboardClient.setBrightness(value))
     }
+
+    // MARK: - Privacy permissions
+
+    @objc func resetPrivacyPermission(
+        _ service: String,
+        forBundleIdentifier bundleIdentifier: String,
+        with reply: @escaping (Bool) -> Void
+    ) {
+        let process = Process()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/tccutil")
+        process.arguments = ["reset", service, bundleIdentifier]
+
+        let output = Pipe()
+        process.standardOutput = output
+        process.standardError = output
+
+        do {
+            try process.run()
+            process.waitUntilExit()
+            if process.terminationStatus != 0 {
+                let message =
+                    String(
+                        data: output.fileHandleForReading.readDataToEndOfFile(),
+                        encoding: .utf8
+                    ) ?? ""
+                NSLog(
+                    "tccutil reset \(service) \(bundleIdentifier) failed (\(process.terminationStatus)): \(message)"
+                )
+            }
+            reply(process.terminationStatus == 0)
+        } catch {
+            NSLog("tccutil reset failed: \(error.localizedDescription)")
+            reply(false)
+        }
+    }
+
     // MARK: - Screen Brightness (moved from client app into helper)
 
     @objc func isScreenBrightnessAvailable(with reply: @escaping (Bool) -> Void) {

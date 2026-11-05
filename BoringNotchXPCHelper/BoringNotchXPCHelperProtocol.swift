@@ -20,6 +20,12 @@ import Foundation
     func isScreenBrightnessAvailable(with reply: @escaping (Bool) -> Void)
     func currentScreenBrightness(with reply: @escaping (NSNumber?) -> Void)
     func setScreenBrightness(_ value: Float, with reply: @escaping (Bool) -> Void)
+    // Privacy permissions are reset through the helper because the main app is sandboxed.
+    func resetPrivacyPermission(
+        _ service: String,
+        forBundleIdentifier bundleIdentifier: String,
+        with reply: @escaping (Bool) -> Void
+    )
 }
 
 /*

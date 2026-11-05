@@ -5,6 +5,7 @@ All notable changes to Notching it up are documented here.
 
 
 ## Added 
+- Hidden Developer settings panel. Select About and press Command-7 to unlock permission controls and app diagnostics for the current session.
 - Bluetooth Live Activity for speaker and headphone connect/disconnect events, with a setting to disable it. Non-audio Bluetooth devices, including cameras, are ignored.
 - Bluetooth devices tab for connected headphones and speakers, with battery levels, hover details, and a shortcut to Bluetooth settings.
 - First-run setup now defaults to Home and Files, lets users choose which tabs to enable, and opens AI settings when AI is selected.
