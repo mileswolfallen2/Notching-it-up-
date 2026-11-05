@@ -3667,9 +3667,6 @@
         }
       }
     },
-    "Battery unavailable" : {
-
-    },
     "Blur intensity" : {
 
     },
@@ -6005,6 +6002,9 @@
           }
         }
       }
+    },
+    "Copy Device Name" : {
+
     },
     "Copy items on drag" : {
       "localizations" : {
@@ -14586,6 +14586,9 @@
     "No AI plans added yet" : {
 
     },
+    "No audio devices" : {
+
+    },
     "No custom animation available" : {
       "localizations" : {
         "ar" : {
@@ -15190,6 +15193,9 @@
         }
       }
     },
+    "Not reported" : {
+
+    },
     "Notch behavior" : {
       "localizations" : {
         "ar" : {
@@ -15697,6 +15703,12 @@
 
     },
     "Open AI settings" : {
+
+    },
+    "Open Bluetooth settings" : {
+
+    },
+    "Open Bluetooth Settings" : {
 
     },
     "Open browser again" : {

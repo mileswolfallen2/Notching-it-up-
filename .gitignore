@@ -53,3 +53,6 @@ build/
 *.xcarchive
 *.dSYM
 
+# Local test images created by make_test_dmg.sh
+Release/*-test.dmg
+
