@@ -132,7 +132,7 @@ To publish a release:
 ## Usage
 
 - Launch the app - it will appear in your menu bar (this is a menu bar app)
-- Hover over the notch to expand it and access all features
+- Click the notch to expand it, or turn on **Open notch on hover** in Settings to expand it by hovering
 - Right-click the menu bar icon or open Settings to customize
 - Use the "Advanced options" toggle in General settings to show/hide more complex options
 

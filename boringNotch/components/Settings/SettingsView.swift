@@ -1463,13 +1463,12 @@ struct Appearance: View {
                         }
                         Divider()
                         Button {
-                            if selectedListVisualizer != nil {
-                                let visualizer = selectedListVisualizer!
+                            if let visualizer = selectedListVisualizer {
                                 selectedListVisualizer = nil
-                                customVisualizers.remove(
-                                    at: customVisualizers.firstIndex(of: visualizer)!)
-                                if visualizer == selectedVisualizer && customVisualizers.count > 0 {
-                                    selectedVisualizer = customVisualizers[0]
+                                customVisualizers.removeAll { $0 == visualizer }
+                                if visualizer == selectedVisualizer,
+                                   let nextVisualizer = customVisualizers.first {
+                                    selectedVisualizer = nextVisualizer
                                 }
                             }
                         } label: {

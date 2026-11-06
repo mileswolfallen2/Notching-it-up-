@@ -26,6 +26,10 @@ class AudioSpectrum: NSView {
         setupBars()
     }
 
+    deinit {
+        animationTimer?.invalidate()
+    }
+
     private func setupBars() {
         let barWidth: CGFloat = 2
         let barCount = 4

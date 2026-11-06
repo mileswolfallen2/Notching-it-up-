@@ -89,7 +89,10 @@ final class BluetoothActivityManager: ObservableObject {
     }
 
     private func merge(_ directDevices: [RawDevice], with profileDevices: [RawDevice]) -> [RawDevice] {
-        var merged = Dictionary(uniqueKeysWithValues: directDevices.map { ($0.address, $0) })
+        var merged = Dictionary(
+            directDevices.map { ($0.address, $0) },
+            uniquingKeysWith: { _, latest in latest }
+        )
         for device in profileDevices {
             merged[device.address] = device
         }

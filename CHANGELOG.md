@@ -13,6 +13,13 @@ All notable changes to Notching it up are documented here.
 - Hover-to-open is now off by default. Turn on "Open notch on hover" in Settings to open the notch by hovering over it.
 - Hovering the closed-notch visualizer no longer opens the notch, so the play or pause control stays usable.
 
+### Fixed
+
+- Hardened several crash-prone paths: empty download lists, duplicate Bluetooth device addresses, missing battery data, screen lookups, and removing a custom visualizer no longer force-unwrap values or trap.
+- Stopped the idle face and music visualizer timers when their views go away, so timers no longer accumulate across repeated opens.
+- Fixed main-actor isolation issues in the display cache and the Shelf open-with panel.
+- Guarded album artwork color calculations against empty images and pure black covers, avoiding invalid color values.
+
 ## [0.2.6.2]
 
 ### Added
