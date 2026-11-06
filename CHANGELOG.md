@@ -9,6 +9,7 @@ All notable changes to Notching it up are documented here.
 
 ### Changed
 
+- Hover-to-open is now off by default. Turn on "Open notch on hover" in Settings to open the notch by hovering over it.
 - Hovering the closed-notch visualizer no longer opens the notch, so the play or pause control stays usable.
 
 ## [0.2.6.2]
