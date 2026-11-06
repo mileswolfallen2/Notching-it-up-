@@ -5,6 +5,7 @@ All notable changes to Notching it up are documented here.
 
 ### Added
 
+- A Join button in the Calendar list for Zoom, Google Meet, Microsoft Teams, Webex, Whereby, and Jitsi meetings. It appears 15 minutes before the event starts and stays visible while the meeting is in progress.
 - Hovering the music visualizer in the closed notch now blurs it and shows a play or pause button, so playback can be controlled without opening the notch.
 
 ### Changed

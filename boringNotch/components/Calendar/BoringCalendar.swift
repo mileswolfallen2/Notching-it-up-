@@ -312,16 +312,23 @@ struct EventListView: View {
         ScrollViewReader { proxy in
             List {
                 ForEach(filteredEvents) { event in
-                    Button(action: {
-                        if let url = event.calendarAppURL() {
-                            openURL(url)
+                    HStack(spacing: 6) {
+                        Button(action: {
+                            if let url = event.calendarAppURL() {
+                                openURL(url)
+                            }
+                        }) {
+                            eventRow(event)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                    }) {
-                        eventRow(event)
+                        .buttonStyle(PlainButtonStyle())
+
+                        if event.isJoinableMeeting() {
+                            joinButton(for: event)
+                        }
                     }
                     .id(event.id)
                     .padding(.leading, -5)
-                    .buttonStyle(PlainButtonStyle())
                     .listRowSeparator(.automatic)
                     .listRowSeparatorTint(.gray.opacity(0.2))
                     .listRowBackground(Color.clear)
@@ -339,6 +346,25 @@ struct EventListView: View {
             }
         }
         Spacer(minLength: 0)
+    }
+
+    private func joinButton(for event: EventModel) -> some View {
+        Button {
+            if let url = event.meetingURL {
+                openURL(url)
+            }
+        } label: {
+            Text("Join")
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 3)
+                .background(Color.accentColor.opacity(0.9), in: Capsule())
+                .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .help("Join \(event.title)")
+        .accessibilityLabel("Join \(event.title)")
     }
 
     private func eventRow(_ event: EventModel) -> some View {

@@ -82,6 +82,39 @@ extension EventModel {
 
     var isMeeting: Bool { !participants.isEmpty }
 
+    /// A video meeting link for the event, when it points at a supported provider.
+    var meetingURL: URL? {
+        guard type.isEvent,
+              !isAllDay,
+              let url,
+              let scheme = url.scheme?.lowercased(),
+              scheme == "http" || scheme == "https"
+        else { return nil }
+
+        let host = url.host?.lowercased() ?? ""
+        let providers = [
+            "zoom.us",
+            "meet.google.com",
+            "teams.microsoft.com",
+            "teams.live.com",
+            "webex.com",
+            "whereby.com",
+            "meet.jit.si"
+        ]
+
+        guard providers.contains(where: { host == $0 || host.hasSuffix(".\($0)") }) else {
+            return nil
+        }
+
+        return url
+    }
+
+    /// Whether the event has a joinable meeting that starts within 15 minutes or is in progress.
+    func isJoinableMeeting(at date: Date = Date()) -> Bool {
+        guard meetingURL != nil else { return false }
+        return date >= start.addingTimeInterval(-15 * 60) && date < end
+    }
+
     func calendarAppURL() -> URL? {
 
         guard let id = id.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
