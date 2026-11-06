@@ -3,6 +3,14 @@
 All notable changes to Notching it up are documented here.
 ## [Unreleased]
 
+### Added
+
+- Hovering the music visualizer in the closed notch now blurs it and shows a play or pause button, so playback can be controlled without opening the notch.
+
+### Changed
+
+- Hovering the closed-notch visualizer no longer opens the notch, so the play or pause control stays usable.
+
 ## [0.2.6.2]
 
 ### Added

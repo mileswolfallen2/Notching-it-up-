@@ -27,6 +27,7 @@ struct ContentView: View {
     @ObservedObject var pomodoroTimer = PomodoroTimer.shared
     @State private var hoverTask: Task<Void, Never>?
     @State private var isHovering: Bool = false
+    @State private var isHoveringMusicVisualizer: Bool = false
     @State private var anyDropDebounceTask: Task<Void, Never>?
 
     @State private var gestureProgress: CGFloat = .zero
@@ -178,6 +179,11 @@ struct ContentView: View {
                         }
                     }
                     .onChange(of: vm.notchState) { _, newState in
+                        if newState == .open && isHoveringMusicVisualizer {
+                            withAnimation(.smooth(duration: 0.16)) {
+                                isHoveringMusicVisualizer = false
+                            }
+                        }
                         if newState == .closed && isHovering {
                             withAnimation {
                                 isHovering = false
@@ -516,6 +522,43 @@ struct ContentView: View {
                 ),
                 alignment: .center
             )
+            .blur(radius: isHoveringMusicVisualizer ? 2.4 : 0)
+            .clipped()
+            .overlay {
+                if isHoveringMusicVisualizer {
+                    Button {
+                        musicManager.togglePlay()
+                    } label: {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                .fill(Color.black.opacity(0.28))
+
+                            Image(systemName: musicManager.isPlaying ? "pause.fill" : "play.fill")
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundStyle(.white.opacity(0.98))
+                                .contentTransition(.symbolEffect(.replace))
+                        }
+                        .frame(width: 18, height: 18)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(musicManager.isPlaying ? "Pause" : "Play")
+                    .transition(.opacity)
+                }
+            }
+            .contentShape(Rectangle())
+            .onHover { hovering in
+                withAnimation(.smooth(duration: 0.16)) {
+                    isHoveringMusicVisualizer = hovering
+                }
+
+                if hovering {
+                    hoverTask?.cancel()
+                } else {
+                    scheduleHoverOpenIfNeeded()
+                }
+            }
+            .animation(.smooth(duration: 0.2), value: musicManager.isPlaying)
         }
         .overlay(alignment: .bottom) {
             if showMusicProgressBar && musicManager.songDuration > 0 {
@@ -636,6 +679,8 @@ struct ContentView: View {
     }
 
     private func doOpen() {
+        guard !isHoveringMusicVisualizer else { return }
+
         withAnimation(animationSpring) {
             vm.open()
         }
@@ -655,23 +700,8 @@ struct ContentView: View {
             if vm.notchState == .closed && Defaults[.enableHaptics] {
                 haptics.toggle()
             }
-            
-            guard vm.notchState == .closed,
-                  !coordinator.sneakPeek.show,
-                  Defaults[.openNotchOnHover] else { return }
-            
-            hoverTask = Task {
-                try? await Task.sleep(for: .seconds(Defaults[.minimumHoverDuration]))
-                guard !Task.isCancelled else { return }
-                
-                await MainActor.run {
-                    guard self.vm.notchState == .closed,
-                          self.isHovering,
-                          !self.coordinator.sneakPeek.show else { return }
-                    
-                    self.doOpen()
-                }
-            }
+
+            scheduleHoverOpenIfNeeded()
         } else {
             hoverTask = Task {
                 try? await Task.sleep(for: .milliseconds(100))
@@ -686,6 +716,31 @@ struct ContentView: View {
                         self.vm.close()
                     }
                 }
+            }
+        }
+    }
+
+    /// Opens the notch after the hover delay, unless the pointer is using the
+    /// closed-notch visualizer controls.
+    private func scheduleHoverOpenIfNeeded() {
+        guard vm.notchState == .closed,
+              isHovering,
+              !isHoveringMusicVisualizer,
+              !coordinator.sneakPeek.show,
+              Defaults[.openNotchOnHover] else { return }
+
+        hoverTask?.cancel()
+        hoverTask = Task {
+            try? await Task.sleep(for: .seconds(Defaults[.minimumHoverDuration]))
+            guard !Task.isCancelled else { return }
+
+            await MainActor.run {
+                guard self.vm.notchState == .closed,
+                      self.isHovering,
+                      !self.isHoveringMusicVisualizer,
+                      !self.coordinator.sneakPeek.show else { return }
+
+                self.doOpen()
             }
         }
     }
