@@ -18,6 +18,7 @@ struct SettingsView: View {
     @State private var selectedTab = "General"
     @State private var accentColorUpdateTrigger = UUID()
     @State private var developerModeUnlocked = false
+    @StateObject private var motion = MotionPreferences.shared
     @Default(.showAdvancedSettings) var showAdvancedSettings
 
     let updaterController: SPUStandardUpdaterController?
@@ -40,6 +41,9 @@ struct SettingsView: View {
                 }
                 NavigationLink(value: "Calendar") {
                     Label("Calendar", systemImage: "calendar")
+                }
+                NavigationLink(value: "Weather") {
+                    Label("Weather", systemImage: "cloud.sun.fill")
                 }
                 NavigationLink(value: "HUD") {
                     Label("HUDs", systemImage: "dial.medium.fill")
@@ -88,6 +92,8 @@ struct SettingsView: View {
                     Media()
                 case "Calendar":
                     CalendarSettings()
+                case "Weather":
+                    WeatherSettings()
                 case "HUD":
                     HUD()
                 case "Timer":
@@ -150,6 +156,9 @@ struct SettingsView: View {
         .onReceive(NotificationCenter.default.publisher(for: .openAISettings)) { _ in
             selectedTab = "AI Usage"
         }
+        .onReceive(NotificationCenter.default.publisher(for: .openWeatherSettings)) { _ in
+            selectedTab = "Weather"
+        }
         .background {
             if selectedTab == "About" && !developerModeUnlocked {
                 Button("") {
@@ -164,6 +173,11 @@ struct SettingsView: View {
                 .opacity(0)
                 .accessibilityHidden(true)
             }
+        }
+        .transaction { transaction in
+            guard motion.shouldReduceMotion else { return }
+            transaction.animation = nil
+            transaction.disablesAnimations = true
         }
     }
 }
@@ -1349,6 +1363,21 @@ struct Appearance: View {
 
             } header: {
                 Text("General")
+            }
+
+            Section {
+                Defaults.Toggle(key: .followSystemReduceMotion) {
+                    Text("Follow system Reduce Motion")
+                }
+                Defaults.Toggle(key: .reduceMotion) {
+                    Text("Reduce motion")
+                }
+            } header: {
+                Text("Accessibility")
+            } footer: {
+                Text("Reduces decorative animations, blinking, marquee scrolling, and visualizer movement. Keyboard focus and VoiceOver labels remain available.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
             Section {

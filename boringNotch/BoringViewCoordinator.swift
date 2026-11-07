@@ -159,6 +159,38 @@ class BoringViewCoordinator: ObservableObject {
 
     @Published var currentView: NotchViews = .home
     @Published var helloAnimationRunning: Bool = false
+
+    /// The tabs currently available in the notch, in the user's preferred order.
+    var visibleTabs: [TopBarTab] {
+        TopBarTab.orderedVisibleTabs(
+            slots: Defaults[.topBarSlots],
+            showHome: Defaults[.showHomeTab],
+            showWeather: Defaults[.showWeatherTab],
+            showShelf: Defaults[.showShelfTab],
+            showTimer: Defaults[.showTimerTab],
+            showNotes: Defaults[.showNotesTab],
+            showAI: Defaults[.showAITab],
+            showDevices: Defaults[.showDevicesTab],
+            shelfEnabled: Defaults[.boringShelf]
+        )
+    }
+
+    /// Move to the previous or next visible tab. Used by keyboard navigation.
+    func switchTab(by offset: Int) {
+        let views = visibleTabs.map(\.notchView)
+        guard let currentIndex = views.firstIndex(of: currentView) else {
+            if let first = views.first {
+                withAnimation(BoringMotion.animation(.smooth)) { currentView = first }
+            }
+            return
+        }
+        let newIndex = currentIndex + offset
+        guard views.indices.contains(newIndex) else { return }
+        withAnimation(BoringMotion.animation(.smooth)) {
+            currentView = views[newIndex]
+        }
+    }
+
     private var sneakPeekDispatch: DispatchWorkItem?
     private var expandingViewDispatch: DispatchWorkItem?
     private var hudEnableTask: Task<Void, Never>?
@@ -326,7 +358,7 @@ class BoringViewCoordinator: ObservableObject {
             }
         }
         Task { @MainActor in
-            withAnimation(.smooth) {
+            withAnimation(BoringMotion.animation(.smooth)) {
                 self.sneakPeek.show = status
                 self.sneakPeek.type = type
                 self.sneakPeek.value = value
@@ -350,7 +382,7 @@ class BoringViewCoordinator: ObservableObject {
             try? await Task.sleep(for: .seconds(duration))
             guard let self = self, !Task.isCancelled else { return }
             await MainActor.run {
-                withAnimation {
+                withAnimation(BoringMotion.animation(.default)) {
                     self.toggleSneakPeek(status: false, type: .music)
                     self.sneakPeekDuration = 1.5
                 }
@@ -375,7 +407,7 @@ class BoringViewCoordinator: ObservableObject {
         browser: BrowserType = .chromium
     ) {
         Task { @MainActor in
-            withAnimation(.smooth) {
+            withAnimation(BoringMotion.animation(.smooth)) {
                 self.expandingView.show = status
                 self.expandingView.type = type
                 self.expandingView.value = value

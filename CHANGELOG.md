@@ -5,6 +5,10 @@ All notable changes to Notching it up are documented here.
 
 ### Added
 
+- Weather tab. Choose a city manually and see current conditions plus a five-day forecast, with Celsius or Fahrenheit. Weather uses Open-Meteo, so there is no API key and no location permission. It can be enabled, hidden, and reordered like the other top-bar tabs.
+- Accessibility and reduced-motion support. Notching it up now follows the macOS Reduce Motion preference and adds a manual "Reduce motion" option in Appearance settings. When motion is reduced, the notch spring, tab capsule, live activities, idle face blinking, status visualizer, marquee scrolling, hover feedback, and other decorative animations become instant.
+- VoiceOver labels and keyboard improvements across the notch: music controls, the volume slider, Pomodoro controls, quick notes, tab buttons, and the closed-notch activity now announce useful labels, values, and hints. Escape closes the open notch, and the tab bar supports arrow-key navigation.
+- A Motion tab in the hidden Developer panel. It previews the notch spring, tab capsule, panel transition, live activity, idle face, visualizer, marquee, album-art crossfade, slider, AI ring, HUD, hover feedback, and onboarding step, so each animation can be checked with and without reduced motion.
 - A Join button in the Calendar list for Zoom, Google Meet, Microsoft Teams, Webex, Whereby, and Jitsi meetings. It appears 15 minutes before the event starts and stays visible while the meeting is in progress.
 - Hovering the music visualizer in the closed notch now blurs it and shows a play or pause button, so playback can be controlled without opening the notch.
 
@@ -12,9 +16,11 @@ All notable changes to Notching it up are documented here.
 
 - Hover-to-open is now off by default. Turn on "Open notch on hover" in Settings to open the notch by hovering over it.
 - Hovering the closed-notch visualizer no longer opens the notch, so the play or pause control stays usable.
+- Settings, onboarding, and the notch now share one reduced-motion policy instead of animating individually, so enabling the option takes effect consistently across the app.
 
 ### Fixed
 
+- The open-notch shadow now follows the full height of the open notch on every tab instead of shrinking to match the current tab's content.
 - Hardened several crash-prone paths: empty download lists, duplicate Bluetooth device addresses, missing battery data, screen lookups, and removing a custom visualizer no longer force-unwrap values or trap.
 - Stopped the idle face and music visualizer timers when their views go away, so timers no longer accumulate across repeated opens.
 - Fixed main-actor isolation issues in the display cache and the Shelf open-with panel.

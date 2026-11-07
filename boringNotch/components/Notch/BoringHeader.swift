@@ -55,6 +55,8 @@ struct BoringHeader: View {
                                     }
                             }
                             .buttonStyle(PlainButtonStyle())
+                            .accessibilityLabel(vm.isCameraExpanded ? "Close camera preview" : "Open camera preview")
+                            .accessibilityHint("Shows or hides the camera preview in the notch")
                         }
                         if Defaults[.settingsIconInNotch] {
                             Button(action: {
@@ -74,6 +76,8 @@ struct BoringHeader: View {
                                     }
                             }
                             .buttonStyle(PlainButtonStyle())
+                            .accessibilityLabel("Open settings")
+                            .accessibilityHint("Opens the Notching it up settings window")
                         }
                         if Defaults[.showBatteryIndicator] {
                             BoringBatteryView(

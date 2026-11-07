@@ -13,6 +13,7 @@ import UniformTypeIdentifiers
 struct TopBarSlotConfigurationView: View {
     @Default(.topBarSlots) private var topBarSlots
     @Default(.showHomeTab) private var showHomeTab
+    @Default(.showWeatherTab) private var showWeatherTab
     @Default(.showShelfTab) private var showShelfTab
     @Default(.showTimerTab) private var showTimerTab
     @Default(.showNotesTab) private var showNotesTab
@@ -35,6 +36,7 @@ struct TopBarSlotConfigurationView: View {
         TopBarTab.orderedVisibleTabs(
             slots: topBarSlots,
             showHome: showHomeTab,
+            showWeather: showWeatherTab,
             showShelf: showShelfTab,
             showTimer: showTimerTab,
             showNotes: showNotesTab,
@@ -63,6 +65,7 @@ struct TopBarSlotConfigurationView: View {
                     withAnimation(.snappy) {
                         topBarSlots = TopBarTab.defaultLayout
                         showHomeTab = true
+                        showWeatherTab = true
                         showShelfTab = true
                         showTimerTab = true
                         showNotesTab = true
@@ -216,6 +219,7 @@ struct TopBarSlotConfigurationView: View {
     private func subtitle(for tab: TopBarTab) -> String {
         switch tab {
         case .home:  return "Music, calendar and live activity"
+        case .weather: return "Current conditions and a five-day forecast"
         case .shelf: return "Files and clipboard items"
         case .timer: return "Pomodoro sessions"
         case .notes: return "A quick persistent scratchpad"
@@ -227,6 +231,7 @@ struct TopBarSlotConfigurationView: View {
     private func isVisible(_ tab: TopBarTab) -> Bool {
         switch tab {
         case .home:  return showHomeTab
+        case .weather: return showWeatherTab
         case .shelf: return showShelfTab && shelfEnabled
         case .timer: return showTimerTab
         case .notes: return showNotesTab
@@ -238,6 +243,7 @@ struct TopBarSlotConfigurationView: View {
     private func visibilityBinding(for tab: TopBarTab) -> Binding<Bool> {
         switch tab {
         case .home:  return $showHomeTab
+        case .weather: return $showWeatherTab
         case .shelf: return $showShelfTab
         case .timer: return $showTimerTab
         case .notes: return $showNotesTab

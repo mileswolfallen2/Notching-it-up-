@@ -11,6 +11,9 @@ struct HoverButton: View {
     var icon: String
     var iconColor: Color = .primary
     var scale: Image.Scale = .medium
+    var accessibilityLabel: String? = nil
+    var accessibilityHint: String? = nil
+    var accessibilityValue: String? = nil
     var action: () -> Void
     var contentTransition: ContentTransition = .symbolEffect;
     
@@ -37,10 +40,20 @@ struct HoverButton: View {
                 }
         }
         .buttonStyle(PlainButtonStyle())
+        .accessibilityLabel(Text(accessibilityLabel ?? fallbackLabel))
+        .accessibilityHint(Text(accessibilityHint ?? ""))
+        .accessibilityValue(Text(accessibilityValue ?? ""))
         .onHover { hovering in
-            withAnimation(.smooth(duration: 0.3)) {
+            withAnimation(BoringMotion.animation(.smooth(duration: 0.3))) {
                 isHovering = hovering
             }
         }
+    }
+
+    private var fallbackLabel: String {
+        let cleaned = icon
+            .replacingOccurrences(of: ".fill", with: "")
+            .replacingOccurrences(of: ".", with: " ")
+        return cleaned.prefix(1).uppercased() + String(cleaned.dropFirst())
     }
 }

@@ -54,7 +54,7 @@ class BatteryStatusViewModel: ObservableObject {
         switch event {
         case .powerSourceChanged(let isPluggedIn):
             print("🔌 Power source: \(isPluggedIn ? "Connected" : "Disconnected")")
-            withAnimation {
+            withAnimation(BoringMotion.animation(.default)) {
                 self.isPluggedIn = isPluggedIn
                 self.statusText = isPluggedIn ? "Plugged In" : "Unplugged"
                 self.notifyImportanChangeStatus()
@@ -62,14 +62,14 @@ class BatteryStatusViewModel: ObservableObject {
 
         case .batteryLevelChanged(let level):
             print("🔋 Battery level: \(Int(level))%")
-            withAnimation {
+            withAnimation(BoringMotion.animation(.default)) {
                 self.levelBattery = level
             }
 
         case .lowPowerModeChanged(let isEnabled):
             print("⚡ Low power mode: \(isEnabled ? "Enabled" : "Disabled")")
             self.notifyImportanChangeStatus()
-            withAnimation {
+            withAnimation(BoringMotion.animation(.default)) {
                 self.isInLowPowerMode = isEnabled
                 self.statusText = "Low Power: \(self.isInLowPowerMode ? "On" : "Off")"
             }
@@ -79,7 +79,7 @@ class BatteryStatusViewModel: ObservableObject {
             print("maxCapacity: \(self.maxCapacity)")
             print("levelBattery: \(self.levelBattery)")
             self.notifyImportanChangeStatus()
-            withAnimation {
+            withAnimation(BoringMotion.animation(.default)) {
                 self.isCharging = isCharging
                 self.statusText =
                     isCharging
@@ -89,13 +89,13 @@ class BatteryStatusViewModel: ObservableObject {
 
         case .timeToFullChargeChanged(let time):
             print("🕒 Time to full charge: \(time) minutes")
-            withAnimation {
+            withAnimation(BoringMotion.animation(.default)) {
                 self.timeToFullCharge = time
             }
 
         case .maxCapacityChanged(let capacity):
             print("🔋 Max capacity: \(capacity)")
-            withAnimation {
+            withAnimation(BoringMotion.animation(.default)) {
                 self.maxCapacity = capacity
             }
 
@@ -107,7 +107,7 @@ class BatteryStatusViewModel: ObservableObject {
     /// Updates the battery information with the given BatteryInfo instance
     /// - Parameter batteryInfo: The BatteryInfo instance containing the battery data
     private func updateBatteryInfo(_ batteryInfo: BatteryInfo) {
-        withAnimation {
+        withAnimation(BoringMotion.animation(.default)) {
             self.levelBattery = batteryInfo.currentCapacity
             self.isPluggedIn = batteryInfo.isPluggedIn
             self.isCharging = batteryInfo.isCharging

@@ -245,7 +245,9 @@ final class BluetoothActivityManager: ObservableObject {
         dismissTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(4))
             guard !Task.isCancelled else { return }
-            withAnimation(.spring(response: 0.34, dampingFraction: 0.86, blendDuration: 0)) {
+            withAnimation(
+                BoringMotion.animation(.spring(response: 0.34, dampingFraction: 0.86, blendDuration: 0))
+            ) {
                 self?.activity = nil
             }
         }

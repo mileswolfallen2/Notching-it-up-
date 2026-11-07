@@ -37,9 +37,24 @@ enum HideNotchOption: String, Defaults.Serializable {
     case never
 }
 
+enum WeatherTemperatureUnit: String, CaseIterable, Identifiable, Codable, Defaults.Serializable {
+    case celsius = "Celsius"
+    case fahrenheit = "Fahrenheit"
+
+    var id: String { rawValue }
+
+    var shortLabel: String {
+        switch self {
+        case .celsius: return "°C"
+        case .fahrenheit: return "°F"
+        }
+    }
+}
+
 // Define notification names at file scope
 extension Notification.Name {
     static let mediaControllerChanged = Notification.Name("mediaControllerChanged")
+    static let openWeatherSettings = Notification.Name("openWeatherSettings")
 }
 
 // Media controller types for selection in settings
@@ -72,6 +87,7 @@ enum OptionKeyAction: String, CaseIterable, Identifiable, Defaults.Serializable 
 /// Represents a configurable item in the top bar (header tab strip).
 enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializable {
     case home  = "home"
+    case weather = "weather"
     case shelf = "shelf"
     case timer = "timer"
     case notes = "notes"
@@ -83,6 +99,7 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
     var label: String {
         switch self {
         case .home:  return "Home"
+        case .weather: return "Weather"
         case .shelf: return "Shelf"
         case .timer: return "Timer"
         case .notes: return "Notes"
@@ -94,6 +111,7 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
     var iconName: String {
         switch self {
         case .home:  return "house.fill"
+        case .weather: return "cloud.sun.fill"
         case .shelf: return "tray.fill"
         case .timer: return "timer"
         case .notes: return "note.text"
@@ -105,6 +123,7 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
     var notchView: NotchViews {
         switch self {
         case .home:  return .home
+        case .weather: return .weather
         case .shelf: return .shelf
         case .timer: return .timer
         case .notes: return .notes
@@ -114,7 +133,7 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
     }
 
     /// Default ordered layout shown in the top bar.
-    static let defaultLayout: [TopBarTab] = [.home, .shelf, .timer, .ai, .notes, .devices]
+    static let defaultLayout: [TopBarTab] = [.home, .weather, .shelf, .timer, .ai, .notes, .devices]
 
     /// Returns the stored order with any missing tabs appended, then filters out
     /// tabs the user has hidden. This keeps existing installations working when
@@ -122,6 +141,7 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
     static func orderedVisibleTabs(
         slots: [TopBarTab],
         showHome: Bool,
+        showWeather: Bool,
         showShelf: Bool,
         showTimer: Bool,
         showNotes: Bool,
@@ -136,6 +156,7 @@ enum TopBarTab: String, CaseIterable, Codable, Identifiable, Defaults.Serializab
         return ordered.filter { tab in
             switch tab {
             case .home:  return showHome
+            case .weather: return showWeather
             case .shelf: return showShelf && shelfEnabled
             case .timer: return showTimer
             case .notes: return showNotes
@@ -428,10 +449,20 @@ extension Defaults.Keys {
     static let timerAutoStartWork = Key<Bool>("timerAutoStartWork", default: false)
     static let timerShowInClosedNotch = Key<Bool>("timerShowInClosedNotch", default: true)
     static let showHomeTab = Key<Bool>("showHomeTab", default: true)
+    static let showWeatherTab = Key<Bool>("showWeatherTab", default: true)
     static let showShelfTab = Key<Bool>("showShelfTab", default: true)
     static let showTimerTab = Key<Bool>("showTimerTab", default: false)
     static let showNotesTab = Key<Bool>("showNotesTab", default: false)
     static let notesText = Key<String>("notesText", default: "")
+    // MARK: Weather
+    static let weatherLocation = Key<String>("weatherLocation", default: "Cupertino")
+    static let weatherTemperatureUnit = Key<WeatherTemperatureUnit>(
+        "weatherTemperatureUnit",
+        default: .celsius
+    )
+    // MARK: Accessibility
+    static let followSystemReduceMotion = Key<Bool>("followSystemReduceMotion", default: true)
+    static let reduceMotion = Key<Bool>("reduceMotion", default: false)
     // MARK: Appearance
     static let showEmojis = Key<Bool>("showEmojis", default: false)
     //static let alwaysShowTabs = Key<Bool>("alwaysShowTabs", default: true)

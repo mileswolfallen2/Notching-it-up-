@@ -100,7 +100,7 @@ class AudioSpectrum: NSView {
     
     func setPlaying(_ playing: Bool) {
         isPlaying = playing
-        if isPlaying {
+        if isPlaying && !BoringMotion.shouldReduceMotion {
             startAnimating()
         } else {
             stopAnimating()
@@ -110,15 +110,16 @@ class AudioSpectrum: NSView {
 
 struct AudioSpectrumView: NSViewRepresentable {
     @Binding var isPlaying: Bool
+    var reduceMotion: Bool = BoringMotion.shouldReduceMotion
     
     func makeNSView(context: Context) -> AudioSpectrum {
         let spectrum = AudioSpectrum()
-        spectrum.setPlaying(isPlaying)
+        spectrum.setPlaying(isPlaying && !reduceMotion)
         return spectrum
     }
     
     func updateNSView(_ nsView: AudioSpectrum, context: Context) {
-        nsView.setPlaying(isPlaying)
+        nsView.setPlaying(isPlaying && !reduceMotion)
     }
 }
 

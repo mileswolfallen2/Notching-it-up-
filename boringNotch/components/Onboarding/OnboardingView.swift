@@ -37,7 +37,7 @@ struct OnboardingView: View {
             switch step {
             case .welcome:
                 WelcomeView {
-                    withAnimation(.easeInOut(duration: 0.6)) {
+                    withAnimation(BoringMotion.animation(.easeInOut(duration: 0.6))) {
                         step = .featureSelection
                     }
                 }
@@ -46,7 +46,7 @@ struct OnboardingView: View {
             case .featureSelection:
                 FeatureSelectionView { openAISettings in
                     shouldOpenAISettings = openAISettings
-                    withAnimation(.easeInOut(duration: 0.6)) {
+                    withAnimation(BoringMotion.animation(.easeInOut(duration: 0.6))) {
                         step = .permissionsGuide
                     }
                 }
@@ -54,7 +54,7 @@ struct OnboardingView: View {
 
             case .permissionsGuide:
                 PermissionsGuideView {
-                    withAnimation(.easeInOut(duration: 0.6)) {
+                    withAnimation(BoringMotion.animation(.easeInOut(duration: 0.6))) {
                         step = .cameraPermission
                     }
                 }
@@ -69,13 +69,13 @@ struct OnboardingView: View {
                     onAllow: {
                         Task {
                             await requestCameraPermission()
-                            withAnimation(.easeInOut(duration: 0.6)) {
+                            withAnimation(BoringMotion.animation(.easeInOut(duration: 0.6))) {
                                 step = .calendarPermission
                             }
                         }
                     },
                     onSkip: {
-                        withAnimation(.easeInOut(duration: 0.6)) {
+                        withAnimation(BoringMotion.animation(.easeInOut(duration: 0.6))) {
                             step = .calendarPermission
                         }
                     }
@@ -91,13 +91,13 @@ struct OnboardingView: View {
                     onAllow: {
                         Task {
                                 await requestCalendarPermission()
-                                withAnimation(.easeInOut(duration: 0.6)) {
+                                withAnimation(BoringMotion.animation(.easeInOut(duration: 0.6))) {
                                     step = .remindersPermission
                                 }
                         }
                     },
                     onSkip: {
-                            withAnimation(.easeInOut(duration: 0.6)) {
+                            withAnimation(BoringMotion.animation(.easeInOut(duration: 0.6))) {
                                 step = .remindersPermission
                             }
                     }
@@ -113,13 +113,13 @@ struct OnboardingView: View {
                         onAllow: {
                             Task {
                                 await requestRemindersPermission()
-                                withAnimation(.easeInOut(duration: 0.6)) {
+                                withAnimation(BoringMotion.animation(.easeInOut(duration: 0.6))) {
                                     step = .bluetoothPermission
                                 }
                             }
                         },
                         onSkip: {
-                            withAnimation(.easeInOut(duration: 0.6)) {
+                            withAnimation(BoringMotion.animation(.easeInOut(duration: 0.6))) {
                                 step = .bluetoothPermission
                             }
                         }
@@ -135,13 +135,13 @@ struct OnboardingView: View {
                     onAllow: {
                         Task {
                             await requestBluetoothPermission()
-                            withAnimation(.easeInOut(duration: 0.6)) {
+                            withAnimation(BoringMotion.animation(.easeInOut(duration: 0.6))) {
                                 step = .accessibilityPermission
                             }
                         }
                     },
                     onSkip: {
-                        withAnimation(.easeInOut(duration: 0.6)) {
+                        withAnimation(BoringMotion.animation(.easeInOut(duration: 0.6))) {
                             step = .accessibilityPermission
                         }
                     }
@@ -157,13 +157,13 @@ struct OnboardingView: View {
                     onAllow: {
                         Task {
                             await requestAccessibilityPermission()
-                            withAnimation(.easeInOut(duration: 0.6)) {
+                            withAnimation(BoringMotion.animation(.easeInOut(duration: 0.6))) {
                                 step = .musicPermission
                             }
                         }
                     },
                     onSkip: {
-                        withAnimation(.easeInOut(duration: 0.6)) {
+                        withAnimation(BoringMotion.animation(.easeInOut(duration: 0.6))) {
                             step = .musicPermission
                         }
                     }
@@ -173,7 +173,7 @@ struct OnboardingView: View {
             case .musicPermission:
                 MusicControllerSelectionView(
                     onContinue: {
-                        withAnimation(.easeInOut(duration: 0.6)) {
+                        withAnimation(BoringMotion.animation(.easeInOut(duration: 0.6))) {
                             BoringViewCoordinator.shared.firstLaunch = false
                             step = .finished
                         }
@@ -220,6 +220,7 @@ private struct FeatureSelectionView: View {
     let onContinue: (_ shouldOpenAISettings: Bool) -> Void
 
     @State private var showHomeTab = Defaults[.showHomeTab]
+    @State private var showWeatherTab = Defaults[.showWeatherTab]
     @State private var showShelfTab = Defaults[.showShelfTab]
     @State private var showTimerTab = Defaults[.showTimerTab]
     @State private var showNotesTab = Defaults[.showNotesTab]
@@ -227,7 +228,7 @@ private struct FeatureSelectionView: View {
     @State private var showDevicesTab = Defaults[.showDevicesTab]
 
     private var hasSelection: Bool {
-        showHomeTab || showShelfTab || showTimerTab || showNotesTab || showAITab || showDevicesTab
+        showHomeTab || showWeatherTab || showShelfTab || showTimerTab || showNotesTab || showAITab || showDevicesTab
     }
 
     var body: some View {
@@ -245,6 +246,7 @@ private struct FeatureSelectionView: View {
             ScrollView {
                 VStack(spacing: 10) {
                     featureToggle("Home", icon: "house.fill", isOn: $showHomeTab)
+                    featureToggle("Weather", icon: "cloud.sun.fill", isOn: $showWeatherTab)
                     featureToggle("Files", icon: "tray.fill", isOn: $showShelfTab)
                     featureToggle("Timer", icon: "timer", isOn: $showTimerTab)
                     featureToggle("Notes", icon: "note.text", isOn: $showNotesTab)
@@ -256,6 +258,7 @@ private struct FeatureSelectionView: View {
 
             Button("Continue") {
                 Defaults[.showHomeTab] = showHomeTab
+                Defaults[.showWeatherTab] = showWeatherTab
                 Defaults[.showShelfTab] = showShelfTab
                 Defaults[.showTimerTab] = showTimerTab
                 Defaults[.showNotesTab] = showNotesTab

@@ -7,6 +7,7 @@
 import SwiftUI
 
 struct MinimalFaceFeatures: View {
+    @ObservedObject private var motion = MotionPreferences.shared
     @State private var isBlinking = false
     @State private var blinkTimer: Timer?
     @State var height:CGFloat = 20;
@@ -42,22 +43,33 @@ struct MinimalFaceFeatures: View {
         }
         .frame(width: self.width, height: self.height) // Maximum size of face
         .onAppear {
-            startBlinking()
+            if !motion.shouldReduceMotion {
+                startBlinking()
+            }
         }
         .onDisappear {
             stopBlinking()
+        }
+        .onChange(of: motion.shouldReduceMotion) { _, reduceMotion in
+            if reduceMotion {
+                stopBlinking()
+                isBlinking = false
+            } else {
+                startBlinking()
+            }
         }
     }
     
     private func startBlinking() {
         stopBlinking()
+        guard !motion.shouldReduceMotion else { return }
 
         let timer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { _ in
-            withAnimation(.spring(duration: 0.2)) {
+            withAnimation(BoringMotion.animation(.spring(duration: 0.2))) {
                 isBlinking = true
             }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                withAnimation(.spring(duration: 0.2)) {
+                withAnimation(BoringMotion.animation(.spring(duration: 0.2))) {
                     isBlinking = false
                 }
             }
@@ -80,7 +92,7 @@ struct Eye: View {
             .fill(Color.white)
             .frame(width: 4, height: isBlinking ? 1 : 4)
             .frame(maxWidth: 15, maxHeight: 15) // Adjusted max size
-            .animation(.easeInOut(duration: 0.1), value: isBlinking)
+            .animation(BoringMotion.animation(.easeInOut(duration: 0.1)), value: isBlinking)
     }
 }
 

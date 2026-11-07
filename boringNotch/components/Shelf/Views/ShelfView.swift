@@ -17,6 +17,7 @@ struct ShelfView: View {
     @ObservedObject var coordinator = BoringViewCoordinator.shared
     @Default(.enableClipboardHistory) var enableClipboardHistory
     @Default(.showHomeTab) private var showHomeTab
+    @Default(.showWeatherTab) private var showWeatherTab
     @Default(.showShelfTab) private var showShelfTab
     @Default(.showTimerTab) private var showTimerTab
     @Default(.showNotesTab) private var showNotesTab
@@ -27,11 +28,12 @@ struct ShelfView: View {
     private let spacing: CGFloat = 8
     @State private var clipboardItems: [ClipboardItem] = []
     @State private var clipboardTimer: Timer?
-    
+
     private var visibleTabs: [NotchViews] {
         TopBarTab.orderedVisibleTabs(
             slots: topBarSlots,
             showHome: showHomeTab,
+            showWeather: showWeatherTab,
             showShelf: showShelfTab,
             showTimer: showTimerTab,
             showNotes: showNotesTab,
@@ -41,15 +43,9 @@ struct ShelfView: View {
         )
         .map(\.notchView)
     }
-    
+
     func switchTab(by offset: Int) {
-        guard let currentIndex = visibleTabs.firstIndex(of: coordinator.currentView) else { return }
-        let newIndex = currentIndex + offset
-        if newIndex >= 0 && newIndex < visibleTabs.count {
-            withAnimation(.smooth) {
-                coordinator.currentView = visibleTabs[newIndex]
-            }
-        }
+        coordinator.switchTab(by: offset)
     }
 
     var body: some View {

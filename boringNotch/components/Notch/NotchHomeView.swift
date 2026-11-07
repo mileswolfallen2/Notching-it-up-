@@ -303,7 +303,10 @@ struct MusicControlsView: View {
             .frame(height: 36)
             .id(musicManager.songTitle)
             .transition(.opacity.combined(with: .scale(scale: 0.98)))
-            .animation(.spring(response: 0.35, dampingFraction: 0.8), value: musicManager.songTitle)
+            .animation(
+                BoringMotion.animation(.spring(response: 0.35, dampingFraction: 0.8)),
+                value: musicManager.songTitle
+            )
         }
     }
 
@@ -338,23 +341,52 @@ struct MusicControlsView: View {
     private func slotView(for slot: MusicControlButton) -> some View {
         switch slot {
         case .shuffle:
-            HoverButton(icon: "shuffle", iconColor: musicManager.isShuffled ? .red : .primary, scale: .medium) {
+            HoverButton(
+                icon: "shuffle",
+                iconColor: musicManager.isShuffled ? .red : .primary,
+                scale: .medium,
+                accessibilityLabel: "Shuffle",
+                accessibilityHint: "Toggles shuffle playback",
+                accessibilityValue: musicManager.isShuffled ? "On" : "Off"
+            ) {
                 MusicManager.shared.toggleShuffle()
             }
         case .previous:
-            HoverButton(icon: "backward.fill", scale: .medium) {
+            HoverButton(
+                icon: "backward.fill",
+                scale: .medium,
+                accessibilityLabel: "Previous track",
+                accessibilityHint: "Skips to the previous track"
+            ) {
                 MusicManager.shared.previousTrack()
             }
         case .playPause:
-            HoverButton(icon: musicManager.isPlaying ? "pause.fill" : "play.fill", scale: .large) {
+            HoverButton(
+                icon: musicManager.isPlaying ? "pause.fill" : "play.fill",
+                scale: .large,
+                accessibilityLabel: musicManager.isPlaying ? "Pause" : "Play",
+                accessibilityHint: "Controls playback"
+            ) {
                 MusicManager.shared.togglePlay()
             }
         case .next:
-            HoverButton(icon: "forward.fill", scale: .medium) {
+            HoverButton(
+                icon: "forward.fill",
+                scale: .medium,
+                accessibilityLabel: "Next track",
+                accessibilityHint: "Skips to the next track"
+            ) {
                 MusicManager.shared.nextTrack()
             }
         case .repeatMode:
-            HoverButton(icon: repeatIcon, iconColor: repeatIconColor, scale: .medium) {
+            HoverButton(
+                icon: repeatIcon,
+                iconColor: repeatIconColor,
+                scale: .medium,
+                accessibilityLabel: "Repeat",
+                accessibilityHint: "Cycles repeat mode",
+                accessibilityValue: repeatModeDescription
+            ) {
                 MusicManager.shared.toggleRepeat()
             }
         case .volume:
@@ -362,15 +394,33 @@ struct MusicControlsView: View {
         case .favorite:
             FavoriteControlButton()
         case .goBackward:
-            HoverButton(icon: "gobackward.15", scale: .medium) {
+            HoverButton(
+                icon: "gobackward.15",
+                scale: .medium,
+                accessibilityLabel: "Skip back 15 seconds",
+                accessibilityHint: "Moves playback back 15 seconds"
+            ) {
                 MusicManager.shared.skip(seconds: -15)
             }
         case .goForward:
-            HoverButton(icon: "goforward.15", scale: .medium) {
+            HoverButton(
+                icon: "goforward.15",
+                scale: .medium,
+                accessibilityLabel: "Skip forward 15 seconds",
+                accessibilityHint: "Moves playback forward 15 seconds"
+            ) {
                 MusicManager.shared.skip(seconds: 15)
             }
         case .none:
             Color.clear.frame(height: 1)
+        }
+    }
+
+    private var repeatModeDescription: String {
+        switch musicManager.repeatMode {
+        case .off: return "Off"
+        case .all: return "All"
+        case .one: return "One"
         }
     }
 
@@ -399,7 +449,14 @@ struct FavoriteControlButton: View {
     @ObservedObject var musicManager = MusicManager.shared
 
     var body: some View {
-        HoverButton(icon: iconName, iconColor: iconColor, scale: .medium) {
+        HoverButton(
+            icon: iconName,
+            iconColor: iconColor,
+            scale: .medium,
+            accessibilityLabel: musicManager.isFavoriteTrack ? "Remove from favorites" : "Add to favorites",
+            accessibilityHint: "Updates the favorite status of the current track",
+            accessibilityValue: musicManager.isFavoriteTrack ? "Favorited" : "Not favorited"
+        ) {
             MusicManager.shared.toggleFavoriteTrack()
         }
         .disabled(!musicManager.canFavoriteTrack)
@@ -436,7 +493,7 @@ struct VolumeControlView: View {
         HStack(spacing: 4) {
             Button(action: {
                 if musicManager.volumeControlSupported {
-                    withAnimation(.easeInOut(duration: 0.12)) {
+                    withAnimation(BoringMotion.animation(.easeInOut(duration: 0.12))) {
                         showVolumeSlider.toggle()
                     }
                 }
@@ -448,6 +505,12 @@ struct VolumeControlView: View {
             .buttonStyle(PlainButtonStyle())
             .disabled(!musicManager.volumeControlSupported)
             .frame(width: 24)
+            .accessibilityLabel(showVolumeSlider ? "Hide volume slider" : "Show volume slider")
+            .accessibilityHint(
+                musicManager.volumeControlSupported
+                    ? "Shows controls for the current player's volume"
+                    : "The current player does not support volume control"
+            )
 
             if showVolumeSlider && musicManager.volumeControlSupported {
                 CustomSlider(
@@ -469,6 +532,23 @@ struct VolumeControlView: View {
                 )
                 .frame(width: 48, height: 8)
                 .transition(.scale.combined(with: .opacity))
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Volume")
+                .accessibilityValue("\(Int((volumeSliderValue * 100).rounded())) percent")
+                .accessibilityAdjustableAction { direction in
+                    let step = 0.05
+                    let newValue: Double
+                    switch direction {
+                    case .increment:
+                        newValue = min(1, volumeSliderValue + step)
+                    case .decrement:
+                        newValue = max(0, volumeSliderValue - step)
+                    @unknown default:
+                        return
+                    }
+                    volumeSliderValue = newValue
+                    MusicManager.shared.setVolume(to: newValue)
+                }
             }
         }
         .clipped()
@@ -479,7 +559,7 @@ struct VolumeControlView: View {
         }
         .onReceive(musicManager.$volumeControlSupported) { supported in
             if !supported {
-                withAnimation(.easeInOut(duration: 0.2)) {
+                withAnimation(BoringMotion.animation(.easeInOut(duration: 0.2))) {
                     showVolumeSlider = false
                 }
             }
@@ -555,7 +635,12 @@ struct NotchHomeView: View {
                     .scaledToFit()
                     .opacity(vm.notchState == .closed ? 0 : 1)
                     .blur(radius: vm.notchState == .closed ? 20 : 0)
-                    .animation(.interactiveSpring(response: 0.32, dampingFraction: 0.76, blendDuration: 0), value: shouldShowCamera)
+                    .animation(
+                        BoringMotion.animation(
+                            .interactiveSpring(response: 0.32, dampingFraction: 0.76, blendDuration: 0)
+                        ),
+                        value: shouldShowCamera
+                    )
             }
         }
         .transition(.asymmetric(insertion: .opacity.combined(with: .move(edge: .top)), removal: .opacity))
@@ -656,7 +741,7 @@ struct CustomSlider: View {
             .gesture(
                 DragGesture(minimumDistance: 0)
                     .onChanged { gesture in
-                        withAnimation {
+                        withAnimation(BoringMotion.animation(.default)) {
                             dragging = true
                         }
                         let newValue = range.lowerBound + Double(gesture.location.x / width) * rangeSpan
@@ -669,7 +754,10 @@ struct CustomSlider: View {
                         lastDragged = Date()
                     }
             )
-            .animation(.spring(response: 0.35, dampingFraction: 0.7), value: dragging)
+            .animation(
+                BoringMotion.animation(.spring(response: 0.35, dampingFraction: 0.7)),
+                value: dragging
+            )
         }
     }
 }
@@ -693,6 +781,8 @@ struct PomodoroTimerView: View {
                 .tint(.effectiveAccent)
                 .clipShape(RoundedRectangle(cornerRadius: 3))
                 .frame(maxWidth: 200)
+                .accessibilityLabel("Pomodoro progress")
+                .accessibilityValue("\(Int((timer.progress * 100).rounded())) percent")
 
             HStack(spacing: 4) {
                 Button(timer.isRunning ? "Pause" : "Start") {
@@ -700,12 +790,14 @@ struct PomodoroTimerView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .controlSize(.mini)
+                .accessibilityHint("Starts or pauses the current Pomodoro phase")
 
                 Button("Reset") {
                     timer.reset()
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.mini)
+                .accessibilityHint("Resets the current phase")
 
                 Button {
                     timer.skipPhase()
@@ -715,11 +807,14 @@ struct PomodoroTimerView: View {
                 .buttonStyle(.bordered)
                 .controlSize(.mini)
                 .help("Skip phase")
+                .accessibilityLabel("Skip phase")
+                .accessibilityHint("Moves to the next Pomodoro phase")
             }
 
             Text("Sessions: \(timer.completedWorkSessions)")
                 .font(.caption2)
                 .foregroundStyle(.secondary)
+                .accessibilityLabel("\(timer.completedWorkSessions) completed work sessions")
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 6)
@@ -752,7 +847,7 @@ struct NotchNotesView: View {
             NotchPanelHeader(icon: "note.text", title: "Notes", detail: detail) {
                 if !notes.isEmpty {
                     Button {
-                        withAnimation(.easeOut(duration: 0.15)) {
+                        withAnimation(BoringMotion.animation(.easeOut(duration: 0.15))) {
                             notes = ""
                         }
                     } label: {
@@ -764,6 +859,8 @@ struct NotchNotesView: View {
                     }
                     .buttonStyle(.plain)
                     .help("Clear notes")
+                    .accessibilityLabel("Clear notes")
+                    .accessibilityHint("Deletes the saved note")
                     .transition(.opacity)
                 }
             }
@@ -786,6 +883,8 @@ struct NotchNotesView: View {
                     .focused($isFocused)
                     .padding(.horizontal, 4)
                     .padding(.vertical, 3)
+                    .accessibilityLabel("Quick notes")
+                    .accessibilityHint("Type a note. Changes are saved automatically.")
             }
             .background(
                 RoundedRectangle(cornerRadius: NotchPanelStyle.cornerRadius, style: .continuous)
@@ -800,7 +899,7 @@ struct NotchNotesView: View {
             )
             .contentShape(Rectangle())
             .simultaneousGesture(TapGesture().onEnded { isFocused = true })
-            .animation(.easeOut(duration: 0.18), value: isFocused)
+            .animation(BoringMotion.animation(.easeOut(duration: 0.18)), value: isFocused)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .padding(.horizontal, 3)

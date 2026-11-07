@@ -17,6 +17,7 @@ import SwiftUIIntrospect
 struct ContentView: View {
     @EnvironmentObject var vm: BoringViewModel
     @ObservedObject var webcamManager = WebcamManager.shared
+    @StateObject private var motion = MotionPreferences.shared
 
     @ObservedObject var coordinator = BoringViewCoordinator.shared
     @ObservedObject var musicManager = MusicManager.shared
@@ -43,8 +44,14 @@ struct ContentView: View {
 
     @Default(.showNotHumanFace) var showNotHumanFace
 
-    // Shared interactive spring for movement/resizing to avoid conflicting animations
-    private let animationSpring = Animation.interactiveSpring(response: 0.38, dampingFraction: 0.8, blendDuration: 0)
+    // Shared interactive spring for movement/resizing to avoid conflicting animations.
+    // Reduced Motion replaces it with no animation so the notch still works but
+    // does not bounce or slide.
+    private var animationSpring: Animation? {
+        BoringMotion.shouldReduceMotion
+            ? nil
+            : .interactiveSpring(response: 0.38, dampingFraction: 0.8, blendDuration: 0)
+    }
 
     private let extendedHoverPadding: CGFloat = 30
     private let zeroHeightHoverPadding: CGFloat = 10
@@ -118,6 +125,10 @@ struct ContentView: View {
                         : cornerRadiusInsets.closed.bottom
                     )
                     .padding([.horizontal, .bottom], vm.notchState == .open ? 12 : 0)
+                    .frame(
+                        height: vm.notchState == .open ? vm.notchSize.height : nil,
+                        alignment: .top
+                    )
                     .background(.black)
                     .clipShape(currentNotchShape)
                     .overlay(alignment: .top) {
@@ -136,16 +147,28 @@ struct ContentView: View {
                     )
                 
                 mainLayout
-                    .frame(height: vm.notchState == .open ? vm.notchSize.height : nil)
                     .conditionalModifier(true) { view in
-                        let openAnimation = Animation.spring(response: 0.42, dampingFraction: 0.8, blendDuration: 0)
-                        let closeAnimation = Animation.spring(response: 0.45, dampingFraction: 1.0, blendDuration: 0)
-                        
+                        let openAnimation: Animation? = BoringMotion.shouldReduceMotion
+                            ? nil
+                            : .spring(response: 0.42, dampingFraction: 0.8, blendDuration: 0)
+                        let closeAnimation: Animation? = BoringMotion.shouldReduceMotion
+                            ? nil
+                            : .spring(response: 0.45, dampingFraction: 1.0, blendDuration: 0)
+
                         return view
                             .animation(vm.notchState == .open ? openAnimation : closeAnimation, value: vm.notchState)
-                            .animation(.smooth, value: gestureProgress)
+                            .animation(BoringMotion.animation(.smooth), value: gestureProgress)
                     }
                     .contentShape(Rectangle())
+                    .focusable()
+                    .focusEffectDisabled()
+                    .onKeyPress(.escape) {
+                        guard vm.notchState == .open else { return .ignored }
+                        vm.close()
+                        return .handled
+                    }
+                    .accessibilityElement(children: .contain)
+                    .accessibilityLabel("Notch controls")
                     .onHover { hovering in
                         handleHover(hovering)
                     }
@@ -180,12 +203,12 @@ struct ContentView: View {
                     }
                     .onChange(of: vm.notchState) { _, newState in
                         if newState == .open && isHoveringMusicVisualizer {
-                            withAnimation(.smooth(duration: 0.16)) {
+                            withAnimation(BoringMotion.animation(.smooth(duration: 0.16))) {
                                 isHoveringMusicVisualizer = false
                             }
                         }
                         if newState == .closed && isHovering {
-                            withAnimation {
+                            withAnimation(BoringMotion.animation(.default)) {
                                 isHovering = false
                             }
                         }
@@ -223,9 +246,11 @@ struct ContentView: View {
                         .fill(Color.black.opacity(0.01))
                         .frame(width: computedChinWidth, height: vm.chinHeight)
                         .animation(
-                            Defaults[.bluetoothConnectionAnimationEnabled]
-                                ? .spring(response: 0.36, dampingFraction: 0.66, blendDuration: 0)
-                                : .smooth(duration: 0.2),
+                            BoringMotion.animation(
+                                Defaults[.bluetoothConnectionAnimationEnabled]
+                                    ? .spring(response: 0.36, dampingFraction: 0.66, blendDuration: 0)
+                                    : .smooth(duration: 0.2)
+                            ),
                             value: bluetoothManager.activity != nil
                         )
                 }
@@ -239,9 +264,14 @@ struct ContentView: View {
             y: gestureScale,
             anchor: .top
         )
-        .animation(.smooth, value: gestureProgress)
+        .animation(BoringMotion.animation(.smooth), value: gestureProgress)
         .background(dragDetector)
         .preferredColorScheme(.dark)
+        .transaction { transaction in
+            guard motion.shouldReduceMotion else { return }
+            transaction.animation = nil
+            transaction.disablesAnimations = true
+        }
         .environmentObject(vm)
         .onChange(of: vm.anyDropZoneTargeting) { _, isTargeted in
             anyDropDebounceTask?.cancel()
@@ -410,9 +440,11 @@ struct ContentView: View {
                       .fixedSize()
               }
               .animation(
-                  Defaults[.bluetoothConnectionAnimationEnabled]
-                      ? .spring(response: 0.36, dampingFraction: 0.66, blendDuration: 0)
-                      : .smooth(duration: 0.2),
+                  BoringMotion.animation(
+                      Defaults[.bluetoothConnectionAnimationEnabled]
+                          ? .spring(response: 0.36, dampingFraction: 0.66, blendDuration: 0)
+                          : .smooth(duration: 0.2)
+                  ),
                   value: bluetoothManager.activity != nil
               )
               .zIndex(2)
@@ -421,6 +453,8 @@ struct ContentView: View {
                     switch coordinator.currentView {
                     case .home:
                         NotchHomeView(albumArtNamespace: albumArtNamespace)
+                    case .weather:
+                        WeatherView()
                     case .shelf:
                         ShelfView()
                     case .timer:
@@ -548,7 +582,7 @@ struct ContentView: View {
             }
             .contentShape(Rectangle())
             .onHover { hovering in
-                withAnimation(.smooth(duration: 0.16)) {
+                withAnimation(BoringMotion.animation(.smooth(duration: 0.16))) {
                     isHoveringMusicVisualizer = hovering
                 }
 
@@ -558,7 +592,7 @@ struct ContentView: View {
                     scheduleHoverOpenIfNeeded()
                 }
             }
-            .animation(.smooth(duration: 0.2), value: musicManager.isPlaying)
+            .animation(BoringMotion.animation(.smooth(duration: 0.2)), value: musicManager.isPlaying)
         }
         .overlay(alignment: .bottom) {
             if showMusicProgressBar && musicManager.songDuration > 0 {
@@ -850,7 +884,10 @@ struct BluetoothLiveActivityView: View {
                 .symbolEffect(.bounce, value: activity.connected)
         }
         .frame(height: vm.effectiveClosedNotchHeight, alignment: .center)
-        .animation(.spring(response: 0.32, dampingFraction: 0.78), value: activity)
+        .animation(
+            BoringMotion.animation(.spring(response: 0.32, dampingFraction: 0.78)),
+            value: activity
+        )
     }
 }
 

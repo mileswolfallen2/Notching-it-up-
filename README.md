@@ -26,7 +26,8 @@ I believe the core app should come first. It should be fast, polished, useful, c
 ## Features
 
 - **Music Control** - Control Apple Music, Spotify, and other media apps right from the notch with album art, playback controls, and lyrics
-- **Calendar & Reminders** - View upcoming events and reminders in one place
+- **Calendar & Reminders** - View upcoming events and reminders in one place, with one-click Join for supported meeting links
+- **Weather** - Check current conditions and a five-day forecast for a city you choose, in Celsius or Fahrenheit, powered by Open-Meteo without an API key or location permission
 - **File Shelf** - Drag and drop files for quick AirDrop or temporary storage
 - **HUD Replacement** - Replace macOS volume, brightness, and keyboard backlight HUDs with sleek notch overlays (enabled by default)
 - **Camera Mirror** - Quick mirror view right from the notch
@@ -36,6 +37,7 @@ I believe the core app should come first. It should be fast, polished, useful, c
 - **Customizable** - Tweak the notch to fit your needs with gestures, sizing, and more
 - **Configurable layout** - Choose which tabs appear in the open notch and arrange them to fit your workflow
 - **Keyboard shortcuts** - Open the notch, trigger sneak peek, and access supported panels without reaching for the mouse
+- **Accessibility** - Follow macOS Reduce Motion or opt into reduced motion, with VoiceOver labels and keyboard navigation across the notch
 - **Advanced Options** - Keep the default settings simple, with advanced controls available when you need them
 
 ## Project status
@@ -172,10 +174,10 @@ For a full list of licenses and attributions, see [Third-Party Licenses](./THIRD
 ## Roadmap
 
 ### Near term: polish and reliability
-- [ ] **First-run permissions guide** - Explain calendar, media, accessibility, and notification permissions when each feature is enabled
+- [x] **First-run permissions guide** - Explain calendar, media, accessibility, and notification permissions when each feature is enabled
 - [ ] **Improved empty states** - Add clear setup guidance when no media, events, files, or AI accounts are available
 - [ ] **Remember user context** - Restore the last selected tab and panel state after relaunch
-- [ ] **Reduced motion and accessibility options** - Respect macOS motion preferences and improve VoiceOver labels and keyboard navigation
+- [x] **Reduced motion and accessibility options** - Respect macOS motion preferences and improve VoiceOver labels and keyboard navigation
 - [ ] **Performance pass** - Reduce unnecessary updates while the notch is closed and improve energy usage over long sessions
 - [ ] **Error and diagnostics view** - Make integration failures actionable without requiring users to inspect logs
 - [ ] **Release quality checklist** - Add regression coverage for updater, permissions, media controls, and shelf workflows
@@ -192,15 +194,15 @@ For a full list of licenses and attributions, see [Third-Party Licenses](./THIRD
 ### Medium effort: daily workflows
 - [ ] **Clipboard history in the Shelf** - Store copied text/images and drag/paste from the shelf
 - [ ] **Quick toggles panel** - Control Center lite for WiFi, Bluetooth, Do Not Disturb, AirDrop, etc.
-- [ ] **Calendar glance** - Show next upcoming event with "Join" button for Zoom/Meet/Teams links
+- [x] **Calendar glance** - Show next upcoming event with "Join" button for Zoom/Meet/Teams links
 - [ ] **Karaoke style lyrics** - Highlight individual words as they're sung (where timing data available)
-- [ ] **Timer/Pomodoro** - Compact timer that can live in the notch or open panel
+- [x] **Timer/Pomodoro** - Compact timer that can live in the notch or open panel
 - [ ] **Shelf collections** - Pin, label, reorder, and expire shelf items without losing useful files
 - [ ] **Notification summaries** - Show a compact, user-controlled summary of recent notifications
 - [ ] **More media integrations** - Improve parity across Apple Music, Spotify, YouTube Music, and browser playback
 - [ ] **Shortcuts integration** - Expose notch actions to macOS Shortcuts and support automation triggers
 - [ ] **AI provider expansion** - Add more providers and clearer account-health and reset-time details to the usage dashboard
-- [ ]  Weather integration ⛅️
+- [x]  Weather integration
 - [ ]  Lock Screen Widgets 🔒
 - [ ]  Extension system 🧩
 - [ ]  Notifications (under consideration) 🔔
@@ -228,5 +230,9 @@ For a full list of licenses and attributions, see [Third-Party Licenses](./THIRD
 - [x] **Pomodoro timer foundation** - Configure work, short-break, and long-break durations
 - [x] **Quick notes tab** - Keep a persistent scratchpad in the notch
 - [x] **AI usage dashboard** - Live account sync for supported providers, manual fallback, reset countdowns, and low-usage alerts
+- [x] **Weather tab** - Manual city lookup, current conditions, five-day forecast, Celsius or Fahrenheit, and Open-Meteo attribution
+- [x] **Reduced motion and VoiceOver support** - Follow macOS Reduce Motion, opt into reduced motion, and use accessible labels and keyboard navigation across the notch
+- [x] **Developer Motion tab** - Preview every app animation with and without reduced motion
+- [x] **Calendar Join button** - Open Zoom, Google Meet, Microsoft Teams, Webex, Whereby, and Jitsi links 15 minutes before an event
 - [x] Customizable Layout options 🛠️
 - [x]  Bluetooth device activity and Devices tab (connected headphones/speakers with battery status when reported by macOS)

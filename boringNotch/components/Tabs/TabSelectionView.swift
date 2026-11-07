@@ -18,6 +18,7 @@ struct TabModel: Identifiable {
 struct TabSelectionView: View {
     @ObservedObject var coordinator = BoringViewCoordinator.shared
     @Default(.showHomeTab) private var showHomeTab
+    @Default(.showWeatherTab) private var showWeatherTab
     @Default(.showShelfTab) private var showShelfTab
     @Default(.showTimerTab) private var showTimerTab
     @Default(.showNotesTab) private var showNotesTab
@@ -32,6 +33,7 @@ struct TabSelectionView: View {
         TopBarTab.orderedVisibleTabs(
             slots: topBarSlots,
             showHome: showHomeTab,
+            showWeather: showWeatherTab,
             showShelf: showShelfTab,
             showTimer: showTimerTab,
             showNotes: showNotesTab,
@@ -58,13 +60,7 @@ struct TabSelectionView: View {
     }
 
     func switchTab(by offset: Int) {
-        guard let currentIndex = visibleTabs.firstIndex(where: { $0.view == coordinator.currentView }) else { return }
-        let newIndex = currentIndex + offset
-        if newIndex >= 0 && newIndex < visibleTabs.count {
-            withAnimation(.smooth) {
-                coordinator.currentView = visibleTabs[newIndex].view
-            }
-        }
+        coordinator.switchTab(by: offset)
     }
 
     var body: some View {
@@ -75,7 +71,7 @@ struct TabSelectionView: View {
                 HStack(spacing: 0) {
                     ForEach(visibleTabs) { tab in
                         TabButton(label: tab.label, icon: tab.icon, selected: coordinator.currentView == tab.view, horizontalPadding: tabButtonPadding) {
-                            withAnimation(.smooth) {
+                            withAnimation(BoringMotion.animation(.smooth)) {
                                 coordinator.currentView = tab.view
                             }
                         }
@@ -88,6 +84,8 @@ struct TabSelectionView: View {
                                     .matchedGeometryEffect(id: "capsule", in: animation)
                             }
                         }
+                        .focusable()
+                        .accessibilityHint("Switches the notch to the \(tab.label) tab")
                     }
                 }
                 .clipShape(Capsule())
@@ -103,9 +101,19 @@ struct TabSelectionView: View {
                             } else if value.translation.width > 40 {
                                 switchTab(by: -1)
                             }
-                            withAnimation(.snappy) { dragOffset = 0 }
+                            withAnimation(BoringMotion.animation(.snappy)) { dragOffset = 0 }
                         }
                 )
+                .onKeyPress(.leftArrow) {
+                    switchTab(by: -1)
+                    return .handled
+                }
+                .onKeyPress(.rightArrow) {
+                    switchTab(by: 1)
+                    return .handled
+                }
+                .accessibilityElement(children: .contain)
+                .accessibilityLabel("Notch tabs")
             }
         }
         .onAppear(perform: ensureCurrentViewVisible)
@@ -119,7 +127,7 @@ struct TabSelectionView: View {
         let views = visibleTabs.map(\.view)
         guard !views.isEmpty else { return }
         guard !views.contains(coordinator.currentView) else { return }
-        withAnimation(.smooth) {
+        withAnimation(BoringMotion.animation(.smooth)) {
             coordinator.currentView = views[0]
         }
     }

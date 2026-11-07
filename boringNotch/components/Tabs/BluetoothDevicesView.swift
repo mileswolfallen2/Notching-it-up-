@@ -66,7 +66,10 @@ struct BluetoothDevicesView: View {
         }
         .padding(.horizontal, 3)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .animation(.spring(response: 0.32, dampingFraction: 0.82), value: devices)
+        .animation(
+            BoringMotion.animation(.spring(response: 0.32, dampingFraction: 0.82)),
+            value: devices
+        )
     }
 
     private var emptyState: some View {
@@ -113,7 +116,7 @@ struct BluetoothDevicesView: View {
         }
         .buttonStyle(.plain)
         .onHover { emptyStateHovering = $0 }
-        .animation(.easeOut(duration: 0.15), value: emptyStateHovering)
+        .animation(BoringMotion.animation(.easeOut(duration: 0.15)), value: emptyStateHovering)
         .help("Open Bluetooth settings")
     }
 
@@ -188,7 +191,7 @@ private struct BluetoothDeviceRow: View {
         .opacity(appeared ? 1 : 0)
         .offset(y: appeared ? 0 : 6)
         .onAppear {
-            withAnimation(.easeOut(duration: 0.28)) {
+            withAnimation(BoringMotion.animation(.easeOut(duration: 0.28))) {
                 appeared = true
             }
         }
@@ -206,7 +209,7 @@ private struct BluetoothDeviceRow: View {
                     .contentTransition(.numericText())
             }
             .foregroundStyle(batteryColor)
-            .animation(.easeOut(duration: 0.25), value: level)
+            .animation(BoringMotion.animation(.easeOut(duration: 0.25)), value: level)
         } else {
             Text("Not reported")
                 .font(.system(size: 9.5, weight: .medium, design: .rounded))
@@ -261,6 +264,6 @@ private extension View {
                 )
         )
         .scaleEffect(hovering ? 1.01 : 1)
-        .animation(.spring(response: 0.28, dampingFraction: 0.72), value: hovering)
+        .animation(BoringMotion.animation(.spring(response: 0.28, dampingFraction: 0.72)), value: hovering)
     }
 }

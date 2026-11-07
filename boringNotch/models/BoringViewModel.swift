@@ -95,7 +95,7 @@ class BoringViewModel: NSObject, ObservableObject {
             .removeDuplicates()
             .receive(on: RunLoop.main)
             .sink { [weak self] shouldHide in
-                withAnimation(.smooth) {
+                withAnimation(BoringMotion.animation(.smooth)) {
                     self?.hideOnClosed = shouldHide
                 }
             }

@@ -13,6 +13,13 @@ import UserNotifications
 /// Hidden settings pane used while testing the app. It is only reachable after
 /// selecting About and pressing Command-7.
 struct DeveloperSettings: View {
+    private enum DeveloperTab: String, CaseIterable, Identifiable {
+        case general = "General"
+        case motion = "Motion"
+
+        var id: String { rawValue }
+    }
+
     private enum PermissionKind: String, CaseIterable, Identifiable {
         case calendar
         case reminders
@@ -152,16 +159,28 @@ struct DeveloperSettings: View {
     @State private var showResetPermissionsConfirmation = false
     @State private var showResetPermissionsResult = false
     @State private var showResetDataConfirmation = false
+    @State private var selectedTab: DeveloperTab = .general
 
     let lock: () -> Void
 
     var body: some View {
-        Form {
-            developerModeSection
-            permissionsSection
-            diagnosticsSection
-            maintenanceSection
-            dangerZoneSection
+        VStack(spacing: 0) {
+            Picker("Developer section", selection: $selectedTab) {
+                ForEach(DeveloperTab.allCases) { tab in
+                    Text(tab.rawValue).tag(tab)
+                }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .padding(.horizontal, 20)
+            .padding(.vertical, 10)
+
+            switch selectedTab {
+            case .general:
+                generalForm
+            case .motion:
+                MotionLabView()
+            }
         }
         .navigationTitle("Developer")
         .task {
@@ -208,6 +227,16 @@ struct DeveloperSettings: View {
             Text(
                 "Some permissions may require a restart before they can be requested again."
             )
+        }
+    }
+
+    private var generalForm: some View {
+        Form {
+            developerModeSection
+            permissionsSection
+            diagnosticsSection
+            maintenanceSection
+            dangerZoneSection
         }
     }
 

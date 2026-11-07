@@ -155,7 +155,7 @@ struct AIUsageView: View {
         }
         .buttonStyle(.plain)
         .onHover { emptyStateHovering = $0 }
-        .animation(.easeOut(duration: 0.15), value: emptyStateHovering)
+        .animation(BoringMotion.animation(.easeOut(duration: 0.15)), value: emptyStateHovering)
     }
 }
 
@@ -212,8 +212,8 @@ private struct AIUsageCard: View {
                     style: StrokeStyle(lineWidth: 4, lineCap: .round)
                 )
                 .rotationEffect(.degrees(-90))
-                .animation(.easeOut(duration: 0.65), value: appeared)
-                .animation(.easeOut(duration: 0.35), value: entry.clampedPercent)
+                .animation(BoringMotion.animation(.easeOut(duration: 0.65)), value: appeared)
+                .animation(BoringMotion.animation(.easeOut(duration: 0.35)), value: entry.clampedPercent)
 
             Text(percentageText)
                 .font(.system(size: 15, weight: .bold, design: .rounded))
@@ -267,8 +267,8 @@ private struct AICompactUsageCard: View {
                         style: StrokeStyle(lineWidth: 3, lineCap: .round)
                     )
                     .rotationEffect(.degrees(-90))
-                    .animation(.easeOut(duration: 0.55), value: appeared)
-                    .animation(.easeOut(duration: 0.35), value: entry.clampedPercent)
+                    .animation(BoringMotion.animation(.easeOut(duration: 0.55)), value: appeared)
+                    .animation(BoringMotion.animation(.easeOut(duration: 0.35)), value: entry.clampedPercent)
 
                 Text(percentageText)
                     .font(.system(size: 12, weight: .bold, design: .rounded))
@@ -320,7 +320,7 @@ private extension View {
                 )
         )
         .scaleEffect(hovering ? 1.02 : 1)
-        .animation(.spring(response: 0.28, dampingFraction: 0.72), value: hovering)
+        .animation(BoringMotion.animation(.spring(response: 0.28, dampingFraction: 0.72)), value: hovering)
     }
 }
 
