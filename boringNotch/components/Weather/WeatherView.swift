@@ -30,22 +30,30 @@ struct WeatherView: View {
         !configuredLocation.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
+    private var cityName: String {
+        if let snapshot = manager.snapshot {
+            return snapshot.location.displayName
+        }
+        let trimmed = configuredLocation.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? "No city" : trimmed
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: NotchPanelStyle.spacing) {
+        VStack(alignment: .leading, spacing: 5) {
             header
 
-            Group {
-                if let snapshot = manager.snapshot {
-                    weatherCard(for: snapshot)
-                } else if manager.isLoading {
-                    loadingCard
-                } else {
-                    emptyCard
-                }
+            if let snapshot = manager.snapshot {
+                snapshotCard(snapshot)
+            } else {
+                statusCard
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 
-            footer
+            Spacer(minLength: 0)
+
+            Text("Open-Meteo")
+                .font(.system(size: 8, weight: .medium, design: .rounded))
+                .foregroundStyle(NotchPanelStyle.secondaryText)
+                .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .padding(.horizontal, 3)
         .padding(.bottom, 8)
@@ -56,11 +64,7 @@ struct WeatherView: View {
     }
 
     private var header: some View {
-        NotchPanelHeader(
-            icon: "cloud.sun.fill",
-            title: "Weather",
-            detail: manager.snapshot?.location.displayName ?? (hasLocation ? configuredLocation : "No city selected")
-        ) {
+        NotchPanelHeader(icon: "cloud.sun.fill", title: "Weather", detail: cityName) {
             HStack(spacing: 2) {
                 Button {
                     manager.refresh()
@@ -82,7 +86,6 @@ struct WeatherView: View {
                 .disabled(manager.isLoading)
                 .help("Refresh weather")
                 .accessibilityLabel("Refresh weather")
-                .accessibilityHint("Fetches the latest conditions for the selected city")
 
                 Button {
                     openWeatherSettings()
@@ -96,25 +99,38 @@ struct WeatherView: View {
                 .buttonStyle(.plain)
                 .help("Configure weather")
                 .accessibilityLabel("Configure weather")
-                .accessibilityHint("Opens Weather settings")
             }
         }
     }
 
-    // MARK: Current conditions
+    // MARK: Snapshot
 
-    private func weatherCard(for snapshot: WeatherSnapshot) -> some View {
-        HStack(alignment: .top, spacing: 10) {
-            currentConditions(for: snapshot)
-            Rectangle()
-                .fill(NotchPanelStyle.border)
-                .frame(width: 1)
-                .padding(.vertical, 4)
-            forecast(for: snapshot)
+    private func snapshotCard(_ snapshot: WeatherSnapshot) -> some View {
+        HStack(alignment: .center, spacing: 14) {
+            VStack(alignment: .leading, spacing: 1) {
+                HStack(alignment: .firstTextBaseline, spacing: 1) {
+                    Text(temperatureUnit.string(fromCelsius: snapshot.current.temperatureC, includeUnit: false))
+                        .font(.system(size: 34, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                    Text(temperatureUnit.shortLabel)
+                        .font(.system(size: 11, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.55))
+                }
+
+                Text(snapshot.current.condition.description)
+                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.7))
+                    .lineLimit(1)
+            }
+            .frame(width: 92, alignment: .leading)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(currentAccessibilityLabel(snapshot))
+
+            forecast(snapshot)
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: NotchPanelStyle.cornerRadius, style: .continuous)
                 .fill(NotchPanelStyle.background)
@@ -125,69 +141,19 @@ struct WeatherView: View {
         )
     }
 
-    private func currentConditions(for snapshot: WeatherSnapshot) -> some View {
-        let current = snapshot.current
-        let today = snapshot.daily.first
-
-        return VStack(alignment: .leading, spacing: 2) {
-            HStack(alignment: .firstTextBaseline, spacing: 1) {
-                Text(temperatureUnit.string(fromCelsius: current.temperatureC, includeUnit: false))
-                    .font(.system(size: 32, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                Text(temperatureUnit.shortLabel)
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.7))
-            }
-
-            Text(current.condition.description)
-                .font(.system(size: 10, weight: .medium, design: .rounded))
-                .foregroundStyle(.white.opacity(0.86))
-                .lineLimit(1)
-
-            Text("Feels like \(temperatureUnit.string(fromCelsius: current.apparentTemperatureC))")
-                .font(.system(size: 9, weight: .medium, design: .rounded))
-                .foregroundStyle(NotchPanelStyle.secondaryText)
-                .lineLimit(1)
-
-            if let today {
-                Text("H \(temperatureUnit.string(fromCelsius: today.highC))  L \(temperatureUnit.string(fromCelsius: today.lowC))")
-                    .font(.system(size: 9, weight: .medium, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.6))
-                    .lineLimit(1)
-            }
-
-            HStack(spacing: 7) {
-                Label(
-                    temperatureUnit.windString(fromKilometersPerHour: current.windSpeedKph),
-                    systemImage: "wind"
-                )
-                if let humidity = current.relativeHumidity {
-                    Label("\(humidity)%", systemImage: "humidity.fill")
-                }
-            }
-            .font(.system(size: 8, weight: .medium, design: .rounded))
-            .foregroundStyle(NotchPanelStyle.secondaryText)
-            .lineLimit(1)
-        }
-        .frame(width: 150, alignment: .leading)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(accessibilitySummary(for: snapshot))
-    }
-
-    private func forecast(for snapshot: WeatherSnapshot) -> some View {
+    private func forecast(_ snapshot: WeatherSnapshot) -> some View {
         HStack(spacing: 0) {
             ForEach(snapshot.daily) { day in
-                forecastColumn(for: day, isToday: day.id == snapshot.daily.first?.id)
+                dayColumn(day, isToday: day.id == snapshot.daily.first?.id)
                     .frame(maxWidth: .infinity)
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private func forecastColumn(for day: WeatherDaily, isToday: Bool) -> some View {
-        VStack(spacing: 3) {
+    private func dayColumn(_ day: WeatherDaily, isToday: Bool) -> some View {
+        VStack(spacing: 4) {
             Text(day.date.formatted(.dateTime.weekday(.abbreviated)))
-                .font(.system(size: 9, weight: isToday ? .bold : .semibold, design: .rounded))
+                .font(.system(size: 9, weight: isToday ? .bold : .medium, design: .rounded))
                 .foregroundStyle(isToday ? .white : NotchPanelStyle.secondaryText)
                 .lineLimit(1)
 
@@ -197,90 +163,58 @@ struct WeatherView: View {
                 .foregroundStyle(.white.opacity(0.9))
                 .frame(height: 17)
 
-            Text("\(temperatureUnit.string(fromCelsius: day.highC, includeUnit: false))°")
-                .font(.system(size: 11, weight: .semibold, design: .rounded))
-                .foregroundStyle(.white)
-                .lineLimit(1)
-
-            Text("\(temperatureUnit.string(fromCelsius: day.lowC, includeUnit: false))°")
-                .font(.system(size: 9, weight: .medium, design: .rounded))
-                .foregroundStyle(NotchPanelStyle.secondaryText)
-                .lineLimit(1)
+            HStack(spacing: 3) {
+                Text(temperatureUnit.string(fromCelsius: day.highC, includeUnit: false))
+                    .foregroundStyle(.white)
+                Text(temperatureUnit.string(fromCelsius: day.lowC, includeUnit: false))
+                    .foregroundStyle(NotchPanelStyle.secondaryText)
+            }
+            .font(.system(size: 9, weight: .semibold, design: .rounded))
+            .monospacedDigit()
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(accessibilityLabel(for: day, isToday: isToday))
+        .accessibilityLabel(dayAccessibilityLabel(day, isToday: isToday))
     }
 
-    // MARK: Loading and empty states
+    // MARK: Empty and loading
 
-    private var loadingCard: some View {
-        HStack(spacing: 10) {
-            ProgressView()
-                .controlSize(.small)
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Loading weather")
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                Text("Fetching conditions for \(configuredLocation)")
-                    .font(.system(size: 9, weight: .medium, design: .rounded))
-                    .foregroundStyle(NotchPanelStyle.secondaryText)
-                    .lineLimit(1)
+    private var statusCard: some View {
+        HStack(spacing: 8) {
+            if manager.isLoading {
+                ProgressView()
+                    .controlSize(.small)
+            } else {
+                Image(systemName: hasLocation ? "exclamationmark.triangle" : "mappin.and.ellipse")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.55))
             }
-            Spacer()
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 14)
-        .frame(maxWidth: .infinity, minHeight: 92, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: NotchPanelStyle.cornerRadius, style: .continuous)
-                .fill(NotchPanelStyle.background)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: NotchPanelStyle.cornerRadius, style: .continuous)
-                .strokeBorder(NotchPanelStyle.border, lineWidth: 1)
-        )
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Loading weather for \(configuredLocation)")
-    }
 
-    private var emptyCard: some View {
-        HStack(spacing: 10) {
-            Image(systemName: hasLocation ? "cloud.slash.fill" : "mappin.and.ellipse")
-                .font(.system(size: 20, weight: .medium))
-                .foregroundStyle(.white.opacity(0.55))
-                .frame(width: 28, height: 28)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(hasLocation ? "Weather unavailable" : "Choose a city")
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                Text(manager.errorMessage ?? "Set a location in Weather settings to see conditions and a five-day forecast.")
-                    .font(.system(size: 9, weight: .medium, design: .rounded))
-                    .foregroundStyle(NotchPanelStyle.secondaryText)
-                    .lineLimit(2)
-            }
+            Text(statusText)
+                .font(.system(size: 10, weight: .medium, design: .rounded))
+                .foregroundStyle(.white.opacity(0.7))
+                .lineLimit(2)
 
             Spacer(minLength: 8)
 
-            if hasLocation {
-                Button("Retry") {
-                    manager.refresh()
+            if !manager.isLoading {
+                if hasLocation {
+                    Button("Retry") {
+                        manager.refresh()
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.mini)
+                } else {
+                    Button("Settings") {
+                        openWeatherSettings()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.mini)
                 }
-                .buttonStyle(.bordered)
-                .controlSize(.mini)
-                .accessibilityLabel("Retry loading weather")
-            } else {
-                Button("Open Settings") {
-                    openWeatherSettings()
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.mini)
-                .accessibilityLabel("Open Weather settings")
             }
         }
         .padding(.horizontal, 12)
-        .padding(.vertical, 12)
-        .frame(maxWidth: .infinity, minHeight: 92, alignment: .leading)
+        .padding(.vertical, 10)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: NotchPanelStyle.cornerRadius, style: .continuous)
                 .fill(NotchPanelStyle.background)
@@ -289,68 +223,44 @@ struct WeatherView: View {
             RoundedRectangle(cornerRadius: NotchPanelStyle.cornerRadius, style: .continuous)
                 .strokeBorder(NotchPanelStyle.border, lineWidth: 1)
         )
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel(hasLocation ? "Weather unavailable" : "No city selected")
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(statusText)
     }
 
-    private var footer: some View {
-        HStack(spacing: 4) {
-            if let error = manager.errorMessage, manager.snapshot != nil {
-                Text(error)
-                    .foregroundStyle(.orange.opacity(0.9))
-                    .lineLimit(1)
-            } else if let lastUpdated = manager.lastUpdated {
-                Text("Updated \(lastUpdated.formatted(date: .omitted, time: .shortened))")
-            }
-            Spacer(minLength: 4)
-            Text("Open-Meteo")
+    private var statusText: String {
+        if manager.isLoading {
+            return "Loading weather"
         }
-        .font(.system(size: 8, weight: .medium, design: .rounded))
-        .foregroundStyle(NotchPanelStyle.secondaryText)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(weatherFooterAccessibilityLabel)
+        if !hasLocation {
+            return "Choose a city in Weather settings"
+        }
+        return manager.errorMessage ?? "Weather unavailable"
     }
 
     // MARK: Accessibility
 
-    private func accessibilitySummary(for snapshot: WeatherSnapshot) -> String {
-        let current = snapshot.current
+    private func currentAccessibilityLabel(_ snapshot: WeatherSnapshot) -> String {
         var parts = [
             snapshot.location.displayName,
-            current.condition.description,
-            temperatureUnit.spokenTemperature(fromCelsius: current.temperatureC),
-            "feels like \(temperatureUnit.spokenTemperature(fromCelsius: current.apparentTemperatureC))",
+            snapshot.current.condition.description,
+            temperatureUnit.spokenTemperature(fromCelsius: snapshot.current.temperatureC),
         ]
         if let today = snapshot.daily.first {
             parts.append("high \(temperatureUnit.spokenTemperature(fromCelsius: today.highC))")
             parts.append("low \(temperatureUnit.spokenTemperature(fromCelsius: today.lowC))")
         }
-        parts.append("wind \(temperatureUnit.windString(fromKilometersPerHour: current.windSpeedKph))")
-        if let humidity = current.relativeHumidity {
-            parts.append("humidity \(humidity) percent")
-        }
         return parts.joined(separator: ", ")
     }
 
-    private func accessibilityLabel(for day: WeatherDaily, isToday: Bool) -> String {
-        var parts = [isToday ? "Today" : day.date.formatted(.dateTime.weekday(.wide))]
-        parts.append(day.condition.description)
-        parts.append("high \(temperatureUnit.spokenTemperature(fromCelsius: day.highC))")
-        parts.append("low \(temperatureUnit.spokenTemperature(fromCelsius: day.lowC))")
-        if let precipitation = day.precipitationProbability, precipitation > 0 {
-            parts.append("\(precipitation) percent chance of precipitation")
-        }
-        return parts.joined(separator: ", ")
-    }
-
-    private var weatherFooterAccessibilityLabel: String {
-        if let error = manager.errorMessage, manager.snapshot != nil {
-            return "\(error). Weather data from Open-Meteo."
-        }
-        if let lastUpdated = manager.lastUpdated {
-            return "Updated \(lastUpdated.formatted(date: .omitted, time: .shortened)). Weather data from Open-Meteo."
-        }
-        return "Weather data from Open-Meteo."
+    private func dayAccessibilityLabel(_ day: WeatherDaily, isToday: Bool) -> String {
+        let weekday = isToday ? "Today" : day.date.formatted(.dateTime.weekday(.wide))
+        return [
+            weekday,
+            day.condition.description,
+            "high \(temperatureUnit.spokenTemperature(fromCelsius: day.highC))",
+            "low \(temperatureUnit.spokenTemperature(fromCelsius: day.lowC))",
+        ]
+        .joined(separator: ", ")
     }
 }
 
@@ -360,7 +270,6 @@ struct WeatherSettings: View {
     @ObservedObject private var manager = WeatherManager.shared
     @Default(.weatherLocation) private var location
     @Default(.weatherTemperatureUnit) private var temperatureUnit
-    @Default(.showWeatherTab) private var showWeatherTab
 
     var body: some View {
         Form {
@@ -368,11 +277,7 @@ struct WeatherSettings: View {
                 Defaults.Toggle(key: .showWeatherTab) {
                     Label("Show Weather tab in the notch", systemImage: "cloud.sun.fill")
                 }
-            } header: {
-                Text("Notch")
-            }
 
-            Section {
                 TextField("City", text: $location)
                     .textFieldStyle(.roundedBorder)
                     .onSubmit {
@@ -385,59 +290,48 @@ struct WeatherSettings: View {
                     }
                 }
                 .pickerStyle(.segmented)
-            } header: {
-                Text("Location")
-            } footer: {
-                Text("Enter a city name and press Return. Notching it up looks up the city with Open-Meteo; it does not use Location Services or ask for a location permission.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
 
-            Section {
                 HStack(spacing: 8) {
-                    if manager.isLoading {
-                        ProgressView()
-                            .controlSize(.small)
-                        Text("Updating weather…")
-                            .foregroundStyle(.secondary)
-                    } else if let error = manager.errorMessage {
-                        Label(error, systemImage: "exclamationmark.triangle.fill")
-                            .foregroundStyle(.orange)
-                    } else if let lastUpdated = manager.lastUpdated {
-                        Text("Last updated \(lastUpdated.formatted(date: .abbreviated, time: .shortened))")
-                            .foregroundStyle(.secondary)
-                    } else {
-                        Text("Weather has not been loaded yet.")
-                            .foregroundStyle(.secondary)
-                    }
+                    statusLabel
 
                     Spacer()
 
-                    Button("Refresh now") {
+                    Button("Refresh") {
                         manager.refresh()
                     }
                     .controlSize(.small)
                     .disabled(manager.isLoading)
                 }
             } header: {
-                Text("Status")
-            }
-
-            Section {
+                Text("Weather")
+            } footer: {
                 if let url = URL(string: "https://open-meteo.com/") {
                     Link("Weather data by Open-Meteo", destination: url)
                         .font(.caption)
                 }
-                Text("Open-Meteo provides free weather forecasts for non-commercial use. Notching it up sends only the city name and coordinates needed for the forecast.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            } header: {
-                Text("Data")
             }
         }
         .navigationTitle("Weather")
         .task {
             manager.refreshIfNeeded()
+        }
+    }
+
+    @ViewBuilder
+    private var statusLabel: some View {
+        if manager.isLoading {
+            ProgressView()
+                .controlSize(.small)
+        } else if let error = manager.errorMessage {
+            Text(error)
+                .foregroundStyle(.orange)
+                .lineLimit(1)
+        } else if let lastUpdated = manager.lastUpdated {
+            Text("Updated \(lastUpdated.formatted(date: .omitted, time: .shortened))")
+                .foregroundStyle(.secondary)
+        } else {
+            Text("Not loaded yet")
+                .foregroundStyle(.secondary)
         }
     }
 }

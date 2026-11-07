@@ -730,6 +730,9 @@
         }
       }
     },
+    "%@°" : {
+
+    },
     "%d%%" : {
       "localizations" : {
         "ar" : {
@@ -929,6 +932,12 @@
           }
         }
       }
+    },
+    "%lld completed work sessions" : {
+
+    },
+    "%lld percent" : {
+
     },
     "%lld%%" : {
       "localizations" : {
@@ -1632,6 +1641,9 @@
           }
         }
       }
+    },
+    "Accessibility" : {
+
     },
     "Accessibility access is required to show HUD controls in the notch." : {
       "localizations" : {
@@ -3267,6 +3279,12 @@
     "Automation" : {
 
     },
+    "Bars animate while playing." : {
+
+    },
+    "Bars are still." : {
+
+    },
     "Battery" : {
       "localizations" : {
         "ar" : {
@@ -4376,6 +4394,12 @@
         }
       }
     },
+    "Change usage" : {
+
+    },
+    "Change volume" : {
+
+    },
     "Charging" : {
       "localizations" : {
         "ar" : {
@@ -4677,6 +4701,9 @@
       }
     },
     "Checking your account…" : {
+
+    },
+    "Choose a city" : {
 
     },
     "Choose a Music Source" : {
@@ -5188,6 +5215,9 @@
         }
       }
     },
+    "City" : {
+
+    },
     "Clear" : {
 
     },
@@ -5397,6 +5427,9 @@
         }
       }
     },
+    "Close camera preview" : {
+
+    },
     "Close gesture" : {
       "localizations" : {
         "ar" : {
@@ -5496,6 +5529,9 @@
           }
         }
       }
+    },
+    "Close preview" : {
+
     },
     "Closed Notch" : {
       "localizations" : {
@@ -5903,6 +5939,12 @@
     "Configure AI usage" : {
 
     },
+    "Configure weather" : {
+
+    },
+    "Connect" : {
+
+    },
     "Connect headphones or speakers to see them here." : {
 
     },
@@ -6005,6 +6047,9 @@
           }
         }
       }
+    },
+    "Controls and content" : {
+
     },
     "Copied" : {
 
@@ -6219,6 +6264,9 @@
       }
     },
     "Crash Reports" : {
+
+    },
+    "Current behavior" : {
 
     },
     "Currently selected: %@" : {
@@ -7032,6 +7080,9 @@
     "Danger Zone" : {
 
     },
+    "Data" : {
+
+    },
     "Data Folder" : {
 
     },
@@ -7134,6 +7185,9 @@
           }
         }
       }
+    },
+    "Deletes the saved note" : {
+
     },
     "Description" : {
       "extractionState" : "stale",
@@ -7240,6 +7294,9 @@
 
     },
     "Developer mode" : {
+
+    },
+    "Developer section" : {
 
     },
     "Diagnostics" : {
@@ -7446,6 +7503,9 @@
           }
         }
       }
+    },
+    "Disconnect" : {
+
     },
     "Display" : {
 
@@ -7953,6 +8013,9 @@
           }
         }
       }
+    },
+    "Each preview uses the same motion helpers as the live app. Turn Reduce motion on and replay a test to confirm it becomes instant." : {
+
     },
     "Easily copy, store, and manage your most-used content. Upgrade now for advanced features like multi-item storage and quick access!" : {
       "localizations" : {
@@ -9165,6 +9228,9 @@
         }
       }
     },
+    "Enter a city name and press Return. Notching it up looks up the city with Open-Meteo; it does not use Location Services or ask for a location permission." : {
+
+    },
     "Enter this code on the website:" : {
 
     },
@@ -9469,6 +9535,15 @@
         }
       }
     },
+    "Feels like %@" : {
+
+    },
+    "Fetches the latest conditions for the selected city" : {
+
+    },
+    "Fetching conditions for %@" : {
+
+    },
     "Files dropped on the shelf will be shared via this service" : {
       "localizations" : {
         "ar" : {
@@ -9668,6 +9743,12 @@
           }
         }
       }
+    },
+    "Follow system Reduce Motion" : {
+
+    },
+    "Full motion" : {
+
     },
     "Full screen behavior" : {
       "localizations" : {
@@ -10469,6 +10550,19 @@
         }
       }
     },
+    "H %@  L %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "H %1$@  L %2$@"
+          }
+        }
+      }
+    },
+    "Headphones connected" : {
+
+    },
     "Hidden" : {
 
     },
@@ -10975,6 +11069,9 @@
     "Hide from the notch" : {
 
     },
+    "Hide panel" : {
+
+    },
     "Hide title bar" : {
       "localizations" : {
         "ar" : {
@@ -11074,6 +11171,9 @@
           }
         }
       }
+    },
+    "Hide volume slider" : {
+
     },
     "Hierarchical" : {
       "localizations" : {
@@ -11374,6 +11474,9 @@
           }
         }
       }
+    },
+    "Hover the heart to check the shared highlight animation." : {
+
     },
     "https://github.com/pear-devs/pear-desktop" : {
       "localizations" : {
@@ -11979,7 +12082,16 @@
         }
       }
     },
+    "Join" : {
+
+    },
+    "Join %@" : {
+
+    },
     "Last synced %@" : {
+
+    },
+    "Last updated %@" : {
 
     },
     "Later" : {
@@ -12092,7 +12204,19 @@
     "Live" : {
 
     },
+    "Live activity content" : {
+
+    },
     "Live from your account" : {
+
+    },
+    "Loading weather" : {
+
+    },
+    "Loading weather for %@" : {
+
+    },
+    "Location" : {
 
     },
     "Lock Panel" : {
@@ -12399,6 +12523,9 @@
       }
     },
     "macOS only asks when a feature needs access. Here is what each permission is for." : {
+
+    },
+    "macOS Reduce Motion is on" : {
 
     },
     "Made with ❤️ by miles allen" : {
@@ -14119,6 +14246,15 @@
         }
       }
     },
+    "Motion" : {
+
+    },
+    "Motion settings" : {
+
+    },
+    "Moves to the next Pomodoro phase" : {
+
+    },
     "Music Player" : {
 
     },
@@ -14622,10 +14758,16 @@
         }
       }
     },
+    "Next step" : {
+
+    },
     "No AI plans added yet" : {
 
     },
     "No audio devices" : {
+
+    },
+    "No city selected" : {
 
     },
     "No custom animation available" : {
@@ -15235,6 +15377,12 @@
     "Not reported" : {
 
     },
+    "Notch" : {
+
+    },
+    "Notch and navigation" : {
+
+    },
     "Notch behavior" : {
       "localizations" : {
         "ar" : {
@@ -15334,6 +15482,9 @@
           }
         }
       }
+    },
+    "Notch controls" : {
+
     },
     "Notch height on non-notch displays" : {
       "localizations" : {
@@ -15535,6 +15686,9 @@
         }
       }
     },
+    "Notch open and close preview" : {
+
+    },
     "Notch preview" : {
 
     },
@@ -15637,6 +15791,9 @@
           }
         }
       }
+    },
+    "Notch tabs" : {
+
     },
     "Notching it up" : {
       "localizations" : {
@@ -15857,6 +16014,9 @@
         }
       }
     },
+    "Open camera preview" : {
+
+    },
     "Open Notch" : {
       "localizations" : {
         "ar" : {
@@ -16057,6 +16217,9 @@
         }
       }
     },
+    "Open preview" : {
+
+    },
     "Open Privacy Settings" : {
 
     },
@@ -16164,6 +16327,12 @@
     "Open Reminders settings" : {
 
     },
+    "Open settings" : {
+
+    },
+    "Open Settings" : {
+
+    },
     "Open shelf by default if items are present" : {
       "localizations" : {
         "ar" : {
@@ -16263,6 +16432,21 @@
           }
         }
       }
+    },
+    "Open Weather settings" : {
+
+    },
+    "Open-Meteo" : {
+
+    },
+    "Open-Meteo provides free weather forecasts for non-commercial use. Notching it up sends only the city name and coordinates needed for the forecast." : {
+
+    },
+    "Opens the Notching it up settings window" : {
+
+    },
+    "Opens Weather settings" : {
+
     },
     "Option key behaviour" : {
       "localizations" : {
@@ -16367,7 +16551,13 @@
     "Overview" : {
 
     },
+    "Panel content" : {
+
+    },
     "Pause" : {
+
+    },
+    "Pause bars" : {
 
     },
     "Permissions" : {
@@ -16485,6 +16675,9 @@
     "Play" : {
 
     },
+    "Play bars" : {
+
+    },
     "Plugged In" : {
       "localizations" : {
         "ar" : {
@@ -16586,6 +16779,9 @@
       }
     },
     "Pomodoro durations" : {
+
+    },
+    "Pomodoro progress" : {
 
     },
     "Preferred display" : {
@@ -16789,6 +16985,9 @@
       }
     },
     "Progress bar thickness" : {
+
+    },
+    "Quick notes" : {
 
     },
     "Quick Share" : {
@@ -17191,10 +17390,25 @@
         }
       }
     },
+    "Reduce motion" : {
+
+    },
+    "Reduce Motion freezes scrolling and keeps the full title readable." : {
+
+    },
+    "Reduced" : {
+
+    },
+    "Reduces decorative animations, blinking, marquee scrolling, and visualizer movement. Keyboard focus and VoiceOver labels remain available." : {
+
+    },
     "Refresh now" : {
 
     },
     "Refresh usage" : {
+
+    },
+    "Refresh weather" : {
 
     },
     "Refreshing…" : {
@@ -17807,6 +18021,9 @@
         }
       }
     },
+    "Replay all tests" : {
+
+    },
     "Request Accessibility" : {
       "localizations" : {
         "ar" : {
@@ -18059,6 +18276,9 @@
     "Resets" : {
 
     },
+    "Resets the current phase" : {
+
+    },
     "Resetting app data restores the first-run state and relaunches the app. It does not delete files that were added to the shelf." : {
 
     },
@@ -18276,6 +18496,12 @@
 
     },
     "Restore every setting to its default and remove local sign-ins, notes, and saved shelf entries. Notching it up will restart." : {
+
+    },
+    "Retry" : {
+
+    },
+    "Retry loading weather" : {
 
     },
     "Ring color" : {
@@ -20021,6 +20247,9 @@
         }
       }
     },
+    "Show panel" : {
+
+    },
     "Show percentage" : {
       "localizations" : {
         "ar" : {
@@ -20530,7 +20759,19 @@
     "Show track progress bar" : {
 
     },
+    "Show volume slider" : {
+
+    },
     "Show volume, brightness, and keyboard backlight in the notch instead of the default macOS HUD." : {
+
+    },
+    "Show Weather tab in the notch" : {
+
+    },
+    "Shows controls for the current player's volume" : {
+
+    },
+    "Shows or hides the camera preview in the notch" : {
 
     },
     "Sign in" : {
@@ -21175,6 +21416,12 @@
     "Start" : {
 
     },
+    "Starts or pauses the current Pomodoro phase" : {
+
+    },
+    "Status" : {
+
+    },
     "Stopped" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -21376,6 +21623,12 @@
           }
         }
       }
+    },
+    "Switch artwork" : {
+
+    },
+    "Switches the notch to the %@ tab" : {
+
     },
     "Sync usage from signed-in accounts" : {
 
@@ -21584,6 +21837,15 @@
       }
     },
     "Tabs" : {
+
+    },
+    "Temperature unit" : {
+
+    },
+    "The current player does not support volume control" : {
+
+    },
+    "The face blinks every three seconds. Reduce Motion stops the timer." : {
 
     },
     "The shelf is disabled, so its tab stays hidden." : {
@@ -22116,6 +22378,9 @@
         }
       }
     },
+    "Type a note. Changes are saved automatically." : {
+
+    },
     "Type a quick note…" : {
 
     },
@@ -22519,6 +22784,12 @@
           }
         }
       }
+    },
+    "Updated %@" : {
+
+    },
+    "Updating weather…" : {
+
     },
     "Upgrade to Pro" : {
       "localizations" : {
@@ -23329,10 +23600,28 @@
         }
       }
     },
+    "Volume" : {
+
+    },
     "Waiting for approval…" : {
 
     },
     "Waiting for the first sync" : {
+
+    },
+    "Weather" : {
+
+    },
+    "Weather data by Open-Meteo" : {
+
+    },
+    "Weather has not been loaded yet." : {
+
+    },
+    "Weather unavailable" : {
+
+    },
+    "Weather, music, calendar" : {
 
     },
     "Welcome" : {
