@@ -163,7 +163,6 @@ This project is a fork of [**Boring Notch**](https://github.com/TheBoredTeam/bor
 
 ### Original Credits
 - Icon credits: [@maxtron95](https://github.com/maxtron95)
-- Website credits: [@himanshhhhuv](https://github.com/himanshhhhuv)
 
 For a full list of licenses and attributions, see [Third-Party Licenses](./THIRD_PARTY_LICENSES.md).
 
