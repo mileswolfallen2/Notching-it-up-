@@ -75,7 +75,7 @@ struct TabSelectionView: View {
                                 coordinator.currentView = tab.view
                             }
                         }
-                        .frame(height: 30)
+                        .frame(height: 26)
                         .foregroundStyle(tab.view == coordinator.currentView ? .white : .gray)
                         .background {
                             if tab.view == coordinator.currentView {

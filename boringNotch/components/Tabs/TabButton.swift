@@ -21,6 +21,7 @@ struct TabButton: View {
             Image(systemName: icon)
                 .font(.system(size: 12.5, weight: .medium))
                 .padding(.horizontal, horizontalPadding)
+                .padding(.vertical, 5)
                 .background(
                     Capsule()
                         .fill(selected ? Color.clear : Color.white.opacity(hovering ? 0.06 : 0))

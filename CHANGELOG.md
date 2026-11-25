@@ -15,7 +15,7 @@ All notable changes to Notching it up are documented here.
 
 ### Changed
 
-- Top-bar tab buttons are slightly taller, so the hover and selected capsules read as round instead of flat.
+- The unselected top-bar tab hover highlight is taller and rounder; the selected capsule is unchanged.
 - Hover-to-open is now off by default. Turn on "Open notch on hover" in Settings to open the notch by hovering over it.
 - Hovering the closed-notch visualizer no longer opens the notch, so the play or pause control stays usable.
 - Settings, onboarding, and the notch now share one reduced-motion policy instead of animating individually, so enabling the option takes effect consistently across the app.
