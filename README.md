@@ -33,7 +33,7 @@ I believe the core app should come first. It should be fast, polished, useful, c
 - **Camera Mirror** - Quick mirror view right from the notch
 - **Pomodoro Timer** - Run focused work and break sessions without leaving the notch
 - **Quick Notes** - Keep a persistent scratchpad in the notch for short notes and reminders
-- **AI Usage Dashboard** - Sign in to Claude, ChatGPT, GitHub Copilot, or Antigravity for live limits, choose a ring color style, track other plans manually, and keep credentials in local app storage. Signed-in accounts appear in the notch automatically; manual plans are opt-in.
+- **AI Chat & Usage Dashboard** - Chat inside the AI tab with Apple Intelligence on supported Macs (with an on/off switch), the Claude, ChatGPT, Antigravity, or Copilot account you already signed in, or a local Ollama model. Usage limits sit beside chat, with ring color styles, manual plans, and credentials kept in local app storage.
 - **Customizable** - Tweak the notch to fit your needs with gestures, sizing, and more
 - **Configurable layout** - Choose which tabs appear in the open notch and arrange them to fit your workflow
 - **Keyboard shortcuts** - Open the notch, trigger sneak peek, and access supported panels without reaching for the mouse
@@ -230,6 +230,7 @@ For a full list of licenses and attributions, see [Third-Party Licenses](./THIRD
 - [x] **Pomodoro timer foundation** - Configure work, short-break, and long-break durations
 - [x] **Quick notes tab** - Keep a persistent scratchpad in the notch
 - [x] **AI usage dashboard** - Live account sync for supported providers, manual fallback, reset countdowns, and low-usage alerts
+- [x] **AI chat** - Apple Intelligence, signed-in provider accounts, and Ollama in the AI tab
 - [x] **Weather tab** - Manual city lookup, current conditions, five-day forecast, Celsius or Fahrenheit, and Open-Meteo attribution
 - [x] **Reduced motion and VoiceOver support** - Follow macOS Reduce Motion, opt into reduced motion, and use accessible labels and keyboard navigation across the notch
 - [x] **Developer Motion tab** - Preview every app animation with and without reduced motion

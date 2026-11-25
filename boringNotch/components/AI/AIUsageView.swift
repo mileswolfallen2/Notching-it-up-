@@ -9,7 +9,7 @@ import Defaults
 import SwiftUI
 
 /// Opens the settings window directly on the AI Usage pane.
-private func openAIUsageSettings() {
+func openAIUsageSettings() {
     DispatchQueue.main.async {
         SettingsWindowController.shared.showWindow()
         // On a cold open the pane starts observing only after the window mounts.
@@ -21,10 +21,26 @@ private func openAIUsageSettings() {
 
 // MARK: - Notch panel
 
+private enum AITabMode: String, CaseIterable, Identifiable {
+    case chat
+    case usage
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .chat:  return "Chat"
+        case .usage: return "Usage"
+        }
+    }
+}
+
 struct AIUsageView: View {
     @ObservedObject private var store = AIUsageStore.shared
     @Default(.aiSortByLowest) private var sortByLowest
     @Default(.aiCompactCards) private var compactCards
+    @Default(.aiChatProvider) private var chatProvider
+    @State private var mode: AITabMode = .chat
     @State private var emptyStateHovering = false
 
     private var visibleEntries: [AIUsageEntry] {
@@ -49,37 +65,48 @@ struct AIUsageView: View {
         VStack(alignment: .leading, spacing: NotchPanelStyle.spacing) {
             header
 
-            if visibleEntries.isEmpty {
-                emptyState
+            if mode == .chat {
+                AIChatPanel()
             } else {
-                TimelineView(.periodic(from: .now, by: 30)) { _ in
-                    ScrollView(.horizontal) {
-                        HStack(spacing: compactCards ? 7 : 9) {
-                            ForEach(visibleEntries) { entry in
-                                card(for: entry)
-                            }
-                        }
-                        .padding(.vertical, 1)
-                    }
-                    .scrollIndicators(.never)
-                }
+                usageContent
             }
-
-            Spacer(minLength: 0)
         }
         .padding(.horizontal, 3)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
+    @ViewBuilder
+    private var usageContent: some View {
+        if visibleEntries.isEmpty {
+            emptyState
+        } else {
+            TimelineView(.periodic(from: .now, by: 30)) { _ in
+                ScrollView(.horizontal) {
+                    HStack(spacing: compactCards ? 7 : 9) {
+                        ForEach(visibleEntries) { entry in
+                            card(for: entry)
+                        }
+                    }
+                    .padding(.vertical, 1)
+                }
+                .scrollIndicators(.never)
+            }
+        }
+
+        Spacer(minLength: 0)
+    }
+
     private var header: some View {
         NotchPanelHeader(
-            icon: "sparkles",
-            title: "AI Usage",
-            detail: summaryText,
-            detailTint: .white.opacity(store.lowPlanCount > 0 ? 0.9 : 0.42)
+            icon: mode == .chat ? "bubble.left.and.bubble.right.fill" : "sparkles",
+            title: mode == .chat ? "AI Chat" : "AI Usage",
+            detail: mode == .chat ? chatProvider.label : summaryText,
+            detailTint: .white.opacity(mode == .usage && store.lowPlanCount > 0 ? 0.9 : 0.42)
         ) {
             HStack(spacing: 4) {
-                if !store.syncing.isEmpty {
+                modeSwitch
+
+                if mode == .usage && !store.syncing.isEmpty {
                     ProgressView()
                         .controlSize(.mini)
                         .scaleEffect(0.7)
@@ -95,9 +122,36 @@ struct AIUsageView: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .help("Configure AI usage")
+                .help("Configure AI")
             }
         }
+    }
+
+    private var modeSwitch: some View {
+        HStack(spacing: 1) {
+            ForEach(AITabMode.allCases) { item in
+                Button {
+                    withAnimation(BoringMotion.animation(.easeOut(duration: 0.16))) {
+                        mode = item
+                    }
+                } label: {
+                    Text(item.label)
+                        .font(.system(size: 9, weight: .semibold, design: .rounded))
+                        .foregroundStyle(mode == item ? .white.opacity(0.9) : .white.opacity(0.42))
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 3)
+                        .background(
+                            Capsule()
+                                .fill(mode == item ? Color.white.opacity(0.12) : Color.clear)
+                        )
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("\(item.label) view")
+            }
+        }
+        .padding(2)
+        .background(Capsule().fill(Color.white.opacity(0.05)))
     }
 
     @ViewBuilder
@@ -424,6 +478,7 @@ struct AIUsageSettings: View {
     var body: some View {
         Form {
             connectionSection
+            AIChatSettingsSection()
             overviewSection
             displaySection
             automationSection

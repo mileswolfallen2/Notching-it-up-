@@ -635,7 +635,7 @@ final class AIAuthService {
     private static let claudeTokenURL = URL(string: "https://platform.claude.com/v1/oauth/token")!
     private static let claudeUsageURL = URL(string: "https://api.anthropic.com/api/oauth/usage")!
     private static let claudeProfileURL = URL(string: "https://api.anthropic.com/api/oauth/profile")!
-    private static let claudeScopes = "user:profile"
+    private static let claudeScopes = "user:profile user:inference"
 
     private func signInClaude() async throws -> AIAccount {
         let pkce = PKCE.generate()
@@ -999,8 +999,7 @@ final class AIAuthService {
                 response = try await AIHTTP.postJSON(Self.claudeTokenURL, fields: [
                     "grant_type": "refresh_token",
                     "refresh_token": refreshToken,
-                    "client_id": Self.claudeClientID,
-                    "scope": Self.claudeScopes
+                    "client_id": Self.claudeClientID
                 ])
             } catch let error as AIAuthError {
                 throw mapRefreshError(error, provider: .claude)

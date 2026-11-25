@@ -440,6 +440,20 @@ extension Defaults.Keys {
     static let aiLowUsageAlerts = Key<Bool>("aiLowUsageAlerts", default: true)
     static let aiLowUsageThreshold = Key<Double>("aiLowUsageThreshold", default: 20)
 
+    // MARK: AI chat
+    static let aiChatUseAppleIntelligence = Key<Bool>("aiChatUseAppleIntelligence", default: true)
+    static let aiChatProvider = Key<AIChatProvider>("aiChatProvider", default: .apple)
+    static let aiChatOllamaBaseURL = Key<String>("aiChatOllamaBaseURL", default: "http://localhost:11434")
+    static let aiChatOllamaModel = Key<String>("aiChatOllamaModel", default: "llama3.2")
+    static let aiChatClaudeModel = Key<String>("aiChatClaudeModel", default: "claude-sonnet-4-5")
+    static let aiChatCodexModel = Key<String>("aiChatCodexModel", default: "gpt-5")
+    static let aiChatAntigravityModel = Key<String>("aiChatAntigravityModel", default: "gemini-2.5-pro")
+    static let aiChatCopilotModel = Key<String>("aiChatCopilotModel", default: "gpt-4.1")
+    static let aiChatSystemPrompt = Key<String>(
+        "aiChatSystemPrompt",
+        default: "You are a concise, helpful assistant in the macOS notch. Keep replies short and practical."
+    )
+
     // MARK: Timer
     static let timerWorkDuration = Key<Int>("timerWorkDuration", default: 25)
     static let timerShortBreakDuration = Key<Int>("timerShortBreakDuration", default: 5)

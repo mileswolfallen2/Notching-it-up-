@@ -710,6 +710,12 @@
         }
       }
     },
+    "%@ is thinking…" : {
+
+    },
+    "%@ view" : {
+
+    },
     "%@, %@ remaining, %@" : {
       "localizations" : {
         "en" : {
@@ -729,9 +735,6 @@
           }
         }
       }
-    },
-    "%@°" : {
-
     },
     "%d%%" : {
       "localizations" : {
@@ -2670,6 +2673,9 @@
     "Animate Bluetooth connections" : {
 
     },
+    "Antigravity" : {
+
+    },
     "App icon" : {
       "localizations" : {
         "ar" : {
@@ -2869,6 +2875,12 @@
           }
         }
       }
+    },
+    "Apple Intelligence requires macOS 26 or later on a supported Mac. Choose another provider for now." : {
+
+    },
+    "Ask %@ anything" : {
+
     },
     "Auto-scroll to next event" : {
       "localizations" : {
@@ -4600,6 +4612,18 @@
         }
       }
     },
+    "Chat" : {
+
+    },
+    "Chat appears in the AI tab next to usage. It reuses the Claude, ChatGPT, Antigravity, and Copilot sign-ins above. Apple Intelligence and Ollama answer on this Mac." : {
+
+    },
+    "ChatGPT" : {
+
+    },
+    "Check connection" : {
+
+    },
     "Check for Updates…" : {
       "localizations" : {
         "ar" : {
@@ -4703,7 +4727,7 @@
     "Checking your account…" : {
 
     },
-    "Choose a city" : {
+    "Checking…" : {
 
     },
     "Choose a Music Source" : {
@@ -5006,6 +5030,9 @@
         }
       }
     },
+    "Choose chat provider" : {
+
+    },
     "Choose the tabs you want to see in the notch. You can change this later in Settings." : {
 
     },
@@ -5216,6 +5243,9 @@
       }
     },
     "City" : {
+
+    },
+    "Claude" : {
 
     },
     "Clear" : {
@@ -5936,13 +5966,16 @@
     "Compact rings" : {
 
     },
-    "Configure AI usage" : {
+    "Configure AI" : {
 
     },
     "Configure weather" : {
 
     },
     "Connect" : {
+
+    },
+    "Connect %@ to chat" : {
 
     },
     "Connect headphones or speakers to see them here." : {
@@ -6052,6 +6085,9 @@
 
     },
     "Copied" : {
+
+    },
+    "Copilot" : {
 
     },
     "Copy Device Name" : {
@@ -7080,9 +7116,6 @@
     "Danger Zone" : {
 
     },
-    "Data" : {
-
-    },
     "Data Folder" : {
 
     },
@@ -7185,6 +7218,9 @@
           }
         }
       }
+    },
+    "Default provider" : {
+
     },
     "Deletes the saved note" : {
 
@@ -9228,9 +9264,6 @@
         }
       }
     },
-    "Enter a city name and press Return. Notching it up looks up the city with Open-Meteo; it does not use Location Services or ask for a location permission." : {
-
-    },
     "Enter this code on the website:" : {
 
     },
@@ -9534,15 +9567,6 @@
           }
         }
       }
-    },
-    "Feels like %@" : {
-
-    },
-    "Fetches the latest conditions for the selected city" : {
-
-    },
-    "Fetching conditions for %@" : {
-
     },
     "Files dropped on the shelf will be shared via this service" : {
       "localizations" : {
@@ -10550,16 +10574,6 @@
         }
       }
     },
-    "H %@  L %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "H %1$@  L %2$@"
-          }
-        }
-      }
-    },
     "Headphones connected" : {
 
     },
@@ -11478,6 +11492,9 @@
     "Hover the heart to check the shared highlight animation." : {
 
     },
+    "http://localhost:11434" : {
+
+    },
     "https://github.com/pear-devs/pear-desktop" : {
       "localizations" : {
         "ar" : {
@@ -12091,9 +12108,6 @@
     "Last synced %@" : {
 
     },
-    "Last updated %@" : {
-
-    },
     "Later" : {
 
     },
@@ -12208,15 +12222,6 @@
 
     },
     "Live from your account" : {
-
-    },
-    "Loading weather" : {
-
-    },
-    "Loading weather for %@" : {
-
-    },
-    "Location" : {
 
     },
     "Lock Panel" : {
@@ -14146,6 +14151,12 @@
         }
       }
     },
+    "Model" : {
+
+    },
+    "Model overrides" : {
+
+    },
     "More" : {
       "localizations" : {
         "ar" : {
@@ -14758,6 +14769,9 @@
         }
       }
     },
+    "New chat" : {
+
+    },
     "Next step" : {
 
     },
@@ -14765,9 +14779,6 @@
 
     },
     "No audio devices" : {
-
-    },
-    "No city selected" : {
 
     },
     "No custom animation available" : {
@@ -15274,6 +15285,9 @@
     "No plans visible" : {
 
     },
+    "Not loaded yet" : {
+
+    },
     "Not Now" : {
       "localizations" : {
         "ar" : {
@@ -15375,9 +15389,6 @@
       }
     },
     "Not reported" : {
-
-    },
-    "Notch" : {
 
     },
     "Notch and navigation" : {
@@ -16330,9 +16341,6 @@
     "Open settings" : {
 
     },
-    "Open Settings" : {
-
-    },
     "Open shelf by default if items are present" : {
       "localizations" : {
         "ar" : {
@@ -16433,19 +16441,10 @@
         }
       }
     },
-    "Open Weather settings" : {
-
-    },
     "Open-Meteo" : {
 
     },
-    "Open-Meteo provides free weather forecasts for non-commercial use. Notching it up sends only the city name and coordinates needed for the forecast." : {
-
-    },
     "Opens the Notching it up settings window" : {
-
-    },
-    "Opens Weather settings" : {
 
     },
     "Option key behaviour" : {
@@ -17400,6 +17399,9 @@
 
     },
     "Reduces decorative animations, blinking, marquee scrolling, and visualizer movement. Keyboard focus and VoiceOver labels remain available." : {
+
+    },
+    "Refresh" : {
 
     },
     "Refresh now" : {
@@ -18501,9 +18503,6 @@
     "Retry" : {
 
     },
-    "Retry loading weather" : {
-
-    },
     "Ring color" : {
 
     },
@@ -18914,7 +18913,13 @@
         }
       }
     },
+    "Send" : {
+
+    },
     "Send test notification" : {
+
+    },
+    "Server" : {
 
     },
     "Sessions before long break: %lld" : {
@@ -21422,6 +21427,9 @@
     "Status" : {
 
     },
+    "Stop replying" : {
+
+    },
     "Stopped" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -21835,6 +21843,9 @@
           }
         }
       }
+    },
+    "System prompt" : {
+
     },
     "Tabs" : {
 
@@ -22788,9 +22799,6 @@
     "Updated %@" : {
 
     },
-    "Updating weather…" : {
-
-    },
     "Upgrade to Pro" : {
       "localizations" : {
         "ar" : {
@@ -23613,12 +23621,6 @@
 
     },
     "Weather data by Open-Meteo" : {
-
-    },
-    "Weather has not been loaded yet." : {
-
-    },
-    "Weather unavailable" : {
 
     },
     "Weather, music, calendar" : {
