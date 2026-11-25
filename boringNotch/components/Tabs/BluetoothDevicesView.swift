@@ -113,6 +113,7 @@ struct BluetoothDevicesView: View {
                         style: StrokeStyle(lineWidth: 1, dash: [4, 4])
                     )
             )
+            .notchHoverShadow(emptyStateHovering)
         }
         .buttonStyle(.plain)
         .onHover { emptyStateHovering = $0 }
@@ -263,6 +264,7 @@ private extension View {
                     lineWidth: 1
                 )
         )
+        .notchHoverShadow(hovering)
         .scaleEffect(hovering ? 1.01 : 1)
         .animation(BoringMotion.animation(.spring(response: 0.28, dampingFraction: 0.72)), value: hovering)
     }

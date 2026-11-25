@@ -39,8 +39,9 @@ struct AIUsageView: View {
     @ObservedObject private var store = AIUsageStore.shared
     @Default(.aiSortByLowest) private var sortByLowest
     @Default(.aiCompactCards) private var compactCards
+    @Default(.aiChatEnabled) private var chatEnabled
     @Default(.aiChatProvider) private var chatProvider
-    @State private var mode: AITabMode = .chat
+    @State private var mode: AITabMode = Defaults[.aiChatEnabled] ? .chat : .usage
     @State private var emptyStateHovering = false
 
     private var visibleEntries: [AIUsageEntry] {
@@ -65,7 +66,7 @@ struct AIUsageView: View {
         VStack(alignment: .leading, spacing: NotchPanelStyle.spacing) {
             header
 
-            if mode == .chat {
+            if chatEnabled && mode == .chat {
                 AIChatPanel()
             } else {
                 usageContent
@@ -73,6 +74,11 @@ struct AIUsageView: View {
         }
         .padding(.horizontal, 3)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .onChange(of: chatEnabled) { _, enabled in
+            withAnimation(BoringMotion.animation(.easeOut(duration: 0.16))) {
+                mode = enabled ? .chat : .usage
+            }
+        }
     }
 
     @ViewBuilder
@@ -98,13 +104,13 @@ struct AIUsageView: View {
 
     private var header: some View {
         NotchPanelHeader(
-            icon: mode == .chat ? "bubble.left.and.bubble.right.fill" : "sparkles",
-            title: mode == .chat ? "AI Chat" : "AI Usage",
-            detail: mode == .chat ? chatProvider.label : summaryText,
+            icon: chatEnabled && mode == .chat ? "bubble.left.and.bubble.right.fill" : "sparkles",
+            title: chatEnabled && mode == .chat ? "AI Chat" : "AI Usage",
+            detail: chatEnabled && mode == .chat ? chatProvider.label : summaryText,
             detailTint: .white.opacity(mode == .usage && store.lowPlanCount > 0 ? 0.9 : 0.42)
         ) {
             HStack(spacing: 4) {
-                modeSwitch
+                if chatEnabled { modeSwitch }
 
                 if mode == .usage && !store.syncing.isEmpty {
                     ProgressView()
@@ -206,6 +212,7 @@ struct AIUsageView: View {
                         style: StrokeStyle(lineWidth: 1, dash: [4, 4])
                     )
             )
+            .notchHoverShadow(emptyStateHovering)
         }
         .buttonStyle(.plain)
         .onHover { emptyStateHovering = $0 }
@@ -373,6 +380,7 @@ private extension View {
                     lineWidth: 1
                 )
         )
+        .notchHoverShadow(hovering)
         .scaleEffect(hovering ? 1.02 : 1)
         .animation(BoringMotion.animation(.spring(response: 0.28, dampingFraction: 0.72)), value: hovering)
     }

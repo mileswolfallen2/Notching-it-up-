@@ -25,6 +25,7 @@ struct WeatherView: View {
     @ObservedObject private var manager = WeatherManager.shared
     @Default(.weatherLocation) private var configuredLocation
     @Default(.weatherTemperatureUnit) private var temperatureUnit
+    @State private var cardHovering = false
 
     private var hasLocation: Bool {
         !configuredLocation.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -139,6 +140,8 @@ struct WeatherView: View {
             RoundedRectangle(cornerRadius: NotchPanelStyle.cornerRadius, style: .continuous)
                 .strokeBorder(NotchPanelStyle.border, lineWidth: 1)
         )
+        .notchHoverShadow(cardHovering)
+        .onHover { cardHovering = $0 }
     }
 
     private func forecast(_ snapshot: WeatherSnapshot) -> some View {
@@ -225,6 +228,8 @@ struct WeatherView: View {
         )
         .accessibilityElement(children: .combine)
         .accessibilityLabel(statusText)
+        .notchHoverShadow(cardHovering)
+        .onHover { cardHovering = $0 }
     }
 
     private var statusText: String {

@@ -385,6 +385,7 @@ private struct AIChatBubble: View {
 struct AIChatSettingsSection: View {
     @ObservedObject private var usageStore = AIUsageStore.shared
 
+    @Default(.aiChatEnabled) private var chatEnabled
     @Default(.aiChatProvider) private var provider
     @Default(.aiChatUseAppleIntelligence) private var useAppleIntelligence
     @Default(.aiChatOllamaBaseURL) private var ollamaBaseURL
@@ -426,113 +427,123 @@ struct AIChatSettingsSection: View {
 
     var body: some View {
         Section {
-            Defaults.Toggle("Use Apple Intelligence when available", key: .aiChatUseAppleIntelligence)
+            Defaults.Toggle("Show chat in the AI tab", key: .aiChatEnabled)
 
-            Picker("Default provider", selection: $provider) {
-                ForEach(AIChatProvider.allCases) { item in
-                    Text(item.label).tag(item)
+            if chatEnabled {
+                Defaults.Toggle("Use Apple Intelligence when available", key: .aiChatUseAppleIntelligence)
+
+                Picker("Default provider", selection: $provider) {
+                    ForEach(AIChatProvider.allCases) { item in
+                        Text(item.label).tag(item)
+                    }
                 }
-            }
 
-            LabeledContent("Status", value: providerStatus)
-                .font(.caption)
+                LabeledContent("Status", value: providerStatus)
+                    .font(.caption)
 
-            if provider == .apple && !AIChatProvider.appleSupported {
-                Label(
-                    "Apple Intelligence requires macOS 26 or later on a supported Mac. Choose another provider for now.",
-                    systemImage: "info.circle"
-                )
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            }
+                if provider == .apple && !AIChatProvider.appleSupported {
+                    Label(
+                        "Apple Intelligence requires macOS 26 or later on a supported Mac. Choose another provider for now.",
+                        systemImage: "info.circle"
+                    )
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
 
-            if provider == .apple && AIChatProvider.appleSupported && !useAppleIntelligence {
-                Label(
-                    "Apple Intelligence is off. Turn the switch above back on to use it for chat.",
-                    systemImage: "info.circle"
-                )
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            }
+                if provider == .apple && AIChatProvider.appleSupported && !useAppleIntelligence {
+                    Label(
+                        "Apple Intelligence is off. Turn the switch above back on to use it for chat.",
+                        systemImage: "info.circle"
+                    )
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
 
-            if provider == .ollama {
-                TextField(
-                    "Server",
-                    text: $ollamaBaseURL,
-                    prompt: Text("http://localhost:11434")
-                )
-                .textFieldStyle(.roundedBorder)
+                if provider == .ollama {
+                    TextField(
+                        "Server",
+                        text: $ollamaBaseURL,
+                        prompt: Text("http://localhost:11434")
+                    )
+                    .textFieldStyle(.roundedBorder)
 
-                TextField(
-                    "Model",
-                    text: $ollamaModel,
-                    prompt: Text(AIChatProvider.ollama.defaultModel)
-                )
-                .textFieldStyle(.roundedBorder)
+                    TextField(
+                        "Model",
+                        text: $ollamaModel,
+                        prompt: Text(AIChatProvider.ollama.defaultModel)
+                    )
+                    .textFieldStyle(.roundedBorder)
 
-                HStack(spacing: 10) {
-                    Button(checkingOllama ? "Checking…" : "Check connection") {
-                        checkingOllama = true
-                        Task {
-                            ollamaStatus = await AIChatService.checkOllama()
-                            checkingOllama = false
+                    HStack(spacing: 10) {
+                        Button(checkingOllama ? "Checking…" : "Check connection") {
+                            checkingOllama = true
+                            Task {
+                                ollamaStatus = await AIChatService.checkOllama()
+                                checkingOllama = false
+                            }
+                        }
+                        .controlSize(.small)
+                        .disabled(checkingOllama)
+
+                        if let ollamaStatus {
+                            Text(ollamaStatus)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(2)
                         }
                     }
-                    .controlSize(.small)
-                    .disabled(checkingOllama)
-
-                    if let ollamaStatus {
-                        Text(ollamaStatus)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(2)
-                    }
                 }
-            }
 
-            DisclosureGroup("Model overrides") {
-                TextField(
-                    "Claude",
-                    text: $claudeModel,
-                    prompt: Text(AIChatProvider.claude.defaultModel)
-                )
-                .textFieldStyle(.roundedBorder)
+                DisclosureGroup("Model overrides") {
+                    TextField(
+                        "Claude",
+                        text: $claudeModel,
+                        prompt: Text(AIChatProvider.claude.defaultModel)
+                    )
+                    .textFieldStyle(.roundedBorder)
 
-                TextField(
-                    "ChatGPT",
-                    text: $codexModel,
-                    prompt: Text(AIChatProvider.codex.defaultModel)
-                )
-                .textFieldStyle(.roundedBorder)
+                    TextField(
+                        "ChatGPT",
+                        text: $codexModel,
+                        prompt: Text(AIChatProvider.codex.defaultModel)
+                    )
+                    .textFieldStyle(.roundedBorder)
 
-                TextField(
-                    "Antigravity",
-                    text: $antigravityModel,
-                    prompt: Text(AIChatProvider.antigravity.defaultModel)
-                )
-                .textFieldStyle(.roundedBorder)
+                    TextField(
+                        "Antigravity",
+                        text: $antigravityModel,
+                        prompt: Text(AIChatProvider.antigravity.defaultModel)
+                    )
+                    .textFieldStyle(.roundedBorder)
 
-                TextField(
-                    "Copilot",
-                    text: $copilotModel,
-                    prompt: Text(AIChatProvider.copilot.defaultModel)
-                )
-                .textFieldStyle(.roundedBorder)
+                    TextField(
+                        "Copilot",
+                        text: $copilotModel,
+                        prompt: Text(AIChatProvider.copilot.defaultModel)
+                    )
+                    .textFieldStyle(.roundedBorder)
 
-                TextField(
-                    "System prompt",
-                    text: $systemPrompt,
-                    axis: .vertical
-                )
-                .lineLimit(2...4)
-                .textFieldStyle(.roundedBorder)
+                    TextField(
+                        "System prompt",
+                        text: $systemPrompt,
+                        axis: .vertical
+                    )
+                    .lineLimit(2...4)
+                    .textFieldStyle(.roundedBorder)
+                }
             }
         } header: {
             Text("Chat")
         } footer: {
-            Text("Chat appears in the AI tab next to usage. It reuses the Claude, ChatGPT, Antigravity, and Copilot sign-ins above. Apple Intelligence and Ollama answer on this Mac.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            if chatEnabled {
+                Text("Chat appears in the AI tab next to usage. It reuses the Claude, ChatGPT, Antigravity, and Copilot sign-ins above. Apple Intelligence and Ollama answer on this Mac.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
+                Text("Chat is off by default. Turn on “Show chat in the AI tab” above to use it.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
         .onChange(of: provider) { _, _ in
             ollamaStatus = nil

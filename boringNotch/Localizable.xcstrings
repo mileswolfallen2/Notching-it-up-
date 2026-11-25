@@ -726,6 +726,16 @@
         }
       }
     },
+    "%@: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
     "%@: %lld minutes" : {
       "localizations" : {
         "en" : {
@@ -2876,6 +2886,9 @@
         }
       }
     },
+    "Apple Intelligence is off. Turn the switch above back on to use it for chat." : {
+
+    },
     "Apple Intelligence requires macOS 26 or later on a supported Mac. Choose another provider for now." : {
 
     },
@@ -4618,6 +4631,12 @@
     "Chat appears in the AI tab next to usage. It reuses the Claude, ChatGPT, Antigravity, and Copilot sign-ins above. Apple Intelligence and Ollama answer on this Mac." : {
 
     },
+    "Chat is off by default. Turn on “Show chat in the AI tab” above to use it." : {
+
+    },
+    "Chat provider: %@" : {
+
+    },
     "ChatGPT" : {
 
     },
@@ -5039,6 +5058,9 @@
     "Choose what to use" : {
 
     },
+    "Choose which provider answers chat" : {
+
+    },
     "Choose which service to use when sharing files from the shelf. Click the shelf button to select files, or drag files onto it to share immediately." : {
       "localizations" : {
         "ar" : {
@@ -5353,6 +5375,9 @@
           }
         }
       }
+    },
+    "Clears the current conversation" : {
+
     },
     "Click to copy to clipboard" : {
 
@@ -13851,6 +13876,9 @@
         }
       }
     },
+    "Message %@" : {
+
+    },
     "Mic %@" : {
       "localizations" : {
         "ar" : {
@@ -18916,6 +18944,9 @@
     "Send" : {
 
     },
+    "Send message" : {
+
+    },
     "Send test notification" : {
 
     },
@@ -21427,6 +21458,9 @@
     "Status" : {
 
     },
+    "Stop reply" : {
+
+    },
     "Stop replying" : {
 
     },
@@ -22388,6 +22422,9 @@
           }
         }
       }
+    },
+    "Type a message, then press Return to send" : {
+
     },
     "Type a note. Changes are saved automatically." : {
 

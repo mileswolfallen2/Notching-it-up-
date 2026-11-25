@@ -33,7 +33,7 @@ I believe the core app should come first. It should be fast, polished, useful, c
 - **Camera Mirror** - Quick mirror view right from the notch
 - **Pomodoro Timer** - Run focused work and break sessions without leaving the notch
 - **Quick Notes** - Keep a persistent scratchpad in the notch for short notes and reminders
-- **AI Chat & Usage Dashboard** - Chat inside the AI tab with Apple Intelligence on supported Macs (with an on/off switch), the Claude, ChatGPT, Antigravity, or Copilot account you already signed in, or a local Ollama model. Usage limits sit beside chat, with ring color styles, manual plans, and credentials kept in local app storage.
+- **AI Chat & Usage Dashboard** - Chat is off by default; turn it on in AI settings, then use Apple Intelligence on supported Macs (with its own switch), the Claude, ChatGPT, Antigravity, or Copilot account you already signed in, or a local Ollama model. Usage limits sit beside chat, with ring color styles, manual plans, and credentials kept in local app storage.
 - **Customizable** - Tweak the notch to fit your needs with gestures, sizing, and more
 - **Configurable layout** - Choose which tabs appear in the open notch and arrange them to fit your workflow
 - **Keyboard shortcuts** - Open the notch, trigger sneak peek, and access supported panels without reaching for the mouse

@@ -441,6 +441,7 @@ extension Defaults.Keys {
     static let aiLowUsageThreshold = Key<Double>("aiLowUsageThreshold", default: 20)
 
     // MARK: AI chat
+    static let aiChatEnabled = Key<Bool>("aiChatEnabled", default: false)
     static let aiChatUseAppleIntelligence = Key<Bool>("aiChatUseAppleIntelligence", default: true)
     static let aiChatProvider = Key<AIChatProvider>("aiChatProvider", default: .apple)
     static let aiChatOllamaBaseURL = Key<String>("aiChatOllamaBaseURL", default: "http://localhost:11434")

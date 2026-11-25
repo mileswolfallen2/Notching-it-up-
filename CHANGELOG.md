@@ -1,7 +1,7 @@
 # Changelog
 
 All notable changes to Notching it up are documented here.
-## [Unreleased]
+## [0.2.6.2]
 
 ### Added
 
@@ -11,7 +11,7 @@ All notable changes to Notching it up are documented here.
 - A Motion tab in the hidden Developer panel. It previews the notch spring, tab capsule, panel transition, live activity, idle face, visualizer, marquee, album-art crossfade, slider, AI ring, HUD, hover feedback, and onboarding step, so each animation can be checked with and without reduced motion.
 - A Join button in the Calendar list for Zoom, Google Meet, Microsoft Teams, Webex, Whereby, and Jitsi meetings. It appears 15 minutes before the event starts and stays visible while the meeting is in progress.
 - Hovering the music visualizer in the closed notch now blurs it and shows a play or pause button, so playback can be controlled without opening the notch.
-- Chat in the AI tab. Switch between Chat and Usage, then ask Apple Intelligence on supported Macs, the Claude, ChatGPT, Antigravity, or Copilot account already signed in for usage, or a local Ollama server. Apple Intelligence has its own on/off switch, and provider and model are configurable in AI settings with a check for Ollama connectivity.
+- Chat in the AI tab, off by default. Turn on “Show chat in the AI tab” in AI settings, then switch between Chat and Usage to ask Apple Intelligence on supported Macs, the Claude, ChatGPT, Antigravity, or Copilot account already signed in for usage, or a local Ollama server. Apple Intelligence has its own on/off switch, and provider and model are configurable in AI settings with a check for Ollama connectivity.
 
 ### Changed
 
@@ -22,6 +22,7 @@ All notable changes to Notching it up are documented here.
 ### Fixed
 
 - The open-notch shadow now follows the full height of the open notch on every tab instead of shrinking to match the current tab's content.
+- Card hover shadows in the AI, Bluetooth, and Weather tabs now share the notch's shadow style at 80% size, so hover feedback is consistent across tabs.
 - Hardened several crash-prone paths: empty download lists, duplicate Bluetooth device addresses, missing battery data, screen lookups, and removing a custom visualizer no longer force-unwrap values or trap.
 - Stopped the idle face and music visualizer timers when their views go away, so timers no longer accumulate across repeated opens.
 - Fixed main-actor isolation issues in the display cache and the Shelf open-with panel.

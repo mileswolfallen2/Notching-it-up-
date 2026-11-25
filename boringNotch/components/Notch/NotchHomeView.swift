@@ -24,6 +24,27 @@ enum NotchPanelStyle {
     static let activeBorder = Color.white.opacity(0.22)
     static let hoverBorder = Color.white.opacity(0.24)
     static let secondaryText = Color.white.opacity(0.42)
+
+    /// The notch drop shadow is black at 0.7 opacity with a 6/4 point radius.
+    /// Cards reuse the same shadow at 80% of its radius so hover feedback
+    /// matches the window without overpowering the small cards.
+    static var hoverShadowColor: Color {
+        Defaults[.enableShadow] ? Color.black.opacity(0.7) : .clear
+    }
+
+    static var hoverShadowRadius: CGFloat {
+        (Defaults[.cornerRadiusScaling] ? 6 : 4) * 0.8
+    }
+}
+
+extension View {
+    /// Matches the notch shadow at 80% size for hovered cards in any tab.
+    func notchHoverShadow(_ hovering: Bool) -> some View {
+        shadow(
+            color: hovering ? NotchPanelStyle.hoverShadowColor : .clear,
+            radius: NotchPanelStyle.hoverShadowRadius
+        )
+    }
 }
 
 /// Icon, title, optional detail, and trailing controls for a notch tab.
