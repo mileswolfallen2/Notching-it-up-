@@ -1,7 +1,7 @@
 # Changelog
 
 All notable changes to Notching it up are documented here.
-## [0.2.6.2]
+## [0.2.6.3]
 
 ### Added
 
